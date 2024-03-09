@@ -1,0 +1,35 @@
+.greet {
+    text-align: center;
+    margin-top: 50px;
+    font-size: 200%;
+}
+
+.buttons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 2 columns by default */
+    gap: 10px;
+    justify-items: center;
+    align-items: center;
+}
+
+.buttons button {
+    background-color: black;
+    color: white;
+    padding: 20%; /* Reduced padding */
+    width: 90%;
+    font-size: 200%; /* Reduced font size */
+    border: none;
+    cursor: pointer;
+    border-radius: 5%;
+}
+
+.buttons button:hover {
+    background-color: #444;
+}
+
+/* When the viewport is 600px or less, switch to 1 column */
+@media (max-width: 1050px) {
+    .buttons {
+        grid-template-columns: 1fr;
+    }
+}
