@@ -1,0 +1,145 @@
+-- Table ClientsBailleurs
+CREATE TABLE ClientsBailleurs (
+  ID_ClientBailleur INT PRIMARY KEY,
+  Nom VARCHAR(255),
+  Prenom VARCHAR(255),
+  AdresseMail VARCHAR(255),
+  MotDePasse VARCHAR(255),
+  Admin BOOLEAN
+);
+
+-- Table Voyageurs
+CREATE TABLE Voyageurs (
+  ID_Voyageur INT PRIMARY KEY,
+  Nom VARCHAR(255),
+  Prenom VARCHAR(255),
+  AdresseMail VARCHAR(255),
+  MotDePasse VARCHAR(255),
+  Admin BOOLEAN
+);
+
+-- Table Prestataires
+CREATE TABLE Prestataires (
+  ID_Prestataire INT PRIMARY KEY,
+  Nom VARCHAR(255),
+  Prenom VARCHAR(255),
+  AdresseMail VARCHAR(255),
+  MotDePasse VARCHAR(255),
+  Admin BOOLEAN
+);
+
+
+-- Table BienImo
+CREATE TABLE BienImo (
+  ID_BienImmobilier INT PRIMARY KEY,
+  cheminImg VARCHAR(255),
+  ID_ClientBailleur INT,
+  prix DECIMAL(10, 2),
+  NomBien VARCHAR(255),
+  Description TEXT,
+  StatutValidation INT, -- Utilisation d'un entier pour représenter le statut
+  disponible INT, -- Utilisation d'un entier pour représenter le statut
+  FOREIGN KEY (ID_ClientBailleur) REFERENCES ClientsBailleurs(ID_ClientBailleur)
+);
+
+-- Table Reservation
+CREATE TABLE Reservation (
+  ID_Reservation INT PRIMARY KEY,
+  ID_BienImmobilier INT,
+  ID_ClientVoyageur INT,
+  DateDebut DATE,
+  DateFin DATE,
+  Statut VARCHAR(50),
+  FOREIGN KEY (ID_BienImmobilier) REFERENCES BienImo(ID_BienImmobilier),
+  FOREIGN KEY (ID_ClientVoyageur) REFERENCES voyageurs(ID_Voyageur)
+);
+
+
+-- Table Finances
+CREATE TABLE Finances (
+  ID_Finances INT PRIMARY KEY,
+  ID_ClientBailleur INT,
+  ID_Prestataire INT,
+  Montant DECIMAL(10, 2),
+  Type VARCHAR(50),
+  DateTransaction DATE,
+  FOREIGN KEY (ID_ClientBailleur) REFERENCES ClientsBailleurs(ID_ClientBailleur),
+  FOREIGN KEY (ID_Prestataire) REFERENCES Prestataires(ID_Prestataire)
+);
+
+-- Table Abonnement
+CREATE TABLE Abonnement (
+  ID_Abonnement INT PRIMARY KEY,
+  ID_ClientBailleur INT,
+  ID_Voyageur INT,
+  Nom VARCHAR(255),
+  FOREIGN KEY (ID_ClientBailleur) REFERENCES ClientsBailleurs(ID_ClientBailleur),
+  FOREIGN KEY (ID_Voyageur) REFERENCES Voyageurs(ID_Voyageur),
+  CHECK (
+    (ID_ClientBailleur IS NOT NULL AND ID_Voyageur IS NULL) OR
+    (ID_ClientBailleur IS NULL AND ID_Voyageur IS NOT NULL)
+  )
+); 
+
+-- Table ÉvaluationPrestation
+CREATE TABLE EvaluationPrestation (
+  ID_InterventionPrestataire INT PRIMARY KEY,
+  ID_BienImmobilier INT,
+  ID_Prestataire INT,
+  TypeIntervention VARCHAR(50),
+  FOREIGN KEY (ID_BienImmobilier) REFERENCES BienImo(ID_BienImmobilier),
+  FOREIGN KEY (ID_Prestataire) REFERENCES Prestataires(ID_Prestataire)
+);
+
+-- Table Prestation
+CREATE TABLE Prestation (
+  ID_InterventionPrestataire INT PRIMARY KEY,
+  ID_BienImmobilier INT,
+  ID_Prestataire INT,
+  TypeIntervention VARCHAR(50),
+  FOREIGN KEY (ID_BienImmobilier) REFERENCES BienImo(ID_BienImmobilier),
+  FOREIGN KEY (ID_Prestataire) REFERENCES Prestataires(ID_Prestataire)
+);
+
+-- Table Contrat
+CREATE TABLE Contrat (
+  ID_Contrat INT PRIMARY KEY,
+  ID_Reservation INT,
+  ID_Prestation INT,
+  ID_Prestataire INT,
+  ID_Bailleur INT,
+  ID_Voyageur INT,
+  TypeContrat VARCHAR(50),
+  TypeIntervention VARCHAR(50),
+  DateDebutContrat DATE,
+  DateFinContrat DATE,
+  Statut VARCHAR(50),
+  FOREIGN KEY (ID_Reservation) REFERENCES Reservation(ID_Reservation),
+  FOREIGN KEY (ID_Prestation) REFERENCES Prestation(ID_InterventionPrestataire),
+  FOREIGN KEY (ID_Prestataire) REFERENCES Prestataires(ID_Prestataire),
+  FOREIGN KEY (ID_Bailleur) REFERENCES ClientsBailleurs(ID_ClientBailleur),
+  FOREIGN KEY (ID_Voyageur) REFERENCES Voyageurs(ID_Voyageur)
+);
+
+-- Table Paiement
+CREATE TABLE Paiement (
+  ID_Paiement INT PRIMARY KEY,
+  ID_Reservation INT,
+  Montant DECIMAL(10, 2),
+  DatePaiement DATE,
+  MethodePaiement VARCHAR(50),
+  Statut VARCHAR(50),
+  FOREIGN KEY (ID_Reservation) REFERENCES Reservation(ID_Reservation)
+);
+
+-- Table Facture
+CREATE TABLE Facture (
+  ID_Facture INT PRIMARY KEY,
+  ID_Reservation INT,
+  ID_ClientBailleur INT,
+  MontantTotal DECIMAL(10, 2),
+  DateEmission DATE,
+  FOREIGN KEY (ID_Reservation) REFERENCES Reservation(ID_Reservation),
+  FOREIGN KEY (ID_ClientBailleur) REFERENCES ClientsBailleurs(ID_ClientBailleur)
+);
+
