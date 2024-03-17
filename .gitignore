@@ -1,2 +1,4 @@
 dist
 .envnode_modules
+/back/node_modules/*
+*.log
