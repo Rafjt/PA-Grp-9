@@ -1,0 +1,10 @@
+.custom-margin{
+    margin-left: 100px;
+    margin-right: 800px;
+}
+
+.btn{
+        background-color: #000000;
+        border-color: #000000;
+        padding: 20px 40px;
+    }
