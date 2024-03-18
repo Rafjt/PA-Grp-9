@@ -3,6 +3,7 @@ import Header from './components/header.js';
 import BackOffice from './backOffice.js'; 
 import Footer from './components/footer.js';
 import './App.css';
+import Acceuil from './pages/acceuil.js';
 
 function App() {
   return (
@@ -11,7 +12,7 @@ function App() {
         <Header />
       </div>
       <div className="app">
-        <BackOffice /> {/* use BackOffice */}
+        <Acceuil /> {/* use BackOffice */}
       </div>
       <div className="footer">
       <Footer/>
