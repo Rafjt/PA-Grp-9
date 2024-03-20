@@ -1,19 +1,122 @@
-import './footer.css'
+import "./footer.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 const Footer = () => {
-    return (
-            <div class="footer-content">
-                <h1>Paris Cartaker services</h1>
-                <div className='desc'>
-                    <p>Nous, chez Paris Caretaker Services (PCS), formons une chaîne de conciergeries immobilières spécialisées dans la gestion locative saisonnière, s'inspirant du modèle bien connu d'Airbnb. Notre aventure a débuté en 2018 à Paris, et depuis lors, notre croissance fulgurante découle de notre engagement envers la qualité de l'accueil et la diversité de nos services. Nous offrons une solution complète aux propriétaires cherchant à louer leurs biens, éliminant ainsi la charge administrative associée à la location. Nous prenons en charge chaque étape du processus, du check-in et check-out des clients au nettoyage du logement, de la publication d'annonces attrayantes à la communication avec les voyageurs, en passant par l'entretien et les réparations nécessaires. Notre plateforme en ligne simplifie le processus, permettant aux propriétaires de demander des simulations de devis, tandis que les voyageurs ont accès à une gamme variée de services. Notre modèle économique repose sur des tarifs transparents, généralement 20% du prix de la nuitée de location, avec des frais fixes et logistiques supplémentaires. Grâce à notre succès à Paris, nous avons étendu notre présence à d'autres arrondissements de la capitale ainsi qu'à des destinations touristiques telles que Nice et Biarritz.</p>
-                </div>
-                <ul class="footer-links">
-                    <li><a href="#">Link 1</a></li>
-                    <li><a href="#">Link 2</a></li>
-                    <li><a href="#">Link 3</a></li>
-                </ul>
+  return (
+    <footer class="text-center text-lg-start text-white">
+      <section class="d-flex justify-content-center justify-content-lg-between p-4 border-bottom">
+        <div class="me-5 d-none d-lg-block">
+          <span>Retrouvez-nous sur les réseaux sociaux</span>
+        </div>
+
+        <div>
+          <a href="" class="me-4 text-reset">
+            <i class="fab fa-facebook-f"></i>
+          </a>
+          <a href="" class="me-4 text-reset">
+            <i class="fab fa-twitter"></i>
+          </a>
+          <a href="" class="me-4 text-reset">
+            <i class="fab fa-google"></i>
+          </a>
+          <a href="" class="me-4 text-reset">
+            <i class="fab fa-instagram"></i>
+          </a>
+          <a href="" class="me-4 text-reset">
+            <i class="fab fa-linkedin"></i>
+          </a>
+          <a href="" class="me-4 text-reset">
+            <i class="fab fa-github"></i>
+          </a>
+        </div>
+      </section>
+
+      <section class="">
+        <div class="container text-center text-md-start mt-5">
+          <div class="row mt-3">
+            <div class="col-md-3 col-lg-4 col-xl-3 mx-auto mb-4">
+              <h6 class="text-uppercase fw-bold mb-4">
+                <i class="fas fa-gem me-3"></i>Company name
+              </h6>
+              <p>
+                Here you can use rows and columns to organize your footer
+                content. Lorem ipsum dolor sit amet, consectetur adipisicing
+                elit.
+              </p>
             </div>
-    );
-    }
+
+            <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mb-4">
+              <h6 class="text-uppercase fw-bold mb-4">Products</h6>
+              <p>
+                <a href="#!" class="text-reset">
+                  Angular
+                </a>
+              </p>
+              <p>
+                <a href="#!" class="text-reset">
+                  React
+                </a>
+              </p>
+              <p>
+                <a href="#!" class="text-reset">
+                  Vue
+                </a>
+              </p>
+              <p>
+                <a href="#!" class="text-reset">
+                  Laravel
+                </a>
+              </p>
+            </div>
+
+            <div class="col-md-3 col-lg-2 col-xl-2 mx-auto mb-4">
+              <h6 class="text-uppercase fw-bold mb-4">Useful links</h6>
+              <p>
+                <a href="#!" class="text-reset">
+                  Pricing
+                </a>
+              </p>
+              <p>
+                <a href="#!" class="text-reset">
+                  Settings
+                </a>
+              </p>
+              <p>
+                <a href="#!" class="text-reset">
+                  Orders
+                </a>
+              </p>
+              <p>
+                <a href="#!" class="text-reset">
+                  Help
+                </a>
+              </p>
+            </div>
+
+            <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mb-md-0 mb-4">
+              <h6 class="text-uppercase fw-bold mb-4">Contact</h6>
+              <p>
+                <i class="fas fa-home me-3"></i> New York, NY 10012, US
+              </p>
+              <p>
+                <i class="fas fa-envelope me-3"></i> info@example.com
+              </p>
+              <p>
+                <i class="fas fa-phone me-3"></i> + 01 234 567 88
+              </p>
+              <p>
+                <i class="fas fa-print me-3"></i> + 01 234 567 89
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="text-center p-4" style={{ backgroundColor: "#000" }}>
+        © 2024 Copyright
+      </div>
+    </footer>
+  );
+};
 
 export default Footer;
