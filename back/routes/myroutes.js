@@ -24,8 +24,12 @@ router.get('/services', (req, res) => {
 
 // Users route
 router.get('/users', async (req, res) => {
-    const [users] = await sequelize.query('SELECT * FROM VOYAGEURS');
-    console.log(users);
-    res.send(users);
+    const [voyageurs] = await sequelize.query('SELECT * FROM VOYAGEURS');
+    const [clientsbailleurs] = await sequelize.query('SELECT * FROM CLIENTSBAILLEURS');
+    const [prestataires] = await sequelize.query('SELECT * FROM PRESTATAIRES');
+
+    console.log(voyageurs, clientsbailleurs, prestataires);
+
+    res.send({voyageurs, clientsbailleurs, prestataires});
 });
 module.exports = router;

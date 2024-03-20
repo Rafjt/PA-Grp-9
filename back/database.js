@@ -3,7 +3,7 @@ const { Sequelize } = require("sequelize");
 const sequelize = new Sequelize(
     'PCS',
     'root',
-    '5318008.Db',
+    '1234.Azerty',
      {
        host: 'localhost',
        dialect: 'mysql'
