@@ -28,3 +28,49 @@
   .buttons button:hover {
     background-color: #444;
   }
+
+.usersContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+  
+  .user {
+    background-color: black;
+    color: white;
+    border-radius: 10%;
+    margin: 10px;
+    flex: 0 0 100%;
+    margin-bottom: 20px;
+  }
+
+  button {
+    background-color: grey;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5%;
+    margin: 1%;
+    margin-bottom: 5%;
+  }
+  
+
+  @media (min-width: 600px) {
+    .user {
+        flex: 0 0 calc(50% - 20%);
+    }
+}
+
+@media (min-width: 900px) {
+    .user {
+        flex: 0 0 calc(33.33% - 20%);
+    }
+}
+
+input {
+  width: 50%;  
+  padding: 5px;
+    margin: 5px;
+    border-radius: 50px;
+    border: 1px solid black;
+}
