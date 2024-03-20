@@ -1,4 +1,5 @@
 const express = require('express');
+const sequelize = require('../database');
 const router = express.Router();
 
 // Home route
@@ -21,4 +22,10 @@ router.get('/services', (req, res) => {
     res.send('Services Page Route');
 });
 
+// Users route
+router.get('/users', async (req, res) => {
+    const [users] = await sequelize.query('SELECT * FROM VOYAGEURS');
+    console.log(users);
+    res.send(users);
+});
 module.exports = router;
