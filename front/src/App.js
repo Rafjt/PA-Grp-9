@@ -5,6 +5,7 @@ import BackOffice from './backOffice.js';
 import Footer from './components/footer.js';
 import './App.css';
 import Acceuil from './pages/acceuil.js';
+import Login from './pages/login';
 
 function App() {
   return (
@@ -13,7 +14,7 @@ function App() {
         <Header />
       </div>
       <div className="app">
-        <Acceuil /> {/* use BackOffice */}
+        <Login /> {/* use BackOffice */}
       </div>
       <div className="footer">
       <Footer/>
