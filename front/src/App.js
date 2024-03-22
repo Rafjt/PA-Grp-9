@@ -16,12 +16,14 @@ function App() {
         <div className="header">
           <Header />
         </div>
+        <div className="app">
         <Routes>
           <Route path="/backoffice" element={<BackOffice />} />
           <Route path="/home" element={<Acceuil />} />
           <Route path="/login" element={<Login />} />
           <Route path="/gestionUtilisateur" element={<GestionUtilisateur />} />
         </Routes>
+        </div>
         <div className="footer">
           <Footer/>
         </div>
