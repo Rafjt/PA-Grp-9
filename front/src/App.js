@@ -8,6 +8,7 @@ import GestionUtilisateur from './gestionUtilisateur.js';
 import './App.css';
 import Acceuil from './pages/acceuil.js';
 import Login from './pages/login';
+import Signup from './pages/signup.js';
 
 function App() {
   return (
@@ -21,7 +22,8 @@ function App() {
           <Route path="/backoffice" element={<BackOffice />} />
           <Route path="/home" element={<Acceuil />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/gestionUtilisateur" element={<GestionUtilisateur />} />
+          <Route path="/gestionUtilisateur" element={<GestionUtilisateur />}/>
+          <Route path="/signup" element={<Signup />} />
         </Routes>
         </div>
         <div className="footer">
