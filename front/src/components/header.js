@@ -14,9 +14,9 @@ const Header = () => {
       <div className="lower-section">
         <nav>
           <ul>
-            <li class='locali'><a href="/">Acceuil</a></li>
-            <li class='locali'><a href="/about">Mon espace</a></li>
-            <li class='locali'><a href="/pages/login">Connexion</a></li>
+            <li class='locali'><a href="/home">Acceuil</a></li>
+            <li class='locali'><a href="/backOffice">Mon espace</a></li>
+            <li class='locali'><a href="/login">Connexion</a></li>
           </ul>
         </nav>
       </div>

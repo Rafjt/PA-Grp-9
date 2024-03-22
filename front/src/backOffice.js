@@ -3,7 +3,7 @@ import './backOffice.css'
 
 const backOffice = () => {
     const myFunction = () => {
-        window.location.replace("./tt.html");
+        window.location.replace("./gestionUtilisateur");
     }
 
     return (
