@@ -63,5 +63,9 @@ span.env a:hover {
   color: white; /* Changed from black to white */
 }
 
+.icon {
+  width: 30px;
+  height: 20px; 
+}
 
 
