@@ -3,8 +3,9 @@ const app = express();
 const port = 3001;
 const bodyParser = require('body-parser');
 const path = require('path');
-const router = require('./routes/myRoutes');
+const router = require('./routes/myroutes');
 const sequelize = require('./database');
+const cors = require('cors');
 
 
 sequelize.authenticate().then(() => {
@@ -15,11 +16,10 @@ sequelize.authenticate().then(() => {
 
 app.use(bodyParser.json());
 
-
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  next();
-});
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+}));
 
 app.get('/index', async (req, res) => {
   const users = await sequelize.query('SELECT * FROM VOYAGEURS');

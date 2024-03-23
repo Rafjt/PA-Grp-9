@@ -10,9 +10,9 @@ const GestionUtilisateur = () => {
     const [searchTerm, setSearchTerm] = useState('');
 
     const idFields = {
-        voyageurs: 'ID_Voyageur',
-        clientsbailleurs: 'ID_ClientBailleur',
-        prestataires: 'ID_Prestataire',
+        voyageurs: 'id',
+        clientsbailleurs: 'id',
+        prestataires: 'id',
     };
 
     useEffect(() => {
@@ -25,7 +25,21 @@ const GestionUtilisateur = () => {
             .catch((error) => console.log(error));
     }, []);
 
-    const handleDelete = (userId) => {};
+    const handleDelete = (userId, userType) => {
+        fetch(`http://localhost:3001/api/users/${userType}/${userId}`, { method: 'DELETE' })
+        .then((response) => {
+            if (response.ok) {
+                // Delete operation successful, update the state to reflect changes
+                setUsers((prevUsers) => ({
+                    ...prevUsers,
+                    [userType]: prevUsers[userType].filter((user) => user[idFields[userType]] !== userId),
+                }));
+            } else {
+                throw new Error('Failed to delete user');
+            }
+        })
+        .catch((error) => console.error('Error deleting user:', error));
+    };
 
     const handleModify = (userId) => {};
 
@@ -58,7 +72,7 @@ const GestionUtilisateur = () => {
                                     <p>Adresse Email: {user.AdresseMail}</p>
                                     <p>Mot de Passe: {user.MotDePasse}</p>
                                     <p>Admin: {user.Admin}</p>
-                                    <button onClick={() => handleDelete(user[idFields[userType]])}>
+                                    <button onClick={() => handleDelete(user[idFields[userType]], userType)}>
                                         Supprimer
                                     </button>
                                     <button onClick={() => handleModify(user[idFields[userType]])}>
