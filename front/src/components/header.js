@@ -28,7 +28,7 @@ const Header = () => {
               </a>
             </li>
             <li class="locali">
-              <a href="/home" class="text-white ml-3">
+              <a href="/" class="text-white ml-3">
                 Acceuil
               </a>
             </li>
