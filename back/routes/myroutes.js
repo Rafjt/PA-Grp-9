@@ -52,8 +52,13 @@ router.get('/users', async (req, res) => {
 
 router.post('/users', async (req, res) => {
     console.log('Creating user:', req.body);
-    // const {name, email, phone} = req.body;
-    //
+    const { nom, prenom, adresseMail, motDePasse, admin, type } = req.body;
+    try {
+        await sequelize.query(`INSERT INTO ${type} (NOM, PRENOM, ADRESSEMAIL, MOTDEPASSE, ADMIN) VALUES ('${nom}', '${prenom}', '${adresseMail}', '${motDePasse}', ${admin})`);
+    }
+    catch (error) {
+        console.error('Error creating user:', error);
+    }
     res.send('User created');
 });
 
