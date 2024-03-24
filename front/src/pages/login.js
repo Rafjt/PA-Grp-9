@@ -10,8 +10,8 @@ function Login() {
         <div className="login-container">
           <h2>Se connecter</h2>
           <form>
-            <input type="text" placeholder="Nom d'utilisateur" />
-            <input type="password" placeholder="Mot de passe" />
+            <input class="input" type="text" placeholder="Nom d'utilisateur" />
+            <input class="input" type="password" placeholder="Mot de passe" />
             <br />
             <button type="submit" class="btn btn-dark btn-lg mt-4">Se connecter</button>
           </form>

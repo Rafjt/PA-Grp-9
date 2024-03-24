@@ -1,5 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './acceuil.css';
+import { NavLink } from 'react-router-dom';
 
 const Acceuil = () => {
 
@@ -17,7 +18,9 @@ const Acceuil = () => {
     Nous offrons une solution complète aux propriétaires cherchant à louer leurs biens, éliminant ainsi la charge administrative associée à la location. Nous prenons en charge chaque étape du processus, du check-in et check-out des clients au nettoyage du logement, de la publication d'annonces attrayantes à la communication avec les voyageurs, en passant par l'entretien et les réparations nécessaires.<br></br><br></br>
     Notre plateforme en ligne simplifie le processus, permettant aux propriétaires de demander des simulations de devis, tandis que les voyageurs ont accès à une gamme variée de services. Notre modèle économique repose sur des tarifs transparents, généralement 20% du prix de la nuitée de location, avec des frais fixes et logistiques supplémentaires. Grâce à notre succès à Paris, nous avons étendu notre présence à d'autres arrondissements de la capitale ainsi qu'à des destinations touristiques telles que Nice et Biarritz.
     </div>
-    <button type="button" class="btn btn-dark btn-lg mt-4">S'inscrire</button>
+    <NavLink to="/signup">
+    <button type="button"  class="btn btn-dark btn-lg mt-4">S'inscrire</button>
+    </NavLink>
 </div>
     );
 };

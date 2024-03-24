@@ -68,11 +68,11 @@
     }
 }
 
-input {
+.input {
   width: 50%;  
   padding: 5px;
-    margin: 5px;
-    border-radius: 50px;
+    margin: 5px; 
+    border-radius: 50px; 
     border: 1px solid black;
 }
 

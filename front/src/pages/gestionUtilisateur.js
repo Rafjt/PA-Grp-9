@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './gestionUtilisateur.css';
+import "bootstrap/dist/css/bootstrap.min.css";
 
 const GestionUtilisateur = () => {
     const [users, setUsers] = useState({
@@ -96,6 +97,7 @@ const GestionUtilisateur = () => {
                         <h2>Ajouter un utilisateur</h2>
                         <form onSubmit={handleSubmit} >
                             <input
+                                class="input"
                                 type='text'
                                 placeholder='Nom'
                                 name='nom'
@@ -103,6 +105,7 @@ const GestionUtilisateur = () => {
                                 onChange={handleChange}
                             />
                             <input
+                                class="input"
                                 type='text'
                                 placeholder='Prénom'
                                 name='prenom'
@@ -110,6 +113,7 @@ const GestionUtilisateur = () => {
                                 onChange={handleChange}
                             />
                             <input
+                                class="input"
                                 type='email'
                                 placeholder='Adresse mail'
                                 name='adresseMail'
@@ -117,6 +121,7 @@ const GestionUtilisateur = () => {
                                 onChange={handleChange}
                             />
                             <input
+                                class="input"
                                 type='text'
                                 placeholder='Mot de passe'
                                 name='motDePasse'
@@ -138,11 +143,11 @@ const GestionUtilisateur = () => {
                                 <option value="PRESTATAIRES">Prestataire</option>
                             </select>
                             <br />
-                            <input type="submit" value="Créer" className='submit' method='POST'></input>
+                            <input class="input" type="submit" value="Créer" className='submit' method='POST'></input>
                         </form>
                     </div>
                     <h2>Rechercher un utilisateur</h2>
-                    <input type="text" placeholder="Rechercher (Nom/prénom)" onChange={handleSearch} />
+                    <input class="input" type="text" placeholder="Rechercher (Nom/prénom)" onChange={handleSearch} />
                     <div className="usersContainer">
                         {['voyageurs', 'clientsbailleurs', 'prestataires'].map((userType) => (
                             <div key={userType}>
