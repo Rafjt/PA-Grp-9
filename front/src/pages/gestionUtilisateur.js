@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './gestionUtilisateur.css';
 import "bootstrap/dist/css/bootstrap.min.css";
+import { Link, useNavigate } from 'react-router-dom';
 
 const GestionUtilisateur = () => {
     const [users, setUsers] = useState({
@@ -13,8 +14,8 @@ const GestionUtilisateur = () => {
     const [form, setForm] = useState({
         nom: '',
         prenom: '',
-        adresseMail: '', // Updated property name
-        motDePasse: '', // Updated property name
+        adresseMail: '',
+        motDePasse: '', 
         admin: '0',
         type: 'VOYAGEURS',
     });
@@ -30,7 +31,7 @@ const GestionUtilisateur = () => {
 
 
         const handleSubmit = async (e) => {
-            e.preventDefault();
+            // e.preventDefault();
     
             const response = await fetch('http://localhost:3001/api/users', {
                 method: 'POST',
@@ -79,7 +80,9 @@ const GestionUtilisateur = () => {
         .catch((error) => console.error('Error deleting user:', error));
     };
 
-    const handleModify = (userId) => {};
+    const handleModify = (e) => {
+        // console.log('Modify user:', userId);
+    };
 
 
 
@@ -169,9 +172,10 @@ const GestionUtilisateur = () => {
                                             <button onClick={() => handleDelete(user[idFields[userType]], userType)}>
                                                 Supprimer
                                             </button>
-                                            <button onClick={() => handleModify(user[idFields[userType]])}>
+                                            <Link className='modif' to={`/update/${user[idFields[userType]]}/${userType}`}>Modifier</Link>
+                                            {/* <button onClick={() => handleModify(user[idFields[userType]], userType, user.Admin, user.Nom, user.Prenom, user.AdresseMail, user.MotDePasse)}>
                                                 Modifier
-                                            </button>
+                                            </button> */}
                                         </div>
                                     ))}
                             </div>

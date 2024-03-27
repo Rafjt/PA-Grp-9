@@ -50,6 +50,17 @@ router.get('/users', async (req, res) => {
     res.send({voyageurs, clientsbailleurs, prestataires});
 });
 
+router.get('/users/:id/:type', async (req, res) => {
+    console.log('route /users/:id called');
+    const id = req.params.id;
+    const type = req.params.type;
+    console.log(type);
+    const [users] = await sequelize.query(`SELECT * FROM ${type} WHERE ID = ${id}`);
+    console.log(users);
+    console.log("APPELER");
+    res.send(users[0]);
+}); 
+
 router.post('/users', async (req, res) => {
     console.log('Creating user:', req.body);
     const { nom, prenom, adresseMail, motDePasse, admin, type } = req.body;
@@ -63,3 +74,17 @@ router.post('/users', async (req, res) => {
 });
 
 module.exports = router;
+
+
+router.put('/users/:id/:type', async (req, res) => {
+    console.log('Modifying user:', req.body);
+    const { id, type } = req.params;
+    const { nom, prenom, adresseMail, motDePasse } = req.body;
+    try {
+        await sequelize.query(`UPDATE ${type} SET NOM = '${nom}', PRENOM = '${prenom}', ADRESSEMAIL = '${adresseMail}', MOTDEPASSE = '${motDePasse}' WHERE ID = ${id}`);
+    }
+    catch (error) {
+        console.error('Error modifying user:', error);
+    }
+    res.send('User modified');
+});
