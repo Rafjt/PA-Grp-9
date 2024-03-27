@@ -9,6 +9,7 @@ import './App.css';
 import Acceuil from './pages/acceuil.js';
 import Login from './pages/login';
 import Signup from './pages/signup.js';
+import Update from './pages/update.js';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           <Route path="/backoffice" element={<BackOffice />} />
           <Route path="/" element={<Acceuil />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/update/:id/:type" element={<Update />} />
           <Route path="/gestionUtilisateur" element={<GestionUtilisateur />}/>
           <Route path="/signup" element={<Signup />} />
         </Routes>

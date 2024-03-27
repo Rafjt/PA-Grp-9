@@ -50,7 +50,7 @@
     color: white;
     border: none;
     cursor: pointer;
-    border-radius: 5%;
+    border-radius: 5px;
     margin: 1%;
     margin-bottom: 5%;
   }
@@ -106,4 +106,18 @@
   border: none;
   cursor: pointer;
   margin-top: 20px;
+}
+
+a.modif {
+  background-color: grey;
+  color: white;
+  padding: 1px 10px;
+  border-radius: 5px;
+  text-decoration: none; /* Removes the default underline of links */
+  display: inline-block; /* Allows padding to be applied */
+  cursor: pointer;
+}
+
+a.modif :hover {
+  background-color: #444;
 }
