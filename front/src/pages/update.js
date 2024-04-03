@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { updateUser } from '../services';
 
 const Update = () => {
   const { id } = useParams();
@@ -46,16 +47,13 @@ const Update = () => {
   const handleModify = async (e) => {
     e.preventDefault();
     console.log('Modifying user:', values);
-    const response = await fetch(`http://localhost:3001/api/users/${id}/${values.type}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(values),
-    });
-    const data = await response.json();
-    console.log(data);
-  }
+    try {
+        const data = await updateUser(id, values.type, values); 
+        console.log(data);
+    } catch (error) {
+        console.log(error);
+    }
+}
 
   return (
     <><div className="container-fluid mt-5 mr-0 ml-0 w-100">

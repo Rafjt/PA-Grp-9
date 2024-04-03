@@ -51,7 +51,7 @@ const GestionUtilisateur = () => {
     
       const handleSubmit = async (e) => {
         // e.preventDefault();
-    
+        console.log("here");
         const data = await createUser(form);
         console.log(data);
       };
