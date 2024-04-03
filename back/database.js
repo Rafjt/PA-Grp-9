@@ -1,7 +1,7 @@
 const { Sequelize } = require("sequelize");
 
 const sequelize = new Sequelize(
-    'PCS',
+    'PCST',
     'root',
     '1234.Azerty',
      {

@@ -18,10 +18,10 @@ const Update = () => {
       .then((response) => response.json())
       .then((data) => {
         setValues({
-          nom: data.Nom,
-          prenom: data.Prenom,
-          adresseMail: data.AdresseMail,
-          motDePasse: data.MotDePasse,
+          nom: data.nom,
+          prenom: data.prenom,
+          adresseMail: data.adresseMail,
+          motDePasse: data.motDePasse,
           type: values.type,
         });
       });

@@ -2,30 +2,27 @@ import React, { useState, useEffect } from 'react';
 import './gestionAnnonce.css';
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Link } from 'react-router-dom';
-import { fetchAnnonce,deleteAnnonce,createAnnonce } from '../services';
-
+import { fetchAnnonce, deleteAnnonce, createAnnonce } from '../services';
 
 const GestionAnnonce = () => {
     const [annonces, setAnnonces] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
-    const [bien, setBien] = useState(
-        {
-            nomBien: '',
-            description: '',
-            id_ClientBailleur: '',
-            prix: '',
-            disponible: '',
-        }
-    );
+    const [bien, setBien] = useState({
+        nomBien: '',
+        description: '',
+        idClientBailleur: '',
+        prix: '',
+        disponible: '',
+    });
 
     const [form, setForm] = useState({
         description: '',
         nomBien: '',
-        StatutValidation: '',
+        statutValidation: '',
         cheminImg: '',
         disponible: '',
         id: '',
-        id_ClientBailleur: '',
+        idClientBailleur: '',
         prix: '',
     });
 
@@ -74,7 +71,6 @@ const GestionAnnonce = () => {
             .catch((error) => console.error('Error deleting annonce:', error));
     };
 
-
     const handleSearch = (event) => {
         setSearchTerm(event.target.value);
     };
@@ -86,65 +82,61 @@ const GestionAnnonce = () => {
     return (
         <div className="gestionAnnonce">
             <h1>Gestion des Annonces</h1>
-            <form onSubmit={handleSubmit}> {/* onSubmit={handleSubmit}*/} 
+            <form onSubmit={handleSubmit}>
                 <div className="createAnnonce">
                     <h2>Ajouter une annonce</h2>
                     <input
-                            class="input"
-                            type="text"
-                            placeholder="Nom du bien"
-                            name="nomBien"
-                            value={form.nomBien}
-                            onChange={handleChange}
-                        />
-                        <input
-                            class="input"
-                            type='text'
-                            placeholder='description'
-                            name='description'
-                            value={form.description}
-                            onChange={handleChange}
-                        />
-                        {/* <button onClick={() => exportImage(form.cheminImg)}>
-                            Export Image
-                        </button> */}
-                        <input
-                            class="input"
-                            type="number"
-                            placeholder="ID du client bailleur"
-                            name="id_ClientBailleur"
-                            value={form.id_ClientBailleur}
-                            onChange={handleChange}
-                        />
-                        <br />
-                        <input
-                            class="input"
-                            type="number"
-                            placeholder="Prix"
-                            name="prix"
-                            value={form.prix}
-                            onChange={handleChange}
-                        />
-                        <br />
-                        <br />
-                        <label htmlFor="disponible">Disponible :</label>
-                        <select
-                            name="disponible"
-                            id="disponible"
-                            value={form.disponible}
-                            onChange={handleChange}
-                        >
-                            <option value="1">Oui</option>
-                            <option value="0">Non</option>
-                        </select>
-                        <br />
-                        <input
-                            class="input"
-                            type="submit"
-                            value="Créer"
-                            className="submit"
-                            method="POST"
-                        ></input>
+                        className="input"
+                        type="text"
+                        placeholder="Nom du bien"
+                        name="nomBien"
+                        value={form.nomBien}
+                        onChange={handleChange}
+                    />
+                    <input
+                        className="input"
+                        type='text'
+                        placeholder='description'
+                        name='description'
+                        value={form.description}
+                        onChange={handleChange}
+                    />
+                    <input
+                        className="input"
+                        type="number"
+                        placeholder="ID du client bailleur"
+                        name="idClientBailleur"
+                        value={form.idClientBailleur}
+                        onChange={handleChange}
+                    />
+                    <br />
+                    <input
+                        className="input"
+                        type="number"
+                        placeholder="Prix"
+                        name="prix"
+                        value={form.prix}
+                        onChange={handleChange}
+                    />
+                    <br />
+                    <br />
+                    <label htmlFor="disponible">Disponible :</label>
+                    <select
+                        name="disponible"
+                        id="disponible"
+                        value={form.disponible}
+                        onChange={handleChange}
+                    >
+                        <option value="1">Oui</option>
+                        <option value="0">Non</option>
+                    </select>
+                    <br />
+                    <input
+                        className="input"
+                        type="submit"
+                        value="Créer"
+                        method="POST"
+                    ></input>
                 </div>
             </form>
             <h2>Rechercher un bien</h2>
@@ -164,9 +156,9 @@ const GestionAnnonce = () => {
                     )
                     .map((annonce) => (
                         annonce && <div key={annonce.id} className="annonce">
-                            <img src={`/img/bien${annonce.id}.jpeg`} alt={annonce.nomBien} className='img'/>
+                            <img src={`/img/bien${annonce.id}.jpeg`} alt={annonce.nomBien} className='img' />
                             <h2> ID :{annonce.id}</h2>
-                            <h2> ID du client bailleur propriétaire :{annonce.id_ClientBailleur}</h2>
+                            <h2> ID du client bailleur propriétaire :{annonce.idClientBailleur}</h2>
                             <h2>{annonce.nomBien}</h2>
                             <h3>Prix par nuits {annonce.prix}€</h3>
                             <button onClick={() => handleDelete(annonce.id)}>
