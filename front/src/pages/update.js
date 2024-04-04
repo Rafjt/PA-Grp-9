@@ -8,6 +8,7 @@ const Update = () => {
   const [values, setValues] = useState({
     nom: '',
     prenom: '',
+    dateDeNaissance: '',
     adresseMail: '',
     motDePasse: '', 
     type: type || 'VOYAGEURS',
@@ -17,9 +18,11 @@ const Update = () => {
     fetch(`http://localhost:3001/api/users/${id}/${values.type}`)
       .then((response) => response.json())
       .then((data) => {
+        console.log(data);
         setValues({
           nom: data.nom,
           prenom: data.prenom,
+          dateDeNaissance: data.dateDeNaissance,
           adresseMail: data.adresseMail,
           motDePasse: data.motDePasse,
           type: values.type,
@@ -46,10 +49,9 @@ const Update = () => {
   
   const handleModify = async (e) => {
     e.preventDefault();
-    console.log('Modifying user:', values);
+    console.log('Modifyinggg user:', values);
     try {
         const data = await updateUser(id, values.type, values); 
-        console.log(data);
     } catch (error) {
         console.log(error);
     }
@@ -69,6 +71,7 @@ const Update = () => {
       <form>
         <input className="input" type="text" name="nom" placeholder="Nom" value={values.nom} onChange={handleChange} />
         <input className="input" type="text" name="prenom" placeholder="Prénom" value={values.prenom} onChange={handleChange} />
+        <input className="input" type="date" name="dateDeNaissance" placeholder="Date de naissance" value={values.dateDeNaissance} onChange={handleChange} />
         <input className="input" type="email" name="adresseMail" placeholder="Adresse email" value={values.adresseMail} onChange={handleChange} />
         <div>
           <div>

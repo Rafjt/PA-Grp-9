@@ -4,6 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { Link } from 'react-router-dom';
 import { fetchAnnonce, deleteAnnonce, createAnnonce } from '../services';
 
+
 const GestionAnnonce = () => {
     const [annonces, setAnnonces] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -109,13 +110,21 @@ const GestionAnnonce = () => {
                         value={form.idClientBailleur}
                         onChange={handleChange}
                     />
-                    <br />
                     <input
                         className="input"
                         type="number"
                         placeholder="Prix"
                         name="prix"
                         value={form.prix}
+                        onChange={handleChange}
+                    />
+                    <br />
+                    <br />
+                    <label htmlFor="pictures">Photos du bien :</label>
+                    <input
+                        type="file"
+                        placeholder="photos du bien"
+                        name="pictures"
                         onChange={handleChange}
                     />
                     <br />

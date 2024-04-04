@@ -14,6 +14,7 @@ const GestionUtilisateur = () => {
       const [form, setForm] = useState({
         nom: '',
         prenom: '',
+        dateDeNaissance: '',
         adresseMail: '',
         motDePasse: '',
         admin: '0',
@@ -106,6 +107,14 @@ const GestionUtilisateur = () => {
           />
           <input
             className="input"
+            type="date"
+            placeholder="Date de naissance"
+            name="dateDeNaissance"
+            value={form.dateDeNaissance}
+            onChange={handleChange}
+          />
+          <input
+            className="input"
             type="email"
             placeholder="Adresse mail"
             name="adresseMail"
@@ -175,6 +184,7 @@ const GestionUtilisateur = () => {
                   <p>ID: {user[idFields[userType]]}</p>
                   <p>Nom: {user.nom}</p>
                   <p>Prénom: {user.prenom}</p>
+                  <p>Date de Naissance: {user.dateDeNaissance}</p>
                   <p>Adresse Email: {user.adresseMail}</p>
                   <p>Mot de Passe: {user.motDePasse}</p>
                   <p>Admin: {user.admin}</p>

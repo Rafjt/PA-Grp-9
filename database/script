@@ -1,142 +1,145 @@
--- Table ClientsBailleurs
-CREATE TABLE ClientsBailleurs (
+-- Table clientsBailleurs
+CREATE TABLE clientsBailleurs (
   id INT PRIMARY KEY AUTO_INCREMENT,
-  Nom VARCHAR(255),
-  Prenom VARCHAR(255),
-  AdresseMail VARCHAR(255),
-  MotDePasse VARCHAR(255),
-  Admin BOOLEAN
+  nom VARCHAR(255),
+  prenom VARCHAR(255),
+  adresseMail VARCHAR(255),
+  motDePasse VARCHAR(255),
+  dateDeNaissance DATE,
+  admin BOOLEAN
 );
 
--- Table Voyageurs
-CREATE TABLE Voyageurs (
+-- Table voyageurs
+CREATE TABLE voyageurs (
   id INT PRIMARY KEY AUTO_INCREMENT,
-  Nom VARCHAR(255),
-  Prenom VARCHAR(255),
-  AdresseMail VARCHAR(255),
-  MotDePasse VARCHAR(255),
-  Admin BOOLEAN
+  nom VARCHAR(255),
+  prenom VARCHAR(255),
+  adresseMail VARCHAR(255),
+  motDePasse VARCHAR(255),
+  dateDeNaissance DATE,
+  admin BOOLEAN
 );
 
--- Table Prestataires
-CREATE TABLE Prestataires (
+-- Table prestataires
+CREATE TABLE prestataires (
   id INT PRIMARY KEY AUTO_INCREMENT,
-  Nom VARCHAR(255),
-  Prenom VARCHAR(255),
-  AdresseMail VARCHAR(255),
-  MotDePasse VARCHAR(255),
-  Admin BOOLEAN
+  nom VARCHAR(255),
+  prenom VARCHAR(255),
+  adresseMail VARCHAR(255),
+  motDePasse VARCHAR(255),
+  dateDeNaissance DATE,
+  admin BOOLEAN
 );
 
--- Table BienImo
-CREATE TABLE BienImo (
+-- Table bienImo
+CREATE TABLE bienImo (
   id INT PRIMARY KEY AUTO_INCREMENT,
   cheminImg VARCHAR(255),
   id_ClientBailleur INT,
   prix DECIMAL(10, 2),
-  NomBien VARCHAR(255),
-  Description TEXT,
-  StatutValidation INT,
+  nomBien VARCHAR(255),
+  description TEXT,
+  statutValidation INT,
   disponible INT,
-  FOREIGN KEY (id_ClientBailleur) REFERENCES ClientsBailleurs(id)
+  FOREIGN KEY (id_ClientBailleur) REFERENCES clientsBailleurs(id)
 );
 
--- Table Reservation
-CREATE TABLE Reservation (
+-- Table reservation
+CREATE TABLE reservation (
   id INT PRIMARY KEY AUTO_INCREMENT,
   id_BienImmobilier INT,
   id_ClientVoyageur INT,
-  DateDebut DATE,
-  DateFin DATE,
-  Statut VARCHAR(50),
-  FOREIGN KEY (id_BienImmobilier) REFERENCES BienImo(id),
-  FOREIGN KEY (id_ClientVoyageur) REFERENCES Voyageurs(id)
+  dateDebut DATE,
+  dateFin DATE,
+  statut VARCHAR(50),
+  FOREIGN KEY (id_BienImmobilier) REFERENCES bienImo(id),
+  FOREIGN KEY (id_ClientVoyageur) REFERENCES voyageurs(id)
 );
 
--- Table Finances
-CREATE TABLE Finances (
+-- Table finances
+CREATE TABLE finances (
   id INT PRIMARY KEY AUTO_INCREMENT,
   id_ClientBailleur INT,
   id_Prestataire INT,
-  Montant DECIMAL(10, 2),
-  Type VARCHAR(50),
-  DateTransaction DATE,
-  FOREIGN KEY (id_ClientBailleur) REFERENCES ClientsBailleurs(id),
-  FOREIGN KEY (id_Prestataire) REFERENCES Prestataires(id)
+  montant DECIMAL(10, 2),
+  type VARCHAR(50),
+  dateTransaction DATE,
+  FOREIGN KEY (id_ClientBailleur) REFERENCES clientsBailleurs(id),
+  FOREIGN KEY (id_Prestataire) REFERENCES prestataires(id)
 );
 
--- Table Abonnement
-CREATE TABLE Abonnement (
+-- Table abonnement
+CREATE TABLE abonnement (
   id INT PRIMARY KEY AUTO_INCREMENT,
   id_ClientBailleur INT,
   id_Voyageur INT,
-  Nom VARCHAR(255),
-  FOREIGN KEY (id_ClientBailleur) REFERENCES ClientsBailleurs(id),
-  FOREIGN KEY (id_Voyageur) REFERENCES Voyageurs(id),
+  nom VARCHAR(255),
+  FOREIGN KEY (id_ClientBailleur) REFERENCES clientsBailleurs(id),
+  FOREIGN KEY (id_Voyageur) REFERENCES voyageurs(id),
   CHECK (
     (id_ClientBailleur IS NOT NULL AND id_Voyageur IS NULL) OR
     (id_ClientBailleur IS NULL AND id_Voyageur IS NOT NULL)
   )
 ); 
 
--- Table ÉvaluationPrestation
-CREATE TABLE EvaluationPrestation (
+-- Table évaluationPrestation
+CREATE TABLE évaluationPrestation (
   id INT PRIMARY KEY AUTO_INCREMENT,
   id_BienImmobilier INT,
   id_Prestataire INT,
-  TypeIntervention VARCHAR(50),
-  FOREIGN KEY (id_BienImmobilier) REFERENCES BienImo(id),
-  FOREIGN KEY (id_Prestataire) REFERENCES Prestataires(id)
+  typeIntervention VARCHAR(50),
+  FOREIGN KEY (id_BienImmobilier) REFERENCES bienImo(id),
+  FOREIGN KEY (id_Prestataire) REFERENCES prestataires(id)
 );
 
--- Table Prestation
-CREATE TABLE Prestation (
+-- Table prestation
+CREATE TABLE prestation (
   id INT PRIMARY KEY AUTO_INCREMENT,
   id_BienImmobilier INT,
   id_Prestataire INT,
-  TypeIntervention VARCHAR(50),
-  FOREIGN KEY (id_BienImmobilier) REFERENCES BienImo(id),
-  FOREIGN KEY (id_Prestataire) REFERENCES Prestataires(id)
+  typeIntervention VARCHAR(50),
+  FOREIGN KEY (id_BienImmobilier) REFERENCES bienImo(id),
+  FOREIGN KEY (id_Prestataire) REFERENCES prestataires(id)
 );
 
--- Table Contrat
-CREATE TABLE Contrat (
+-- Table contrat
+CREATE TABLE contrat (
   id INT PRIMARY KEY AUTO_INCREMENT,
   id_Reservation INT,
   id_Prestation INT,
   id_Prestataire INT,
   id_Bailleur INT,
   id_Voyageur INT,
-  TypeContrat VARCHAR(50),
-  TypeIntervention VARCHAR(50),
-  DateDebutContrat DATE,
-  DateFinContrat DATE,
-  Statut VARCHAR(50),
-  FOREIGN KEY (id_Reservation) REFERENCES Reservation(id),
-  FOREIGN KEY (id_Prestation) REFERENCES Prestation(id),
-  FOREIGN KEY (id_Prestataire) REFERENCES Prestataires(id),
-  FOREIGN KEY (id_Bailleur) REFERENCES ClientsBailleurs(id),
-  FOREIGN KEY (id_Voyageur) REFERENCES Voyageurs(id)
+  typeContrat VARCHAR(50),
+  typeIntervention VARCHAR(50),
+  dateDebutContrat DATE,
+  dateFinContrat DATE,
+  statut VARCHAR(50),
+  FOREIGN KEY (id_Reservation) REFERENCES reservation(id),
+  FOREIGN KEY (id_Prestation) REFERENCES prestation(id),
+  FOREIGN KEY (id_Prestataire) REFERENCES prestataires(id),
+  FOREIGN KEY (id_Bailleur) REFERENCES clientsBailleurs(id),
+  FOREIGN KEY (id_Voyageur) REFERENCES voyageurs(id)
 );
 
--- Table Paiement
-CREATE TABLE Paiement (
+-- Table paiement
+CREATE TABLE paiement (
   id INT PRIMARY KEY AUTO_INCREMENT,
   id_Reservation INT,
-  Montant DECIMAL(10, 2),
-  DatePaiement DATE,
-  MethodePaiement VARCHAR(50),
-  Statut VARCHAR(50),
-  FOREIGN KEY (id_Reservation) REFERENCES Reservation(id)
+  montant DECIMAL(10, 2),
+  datePaiement DATE,
+  methodePaiement VARCHAR(50),
+  statut VARCHAR(50),
+  FOREIGN KEY (id_Reservation) REFERENCES reservation(id)
 );
 
--- Table Facture
-CREATE TABLE Facture (
+-- Table facture
+CREATE TABLE facture (
   id INT PRIMARY KEY AUTO_INCREMENT,
   id_Reservation INT,
   id_ClientBailleur INT,
-  MontantTotal DECIMAL(10, 2),
-  DateEmission DATE,
-  FOREIGN KEY (id_Reservation) REFERENCES Reservation(id),
-  FOREIGN KEY (id_ClientBailleur) REFERENCES ClientsBailleurs(id)
+  montantTotal DECIMAL(10, 2),
+  dateEmission DATE,
+  FOREIGN KEY (id_Reservation) REFERENCES reservation(id),
+  FOREIGN KEY (id_ClientBailleur) REFERENCES clientsBailleurs(id)
 );

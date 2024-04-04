@@ -1,5 +1,6 @@
 const express = require('express');
 const sequelize = require('../database');
+// const {fs} = require('fs');
 
 const router = express.Router();
 
@@ -80,9 +81,10 @@ module.exports = router;
 router.put('/users/:id/:type', async (req, res) => {
     console.log('Modifying user:', req.body);
     const { id, type } = req.params;
-    const { nom, prenom, adresseMail, motDePasse } = req.body;
+    const { nom, prenom, adresseMail, motDePasse,dateDeNaissance } = req.body;
+    console.log('date de naissance est :', dateDeNaissance);
     try {
-        await sequelize.query(`UPDATE ${type} SET nom = '${nom}', prenom = '${prenom}', adresseMail = '${adresseMail}', motDePasse = '${motDePasse}' WHERE id = ${id}`);
+        await sequelize.query(`UPDATE ${type} SET nom = '${nom}', prenom = '${prenom}', adresseMail = '${adresseMail}',dateDeNaissance = '${dateDeNaissance}', motDePasse = '${motDePasse}' WHERE id = ${id}`);
     }
     catch (error) {
         console.error('Error modifying user:', error);
