@@ -8,6 +8,9 @@ const backOffice = () => {
     const toAnnonce = () => {
         window.location.replace("./gestionAnnonce");
     }
+    const toRes = () => {
+        window.location.replace("./gestionReservations");
+    }
 
     return (
         <div className="backoffice">
@@ -18,7 +21,7 @@ const backOffice = () => {
             <div className="buttons">
                 <button onClick={toAnnonce}>Gestion des Annonces</button>
                 <button onClick={toUser}>Gestion des Utilisateurs</button>
-                <button>Gestion des Réservations</button>
+                <button onClick={toRes}>Gestion des Réservations</button>
                 <button>Gestion des Paiements</button>
                 <button>Statistiques et rapports</button>
             </div>
