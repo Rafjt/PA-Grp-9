@@ -149,3 +149,12 @@ router.put('/bienimo/:id', async (req, res) => {
     }
     res.send('Bien modified');
 });
+
+
+// GESTION DES RESERVATIONS
+
+router.get('/reservation', async (req, res) => {
+    const [reservation] = await sequelize.query('SELECT * FROM reservation');
+    console.log(reservation);
+    res.send(reservation);
+}); 

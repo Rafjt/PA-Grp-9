@@ -12,6 +12,7 @@ import Signup from './pages/signup.js';
 import Update from './pages/update.js';
 import UpdateAnnonce from './pages/updateAnnonce.js';
 import GestionAnnonce from './pages/gestionAnnonce.js';
+import GestionReservations from './pages/gestionReservations.js';
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
           <Route path="/update/:id/:type" element={<Update />} />
           <Route path="/update/:id/bien" element={<UpdateAnnonce />} />
           <Route path="/gestionUtilisateur" element={<GestionUtilisateur />}/>
+          <Route path="/gestionReservations" element={<GestionReservations />} />
           <Route path="/gestionAnnonce" element={<GestionAnnonce />} />
           <Route path="/signup" element={<Signup />} />
         </Routes>
