@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { updateUser } from '../services';
 
 const Update = () => {
   const { id } = useParams();
@@ -7,6 +8,7 @@ const Update = () => {
   const [values, setValues] = useState({
     nom: '',
     prenom: '',
+    dateDeNaissance: '',
     adresseMail: '',
     motDePasse: '', 
     type: type || 'VOYAGEURS',
@@ -16,11 +18,13 @@ const Update = () => {
     fetch(`http://localhost:3001/api/users/${id}/${values.type}`)
       .then((response) => response.json())
       .then((data) => {
+        console.log(data);
         setValues({
-          nom: data.Nom,
-          prenom: data.Prenom,
-          adresseMail: data.AdresseMail,
-          motDePasse: data.MotDePasse,
+          nom: data.nom,
+          prenom: data.prenom,
+          dateDeNaissance: data.dateDeNaissance,
+          adresseMail: data.adresseMail,
+          motDePasse: data.motDePasse,
           type: values.type,
         });
       });
@@ -45,17 +49,13 @@ const Update = () => {
   
   const handleModify = async (e) => {
     e.preventDefault();
-    console.log('Modifying user:', values);
-    const response = await fetch(`http://localhost:3001/api/users/${id}/${values.type}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(values),
-    });
-    const data = await response.json();
-    console.log(data);
-  }
+    console.log('Modifyinggg user:', values);
+    try {
+        const data = await updateUser(id, values.type, values); 
+    } catch (error) {
+        console.log(error);
+    }
+}
 
   return (
     <><div className="container-fluid mt-5 mr-0 ml-0 w-100">
@@ -71,6 +71,7 @@ const Update = () => {
       <form>
         <input className="input" type="text" name="nom" placeholder="Nom" value={values.nom} onChange={handleChange} />
         <input className="input" type="text" name="prenom" placeholder="Prénom" value={values.prenom} onChange={handleChange} />
+        <input className="input" type="date" name="dateDeNaissance" placeholder="Date de naissance" value={values.dateDeNaissance} onChange={handleChange} />
         <input className="input" type="email" name="adresseMail" placeholder="Adresse email" value={values.adresseMail} onChange={handleChange} />
         <div>
           <div>

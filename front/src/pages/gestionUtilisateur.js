@@ -7,13 +7,14 @@ import { fetchUsers, createUser, deleteUser } from '../services';
 const GestionUtilisateur = () => {
     const [users, setUsers] = useState({
         voyageurs: [],
-        clientsbailleurs: [],
+        clientsBailleurs: [],
         prestataires: [],
       });
     
       const [form, setForm] = useState({
         nom: '',
         prenom: '',
+        dateDeNaissance: '',
         adresseMail: '',
         motDePasse: '',
         admin: '0',
@@ -24,7 +25,7 @@ const GestionUtilisateur = () => {
     
       const idFields = {
         voyageurs: 'id',
-        clientsbailleurs: 'id',
+        clientsBailleurs: 'id',
         prestataires: 'id',
       };
     
@@ -51,7 +52,7 @@ const GestionUtilisateur = () => {
     
       const handleSubmit = async (e) => {
         // e.preventDefault();
-    
+        console.log("here");
         const data = await createUser(form);
         console.log(data);
       };
@@ -89,7 +90,7 @@ const GestionUtilisateur = () => {
         <h2>Ajouter un utilisateur</h2>
         <form onSubmit={handleSubmit}>
           <input
-            class="input"
+            className="input"
             type='text'
             placeholder='Nom'
             name='nom'
@@ -97,7 +98,7 @@ const GestionUtilisateur = () => {
             onChange={handleChange}
           />
           <input
-            class="input"
+            className="input"
             type="text"
             placeholder="Prénom"
             name="prenom"
@@ -105,7 +106,15 @@ const GestionUtilisateur = () => {
             onChange={handleChange}
           />
           <input
-            class="input"
+            className="input"
+            type="date"
+            placeholder="Date de naissance"
+            name="dateDeNaissance"
+            value={form.dateDeNaissance}
+            onChange={handleChange}
+          />
+          <input
+            className="input"
             type="email"
             placeholder="Adresse mail"
             name="adresseMail"
@@ -113,7 +122,7 @@ const GestionUtilisateur = () => {
             onChange={handleChange}
           />
           <input
-            class="input"
+            className="input"
             type="text"
             placeholder="Mot de passe"
             name="motDePasse"
@@ -146,39 +155,39 @@ const GestionUtilisateur = () => {
           </select>
           <br />
           <input
-            class="input"
+            className="input"
             type="submit"
             value="Créer"
-            className="submit"
             method="POST"
           ></input>
         </form>
       </div>
       <h2>Rechercher un utilisateur</h2>
       <input
-        class="input"
+        className="input"
         type="text"
         placeholder="Rechercher (Nom/prénom)"
         onChange={handleSearch}
       />
       <div className="usersContainer">
-        {["voyageurs", "clientsbailleurs", "prestataires"].map((userType) => (
+        {["voyageurs", "clientsBailleurs", "prestataires"].map((userType) => (
           <div key={userType}>
             <h2>{userType}</h2>
             {users[userType]
               .filter(
                 (user) =>
-                  user.Nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                  user.Prenom.toLowerCase().includes(searchTerm.toLowerCase())
+                  user.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                  user.prenom.toLowerCase().includes(searchTerm.toLowerCase())
               )
               .map((user) => (
                 <div key={user[idFields[userType]]} className="user">
                   <p>ID: {user[idFields[userType]]}</p>
-                  <p>Nom: {user.Nom}</p>
-                  <p>Prénom: {user.Prenom}</p>
-                  <p>Adresse Email: {user.AdresseMail}</p>
-                  <p>Mot de Passe: {user.MotDePasse}</p>
-                  <p>Admin: {user.Admin}</p>
+                  <p>Nom: {user.nom}</p>
+                  <p>Prénom: {user.prenom}</p>
+                  <p>Date de Naissance: {user.dateDeNaissance}</p>
+                  <p>Adresse Email: {user.adresseMail}</p>
+                  <p>Mot de Passe: {user.motDePasse}</p>
+                  <p>Admin: {user.admin}</p>
                   <button
                     onClick={() =>
                       handleDelete(user[idFields[userType]], userType)
@@ -192,7 +201,7 @@ const GestionUtilisateur = () => {
                   >
                     Modifier
                   </Link>
-                  {/* <button onClick={() => handleModify(user[idFields[userType]], userType, user.Admin, user.Nom, user.Prenom, user.AdresseMail, user.MotDePasse)}>
+                  {/* <button onClick={() => handleModify(user[idFields[userType]], userType, user.admin, user.nom, user.prenom, user.adresseMail, user.motDePasse)}>
                                                 Modifier
                                             </button> */}
                 </div>
