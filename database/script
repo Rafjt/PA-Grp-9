@@ -83,7 +83,7 @@ CREATE TABLE abonnement (
 ); 
 
 -- Table évaluationPrestation
-CREATE TABLE évaluationPrestation (
+CREATE TABLE evaluationPrestation (
   id INT PRIMARY KEY AUTO_INCREMENT,
   id_BienImmobilier INT,
   id_Prestataire INT,
