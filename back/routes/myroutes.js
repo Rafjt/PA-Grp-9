@@ -65,15 +65,32 @@ router.get('/users/:id/:type', async (req, res) => {
 
 router.post('/users', async (req, res) => {
     console.log('Creating user:', req.body);
-    const { nom, prenom, adresseMail, motDePasse, admin, type } = req.body;
+    const { nom, prenom, adresseMail, motDePasse, admin, dateDeNaissance, type } = req.body;
+    
     try {
-        await sequelize.query(`INSERT INTO ${type} (nom, prenom, adresseMail, motDePasse, admin) VALUES ('${nom}', '${prenom}', '${adresseMail}', '${motDePasse}', ${admin})`);
+      // Use parameterized query to safely insert data and convert date format
+      await sequelize.query(
+        `INSERT INTO ${type} (nom, prenom, adresseMail, motDePasse, dateDeNaissance, admin) 
+        VALUES (:nom, :prenom, :adresseMail, :motDePasse, STR_TO_DATE(:dateDeNaissance, '%d/%m/%Y'), :admin)`,
+        {
+          replacements: {
+            nom,
+            prenom,
+            adresseMail,
+            motDePasse,
+            dateDeNaissance,
+            admin
+          },
+          type: QueryTypes.INSERT // Specify the query type as INSERT
+        }
+      );
+      
+      res.send('User created');
+    } catch (error) {
+      console.error('Error creating user:', error);
+      res.status(500).send('Error creating user');
     }
-    catch (error) {
-        console.error('Error creating user:', error);
-    }
-    res.send('User created');
-});
+  });
 
 module.exports = router;
 
@@ -81,7 +98,7 @@ module.exports = router;
 router.put('/users/:id/:type', async (req, res) => {
     console.log('Modifying user:', req.body);
     const { id, type } = req.params;
-    const { nom, prenom, adresseMail, motDePasse,dateDeNaissance } = req.body;
+    const { nom, prenom, adresseMail, motDePasse, dateDeNaissance } = req.body;
     console.log('date de naissance est :', dateDeNaissance);
     try {
         await sequelize.query(`UPDATE ${type} SET nom = '${nom}', prenom = '${prenom}', adresseMail = '${adresseMail}',dateDeNaissance = '${dateDeNaissance}', motDePasse = '${motDePasse}' WHERE id = ${id}`);
