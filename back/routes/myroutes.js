@@ -53,6 +53,19 @@ router.get('/users', async (req, res) => {
     res.send({voyageurs, clientsBailleurs, prestataires});
 });
 
+router.get('/users/count/:type', async (req, res) => {
+    console.log('Route /count called');
+    const type = req.params.type;
+    try {
+        const [result] = await sequelize.query(`SELECT COUNT(*) AS count FROM ${type}`);
+        console.log(result);
+        res.json({ count: result[0].count });
+    } catch (error) {
+        console.error('Error fetching user count:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 router.get('/users/:id/:type', async (req, res) => {
     console.log('route /users/:id called');
     const id = req.params.id;

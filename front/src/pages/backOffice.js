@@ -1,5 +1,7 @@
 import React from 'react';
 import './backOffice.css'
+import { Link, NavLink } from 'react-router-dom';
+
 
 const backOffice = () => {
     const toUser = () => {
@@ -10,6 +12,9 @@ const backOffice = () => {
     }
     const toRes = () => {
         window.location.replace("./gestionReservations");
+    }
+    const toStat = () => {
+        window.location.replace("./statistiques");
     }
 
     return (
@@ -23,7 +28,7 @@ const backOffice = () => {
                 <button onClick={toUser}>Gestion des Utilisateurs</button>
                 <button onClick={toRes}>Gestion des Réservations</button>
                 <button>Gestion des Paiements</button>
-                <button>Statistiques et rapports</button>
+                <button onClick={toStat}>Statistiques et rapports</button>
             </div>
         </div>
     );

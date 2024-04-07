@@ -11,6 +11,27 @@ export const fetchUsers = async () => {
       console.log(error);
     }
   };
+
+  export const fetchNombreUsers = async (type) => {
+    try {
+      const response = await fetch(`${URL_USERS}/count/${type}`);
+      const data = await response.json();
+      return data;
+    } catch (error){
+      console.log(error);
+    }
+  }
+
+  // export const fetchAgeMoyenUsers = async () => {
+  //   try {
+  //     const response = await fetch(`${URL_USERS}/users/moyenne-age`);
+  //     const data = await response.json();
+  //     return data;
+  //   } catch (error){
+  //     console.log(error);
+  //   }
+  // }
+  
   
   export const createUser = async (userData) => {
     try {
