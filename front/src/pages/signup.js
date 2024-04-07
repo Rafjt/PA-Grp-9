@@ -4,90 +4,12 @@ import { useState } from "react";
 import { createUser } from "../services";
 
 const Signup = () => {
-  // useState= undefined;
 
   // const [users, setUsers] = useState({
-  //     voyageurs: [],
-  //     clientsbailleurs: [],
-  //     prestataires: [],
+  //   voyageurs: [],
+  //   clientsBailleurs: [],
+  //   prestataires: [],
   // });
-
-  // const [form, setForm] = useState({
-  //     nom: '',
-  //     prenom: '',
-  //     adresseMail: '', // Updated property name
-  //     motDePasse: '', // Updated property name
-  //     admin: '0',
-  //     type: 'VOYAGEURS',
-  // });
-
-  //     const handleChange = (e) => {
-  //         setForm({
-  //             ...form,
-  //             [e.target.name]: e.target.value,
-  //         });
-  //     };
-
-  //     const handleSubmit = async (e) => {
-  //         e.preventDefault();
-
-  //         const response = await fetch('http://localhost:3001/api/users', {
-  //             method: 'POST',
-  //             headers: {
-  //                 'Content-Type': 'application/json',
-  //             },
-  //             body: JSON.stringify(form),
-  //         });
-
-  //         const data = await response.json();
-  //         console.log(data);
-  //     };
-
-  // const [searchTerm, setSearchTerm] = useState('');
-
-  // const idFields = {
-  //     voyageurs: 'id',
-  //     clientsbailleurs: 'id',
-  //     prestataires: 'id',
-  // };
-
-  // useEffect(() => {
-  //     fetch('http://localhost:3001/api/users')
-  //         .then((response) => response.json())
-  //         .then((data) => {
-  //             console.log('here:', data);
-  //             setUsers(data);
-  //         })
-  //         .catch((error) => console.log(error));
-  // }, []);
-
-  // const handleDelete = (userId, userType) => {
-  //     fetch(`http://localhost:3001/api/users/${userType}/${userId}`, { method: 'DELETE' })
-  //     .then((response) => {
-  //         if (response.ok) {
-  //             // Delete operation successful, update the state to reflect changes
-  //             setUsers((prevUsers) => ({
-  //                 ...prevUsers,
-  //                 [userType]: prevUsers[userType].filter((user) => user[idFields[userType]] !== userId),
-  //             }));
-  //         } else {
-  //             throw new Error('Failed to delete user');
-  //         }
-  //     })
-  //     .catch((error) => console.error('Error deleting user:', error));
-  // };
-
-  // const handleModify = (userId) => {};
-
-  // const handleSearch = (event) => {
-  //     setSearchTerm(event.target.value);
-  // };
-
-  const [users, setUsers] = useState({
-    voyageurs: [],
-    clientsBailleurs: [],
-    prestataires: [],
-  });
 
   const [form, setForm] = useState({
     nom: "",
@@ -96,7 +18,7 @@ const Signup = () => {
     adresseMail: "",
     motDePasse: "",
     admin: "0",
-    type: "",
+    type: "voyageurs",
   });
 
   const handleChange = (e) => {
@@ -144,42 +66,47 @@ const Signup = () => {
       </div>
       <form onSubmit={handleSubmit}>
         <input
-          class="input"
-          type="text"
-          placeholder="Nom"
-          value={form.nom}
-          onChange={handleChange}
+            className="input"
+            type='text'
+            placeholder='Nom'
+            name='nom'
+            value={form.nom}
+            onChange={handleChange}
         />
         <input
-          class="input"
-          type="text"
-          placeholder="Prénom"
-          value={form.prenom}
-          onChange={handleChange}
+            className="input"
+            type="text"
+            placeholder="Prénom"
+            name="prenom"
+            value={form.prenom}
+            onChange={handleChange}
         />
         <input
-          class="input"
-          type="date"
-          placeholder="Date de naissance"
-          value={form.dateDeNaissance}
-          onChange={handleChange}
+            className="input"
+            type="date"
+            placeholder="Date de naissance"
+            name="dateDeNaissance"
+            value={form.dateDeNaissance}
+            onChange={handleChange}
         />
         <input
-          class="input"
-          type="email"
-          placeholder="Adresse email"
-          value={form.adresseMail}
-          onChange={handleChange}
+            className="input"
+            type="email"
+            placeholder="Adresse mail"
+            name="adresseMail"
+            value={form.adresseMail}
+            onChange={handleChange}
         />
         <div>
           <div>
             <input
-              id="mdp"
-              class="input mt-3"
-              type="password"
-              placeholder="Mot de passe"
-              value={form.motDePasse}
-              onChange={handleChange}
+            id="mdp"
+            className="input"
+            type="password"
+            placeholder="Mot de passe"
+            name="motDePasse"
+            value={form.motDePasse}
+            onChange={handleChange}
             />
             <br />
             <label class="position-relative d-inline-block text-center showpwd">
@@ -209,17 +136,19 @@ const Signup = () => {
           value={form.type}
           onChange={handleChange}
         >
-          <option value="VOYAGEURS">Voyageur</option>
-          <option value="CLIENTSBAILLEURS">Bailleur</option>
-          <option value="PRESTATAIRES">Prestataire</option>
+          <option value="voyageurs">Voyageur</option>
+          <option value="clientsBailleurs">Bailleur</option>
+          <option value="prestataires">Prestataire</option>
         </select>
 
         <br></br>
-        <input className="input" type="submit" value="Créer" method="POST">
-          <button type="submit" class="btn btn-dark btn-lg mt-4">
-            Créer un compte
-          </button>
-        </input>
+        <button
+          className="input"
+          type="submit"
+          class="btn btn-dark btn-lg mt-4"
+        >
+          Créer un compte
+        </button>
       </form>
     </div>
   );
