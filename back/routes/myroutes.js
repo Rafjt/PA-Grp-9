@@ -1,6 +1,7 @@
 const express = require('express');
 const sequelize = require('../database');
 // const {fs} = require('fs');
+const { QueryTypes } = require('sequelize');
 
 const router = express.Router();
 
@@ -65,32 +66,15 @@ router.get('/users/:id/:type', async (req, res) => {
 
 router.post('/users', async (req, res) => {
     console.log('Creating user:', req.body);
-    const { nom, prenom, adresseMail, motDePasse, admin, dateDeNaissance, type } = req.body;
-    
+    const { nom, prenom, adresseMail, motDePasse, admin, dateDeNaissance,type } = req.body;
     try {
-      // Use parameterized query to safely insert data and convert date format
-      await sequelize.query(
-        `INSERT INTO ${type} (nom, prenom, adresseMail, motDePasse, dateDeNaissance, admin) 
-        VALUES (:nom, :prenom, :adresseMail, :motDePasse, STR_TO_DATE(:dateDeNaissance, '%d/%m/%Y'), :admin)`,
-        {
-          replacements: {
-            nom,
-            prenom,
-            adresseMail,
-            motDePasse,
-            dateDeNaissance,
-            admin
-          },
-          type: QueryTypes.INSERT // Specify the query type as INSERT
-        }
-      );
-      
-      res.send('User created');
-    } catch (error) {
-      console.error('Error creating user:', error);
-      res.status(500).send('Error creating user');
+        await sequelize.query(`INSERT INTO ${type} (nom, prenom, adresseMail, motDePasse, admin, dateDeNaissance) VALUES ('${nom}', '${prenom}', '${adresseMail}', '${motDePasse}', ${admin}, '${dateDeNaissance}')`);
     }
-  });
+    catch (error) {
+        console.error('Error creating user:', error);
+    }
+    res.send('User created');
+});
 
 module.exports = router;
 
