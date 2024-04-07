@@ -8,22 +8,15 @@ import { fetchAnnonce, deleteAnnonce, createAnnonce } from '../services';
 const GestionAnnonce = () => {
     const [annonces, setAnnonces] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
-    const [bien, setBien] = useState({
-        nomBien: '',
-        description: '',
-        idClientBailleur: '',
-        prix: '',
-        disponible: '',
-    });
 
     const [form, setForm] = useState({
         description: '',
         nomBien: '',
         statutValidation: '',
         cheminImg: '',
-        disponible: '',
+        disponible: '1', // default value set to "Oui"
         id: '',
-        idClientBailleur: '',
+        id_ClientBailleur: '',
         prix: '',
     });
 
@@ -52,9 +45,9 @@ const GestionAnnonce = () => {
         try {
             const data = await createAnnonce({
                 ...form,
-                ...bien
             });
             setAnnonces([...annonces, data]);
+            console.log('Annonce created:', data);
             console.log(data);
         } catch (error) {
             console.error('Error creating annonce:', error);
@@ -106,8 +99,8 @@ const GestionAnnonce = () => {
                         className="input"
                         type="number"
                         placeholder="ID du client bailleur"
-                        name="idClientBailleur"
-                        value={form.idClientBailleur}
+                        name="id_ClientBailleur"
+                        value={form.id_ClientBailleur}
                         onChange={handleChange}
                     />
                     <input
@@ -167,7 +160,7 @@ const GestionAnnonce = () => {
                         annonce && <div key={annonce.id} className="annonce">
                             <img src={`/img/bien${annonce.id}.jpeg`} alt={annonce.nomBien} className='img' />
                             <h2> ID :{annonce.id}</h2>
-                            <h2> ID du client bailleur propriétaire :{annonce.idClientBailleur}</h2>
+                            <h2> ID du client bailleur propriétaire :{annonce.id_ClientBailleur}</h2>
                             <h2>{annonce.nomBien}</h2>
                             <h3>Prix par nuits {annonce.prix}€</h3>
                             <button onClick={() => handleDelete(annonce.id)}>

@@ -119,9 +119,9 @@ router.delete('/bienImo/:id', async (req, res) => {
 
 router.post('/bienImo', async (req, res) => {
     console.log('Creating bien:', req.body);
-    const { nomBien, description, idClientBailleur } = req.body;
+    const { nomBien, description, id_ClientBailleur, prix, disponible} = req.body;
     try {
-        await sequelize.query(`INSERT INTO bienImo (nomBien, description, idClientBailleur) VALUES ('${nomBien}', '${description}', ${idClientBailleur})`);
+        await sequelize.query(`INSERT INTO bienImo (nomBien, description, id_ClientBailleur, statutValidation, prix, disponible) VALUES ('${nomBien}', '${description}', '${id_ClientBailleur}', '0', '${prix}', '${disponible}')`);
     }
     catch (error) {
         console.error('Error creating bien:', error);
