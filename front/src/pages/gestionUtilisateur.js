@@ -18,7 +18,7 @@ const GestionUtilisateur = () => {
         adresseMail: '',
         motDePasse: '',
         admin: '0',
-        type: '',
+        type: 'voyageurs',
       });
     
       const [searchTerm, setSearchTerm] = useState('');
@@ -54,7 +54,7 @@ const GestionUtilisateur = () => {
         // e.preventDefault();
         console.log("here");
         const data = await createUser(form);
-        console.log(data);
+        // window.location.reload();
       };
     
       const handleDelete = (userId, userType) => {
@@ -75,7 +75,7 @@ const GestionUtilisateur = () => {
       };
     
       if (!users) {
-        return <div>Loading...</div>; // Render a loading indicator while users data is being fetched
+        return <div>Loading...</div>;
       }
   return (
     <div className="gestionUtilisateur">
@@ -149,9 +149,9 @@ const GestionUtilisateur = () => {
             value={form.type}
             onChange={handleChange}
           >
-            <option value="VOYAGEURS">Voyageur</option>
-            <option value="CLIENTSBAILLEURS">Bailleur</option>
-            <option value="PRESTATAIRES">Prestataire</option>
+            <option value="voyageurs">Voyageur</option>
+            <option value="clientsBailleurs">Bailleur</option>
+            <option value="prestataires">Prestataire</option>
           </select>
           <br />
           <input
