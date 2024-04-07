@@ -96,19 +96,19 @@ router.put('/users/:id/:type', async (req, res) => {
 
 // GESTION DES BIENS/ANNONCES
 
-router.get('/bienimo', async (req, res) => {
-    const [bienimo] = await sequelize.query('SELECT * FROM bienimo');
-    console.log(bienimo);
-    res.send(bienimo);
+router.get('/bienImo', async (req, res) => {
+    const [bienImo] = await sequelize.query('SELECT * FROM bienImo');
+    console.log(bienImo);
+    res.send(bienImo);
 });
 
-router.delete('/bienimo/:id', async (req, res) => {
+router.delete('/bienImo/:id', async (req, res) => {
     const {id} = req.params;
 
     console.log('trying to delete bien:', id);
 
     try {
-        await sequelize.query(`DELETE FROM bienimo WHERE id = ${id}`);
+        await sequelize.query(`DELETE FROM bienImo WHERE id = ${id}`);
         res.send('Bien deleted');
     } catch (error) {
         console.error('Error deleting bien:', error);
@@ -117,11 +117,11 @@ router.delete('/bienimo/:id', async (req, res) => {
 });
 
 
-router.post('/bienimo', async (req, res) => {
+router.post('/bienImo', async (req, res) => {
     console.log('Creating bien:', req.body);
     const { nomBien, description, idClientBailleur } = req.body;
     try {
-        await sequelize.query(`INSERT INTO bienimo (nomBien, description, idClientBailleur) VALUES ('${nomBien}', '${description}', ${idClientBailleur})`);
+        await sequelize.query(`INSERT INTO bienImo (nomBien, description, idClientBailleur) VALUES ('${nomBien}', '${description}', ${idClientBailleur})`);
     }
     catch (error) {
         console.error('Error creating bien:', error);
@@ -129,21 +129,21 @@ router.post('/bienimo', async (req, res) => {
     res.send('Bien created');
 });
 
-router.get('/bienimo/:id', async (req, res) => {
-    console.log('route /bienimo/:id called');
+router.get('/bienImo/:id', async (req, res) => {
+    console.log('route /bienImo/:id called');
     const id = req.params.id;
-    const [bien] = await sequelize.query(`SELECT * FROM bienimo WHERE id = ${id}`);
+    const [bien] = await sequelize.query(`SELECT * FROM bienImo WHERE id = ${id}`);
     console.log(bien);
     res.send(bien[0]);
 });
 
-router.put('/bienimo/:id', async (req, res) => {
+router.put('/bienImo/:id', async (req, res) => {
     console.log('Modifying bien:', req.body);
     const { id } = req.params;
     const { nomBien, description, id_ClientBailleur, prix } = req.body;
     console.log('prix est :', prix);
     try {
-        await sequelize.query(`UPDATE bienimo SET nomBien = '${nomBien}', description = '${description}', prix = '${prix}', id_ClientBailleur = ${id_ClientBailleur} WHERE id = ${id}`);
+        await sequelize.query(`UPDATE bienImo SET nomBien = '${nomBien}', description = '${description}', prix = '${prix}', id_ClientBailleur = ${id_ClientBailleur} WHERE id = ${id}`);
     }
     catch (error) {
         console.error('Error modifying bien:', error);
