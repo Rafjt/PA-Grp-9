@@ -140,10 +140,11 @@ router.get('/bienImo/:id', async (req, res) => {
 router.put('/bienImo/:id', async (req, res) => {
     console.log('Modifying bien:', req.body);
     const { id } = req.params;
-    const { nomBien, description, id_ClientBailleur, prix } = req.body;
+    const { nomBien, description, id_ClientBailleur, prix, cheminImg } = req.body;
+    newDescription = description.replace(/'/g, "''");
     console.log('prix est :', prix);
     try {
-        await sequelize.query(`UPDATE bienImo SET nomBien = '${nomBien}', description = '${description}', prix = '${prix}', id_ClientBailleur = ${id_ClientBailleur} WHERE id = ${id}`);
+        await sequelize.query(`UPDATE bienImo SET nomBien = '${nomBien}', description = '${newDescription}', prix = '${prix}',cheminImg = '${cheminImg}', id_ClientBailleur = ${id_ClientBailleur} WHERE id = ${id}`);
     }
     catch (error) {
         console.error('Error modifying bien:', error);
