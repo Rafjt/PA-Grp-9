@@ -7,6 +7,8 @@ const UpdateAnnonce = () => {
 
     const { id } = useParams();
 
+    const [initialValues, setInitialValues] = useState(null);
+
     const [annonceData, setAnnonceData] = useState(null);
     const [values, setValues] = useState({
         description: '',
@@ -24,18 +26,24 @@ const UpdateAnnonce = () => {
             .then((response) => response.json())
             .then((data) => {
                 if (loading) {
-                    setValues({
+                    const initialData = {
                         description: data.description,
                         nomBien: data.nomBien,
                         cheminImg: data.cheminImg,
                         disponible: data.disponible,
                         id_ClientBailleur: data.id_ClientBailleur,
                         prix: data.prix,
-                    });
+                    };
+                    setValues(initialData);
+                    setInitialValues(initialData);
                     setLoading(false);
                 }
             });
     }, [id, loading]);
+
+    const hasFormChanged = () => {
+        return JSON.stringify(values) !== JSON.stringify(initialValues);
+    }
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -99,7 +107,7 @@ const UpdateAnnonce = () => {
                             <option value="0">Non</option>
                         </select>
                         <br></br>
-                        <button type="submit" onClick={handleModify} className="btn btn-dark btn-lg mt-4">
+                        <button type="submit" onClick={handleModify} className="btn btn-dark btn-lg mt-4" disabled={!hasFormChanged()}>
                             Confirmer les modifications
                         </button>
                     </form>
