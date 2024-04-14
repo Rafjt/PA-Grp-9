@@ -1,16 +1,17 @@
 import "./gestionUtilisateur.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Link } from "react-router-dom";
-import { fetchAgeMoyenUsers, fetchNombreUsers } from "../services";
+import { fetchNombreUsers, fetchAgeMoyenUsers } from "../services";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useState, useEffect } from "react";
 
 const Statistiques = () => {
+  //PARTIE UTILISATEUR
   const [voyageursCount, setVoyageursCount] = useState(0);
   const [clientsBailleursCount, setClientsBailleursCount] = useState(0);
   const [prestatairesCount, setPrestatairesCount] = useState(0);
   const [totalUsersCount, setTotalUsersCount] = useState(0);
-//   const [ageMoyenUsers, setAgeMoyenUsers] = useState(0);
+  const [meanAge, setMeanAge] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -23,33 +24,33 @@ const Statistiques = () => {
 
         const prestatairesData = await fetchNombreUsers("prestataires");
         setPrestatairesCount(prestatairesData.count);
+
+        const ageMoyenData = await fetchAgeMoyenUsers();
+        setMeanAge(ageMoyenData.mean_age);
       } catch (error) {
-        console.error("Error fetching user counts:", error);
+        console.error("Error fetching user data:", error);
       }
     };
 
     fetchData();
-  }, []); // Fetch data on component mount
+  }, []);
 
   useEffect(() => {
-    // Calculate total users count whenever any of the individual counts change
     const totalUsers =
       voyageursCount + clientsBailleursCount + prestatairesCount;
     setTotalUsersCount(totalUsers);
   }, [voyageursCount, clientsBailleursCount, prestatairesCount]);
 
-//   useEffect(() => {
-//     const fetchAge = async () => {
-//       try {
-//         const ageMoyen = await fetchAgeMoyenUsers(); // Use fetchMeanAge function
-//         setAgeMoyenUsers(ageMoyen);
-//       } catch (error) {
-//         console.error("Error fetching user counts:", error);
-//       }
-//     };
+  const getTrimmedMeanAge = () => {
+    if (meanAge) {
+      const meanAgeString = meanAge.toString();
+      const trimmedAge = parseFloat(meanAgeString).toFixed(1); // Trim the mean age to one decimal place
+      return trimmedAge;
+    }
+    return 0;
+  };
 
-//     fetchAge();
-//   }, []); // Fetch data on component mount
+  //PARTIE ANNONCES/BIENS
 
   return (
     <body>
@@ -63,13 +64,13 @@ const Statistiques = () => {
               <li>Nombre de clients bailleurs: {clientsBailleursCount}</li>
               <li>Nombre de prestataires: {prestatairesCount}</li>
               <li>Nombre total d'utilisateurs: {totalUsersCount}</li>
-              {/* <li>Age moyen des utilisateurs: {ageMoyenUsers}</li> */}
+              <li>Age moyen des utilisateurs: {getTrimmedMeanAge()}</li>
             </ul>
           </div>
           <div className="col-md-6">
             <h3>Annonces</h3>
             <ul className="list-unstyled">
-              <li>Nombre d'annonces</li>
+              <li>Nombre d'annonces: {}</li>
               <li>Prix moyen des annonces</li>
             </ul>
           </div>
