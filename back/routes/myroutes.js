@@ -157,9 +157,9 @@ router.delete('/bienImo/:id', async (req, res) => {
 
 router.post('/bienImo', async (req, res) => {
     console.log('Creating bien:', req.body);
-    const { nomBien, description, idClientBailleur } = req.body;
+    const { nomBien, description, id_ClientBailleur, prix, disponible} = req.body;
     try {
-        await sequelize.query(`INSERT INTO bienImo (nomBien, description, idClientBailleur) VALUES ('${nomBien}', '${description}', ${idClientBailleur})`);
+        await sequelize.query(`INSERT INTO bienImo (nomBien, description, id_ClientBailleur, statutValidation, prix, disponible) VALUES ('${nomBien}', '${description}', '${id_ClientBailleur}', '0', '${prix}', '${disponible}')`);
     }
     catch (error) {
         console.error('Error creating bien:', error);
@@ -178,10 +178,11 @@ router.get('/bienImo/:id', async (req, res) => {
 router.put('/bienImo/:id', async (req, res) => {
     console.log('Modifying bien:', req.body);
     const { id } = req.params;
-    const { nomBien, description, id_ClientBailleur, prix } = req.body;
+    const { nomBien, description, id_ClientBailleur, prix, cheminImg } = req.body;
+    newDescription = description.replace(/'/g, "''");
     console.log('prix est :', prix);
     try {
-        await sequelize.query(`UPDATE bienImo SET nomBien = '${nomBien}', description = '${description}', prix = '${prix}', id_ClientBailleur = ${id_ClientBailleur} WHERE id = ${id}`);
+        await sequelize.query(`UPDATE bienImo SET nomBien = '${nomBien}', description = '${newDescription}', prix = '${prix}',cheminImg = '${cheminImg}', id_ClientBailleur = ${id_ClientBailleur} WHERE id = ${id}`);
     }
     catch (error) {
         console.error('Error modifying bien:', error);
