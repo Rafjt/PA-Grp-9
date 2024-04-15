@@ -121,3 +121,36 @@ a.modif {
 a.modif :hover {
   background-color: #444;
 }
+
+.usersContainer {
+  border-radius: 20px; /* Rounded corners */
+  box-shadow: 1 px 8px rgba(0, 0, 0, 0.1); /* Slight shadow */
+}
+
+.custom-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.custom-table th,
+.custom-table td {
+  font-family: 'roboto', sans-serif; /* Smoother text */
+}
+
+.custom-table td {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.long-column {
+  overflow-x: hidden;
+}
+
+.long-column:hover {
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.narrow-column {
+  width: 75px;
+}
