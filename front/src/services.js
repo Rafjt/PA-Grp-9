@@ -21,10 +21,15 @@ export const fetchUsers = async () => {
         },
         body: JSON.stringify(userData),
       });
+  
+      if (response.status === 409) {
+        throw new Error("Email already exists");
+      }
+  
       const data = await response.json();
       return data;
     } catch (error) {
-      console.log(error);
+      throw error; // Re-throw the error to be handled by the calling function
     }
   };
   

@@ -2,6 +2,7 @@ const express = require('express');
 const sequelize = require('../database');
 // const {fs} = require('fs');
 const { QueryTypes } = require('sequelize');
+const bcrypt = require('bcrypt');
 
 const router = express.Router();
 
@@ -66,15 +67,30 @@ router.get('/users/:id/:type', async (req, res) => {
 
 router.post('/users', async (req, res) => {
     console.log('Creating user:', req.body);
-    const { nom, prenom, adresseMail, motDePasse, admin, dateDeNaissance,type } = req.body;
+    const { nom, prenom, adresseMail, motDePasse, admin, dateDeNaissance, type } = req.body;
+    
     try {
-        await sequelize.query(`INSERT INTO ${type} (nom, prenom, adresseMail, motDePasse, admin, dateDeNaissance) VALUES ('${nom}', '${prenom}', '${adresseMail}', '${motDePasse}', ${admin}, '${dateDeNaissance}')`);
-    }
-    catch (error) {
+        // Check if the email already exists in the database
+        const existingUser = await sequelize.query(`SELECT * FROM ${type} WHERE adresseMail = '${adresseMail}'`, { type: QueryTypes.SELECT });
+
+        // If the email already exists, return a 409 Conflict status
+        if (existingUser.length > 0) {
+            return res.status(409).send('Email already exists');
+        }
+
+        // Hash the password
+        const hashedPassword = await bcrypt.hash(motDePasse, 10); // 10 is the number of salt rounds
+
+        // Insert the user data into the database
+        await sequelize.query(`INSERT INTO ${type} (nom, prenom, adresseMail, motDePasse, admin, dateDeNaissance) VALUES ('${nom}', '${prenom}', '${adresseMail}', '${hashedPassword}', ${admin}, '${dateDeNaissance}')`);
+    } catch (error) {
         console.error('Error creating user:', error);
+        return res.status(500).send('Error creating user');
     }
-    res.send('User created');
+    
+    res.send();
 });
+
 
 module.exports = router;
 
