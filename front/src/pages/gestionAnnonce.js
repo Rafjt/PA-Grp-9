@@ -12,6 +12,8 @@ const GestionAnnonce = () => {
     const [searchTerm, setSearchTerm] = useState('');
 
     const [filterValues, setFilterValues] = useState({
+        prixMin: '',
+        prixMax: '',
         typeDePropriete: 'Tout',
         nombreChambres: 'Tout',
         nombreLits: 'Tout',
@@ -26,69 +28,6 @@ const GestionAnnonce = () => {
         salleDeSport: false,
         climatisation: false,
     });
-    
-    // const filteredAnnonces = annonces.filter((annonce) => {
-    //     // Implement your filtering logic here
-    //     // Return true if the annonce passes all filter conditions, otherwise false
-    //     const {
-    //         typeDePropriete,
-    //         nombreChambres,
-    //         nombreLits,
-    //         nombreSallesDeBain,
-    //         wifi,
-    //         cuisine,
-    //         balcon,
-    //         jardin,
-    //         parking,
-    //         piscine,
-    //         jaccuzzi,
-    //         salleDeSport,
-    //         climatisation
-    //     } = filterValues;
-
-    //     // Apply filter conditions
-    //     if (typeDePropriete && annonce.typeDePropriete !== typeDePropriete) {
-    //         return false;
-    //     }
-    //     if (nombreChambres !== 'Tout' && annonce.nombrenombreChambres !== parseInt(nombreChambres)) {
-    //         return false;
-    //     }
-    //     if (nombreLits !== 'Tout' && annonce.nombrenombreLits !== parseInt(nombreLits)) {
-    //         return false;
-    //     }
-    //     if (nombreSallesDeBain !== 'Tout' && annonce.nombrenombreSallesDeBain !== parseInt(nombreSallesDeBain)) {
-    //         return false;
-    //     }
-    //     if (wifi && !annonce.wifi) {
-    //         return false;
-    //     }
-    //     if (cuisine && !annonce.cuisine) {
-    //         return false;
-    //     }
-    //     if (balcon && !annonce.balcon) {
-    //         return false;
-    //     }
-    //     if (jardin && !annonce.jardin) {
-    //         return false;
-    //     }
-    //     if (parking && !annonce.parking) {
-    //         return false;
-    //     }
-    //     if (piscine && !annonce.piscine) {
-    //         return false;
-    //     }
-    //     if (jaccuzzi && !annonce.jaccuzzi) {
-    //         return false;
-    //     }
-    //     if (salleDeSport && !annonce.salleDeSport) {
-    //         return false;
-    //     }
-    //     if (climatisation && !annonce.climatisation) {
-    //         return false;
-    //     }
-
-    //     return true;
-    // });
 
     
     const handleFilterChange = (e) => {
@@ -195,7 +134,6 @@ const GestionAnnonce = () => {
     };
 
     const isFilterActive = () => {
-        // Check if any filter value is different from its default value
         return Object.values(filterValues).some(value => (
             typeof value === 'boolean' ? value === true : value !== 'Tout'
         ));
@@ -400,6 +338,12 @@ const GestionAnnonce = () => {
                             <option value="7">7</option>
                             <option value="8+">8+</option>
                         </select>
+                    </label>
+                    <br></br>
+                    <label>
+                        <h5>Prix</h5>
+                        <input type='number' name='prixMin' value={filterValues.prixMin} onChange={handleFilterChange} placeholder='Prix min' />
+                        <input type='number' name='prixMax' value={filterValues.prixMax} onChange={handleFilterChange} placeholder='Prix max' />
                     </label>
                 </div>
                 <br></br>

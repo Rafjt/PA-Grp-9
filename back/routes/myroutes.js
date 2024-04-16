@@ -224,7 +224,7 @@ router.put('/bienImo/:id', async (req, res) => {
 });
 
 router.post('/bienImo/filter', async (req, res) => {
-    let { typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation } = req.body;
+    let { typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation, prixMin, prixMax} = req.body;
 
     wifi = wifi ? 1 : 0;
     cuisine = cuisine ? 1 : 0;
@@ -256,6 +256,29 @@ router.post('/bienImo/filter', async (req, res) => {
             query += ` ${property} = ?`;
             params.push(properties[property]);
         }
+    }
+
+    // Add price range filter
+    if (prixMin) {
+        if (params.length === 0) {
+            query += ' WHERE';
+        } else {
+            query += ' AND';
+        }
+
+        query += ' prix >= ?';
+        params.push(prixMin);
+    }
+
+    if (prixMax) {
+        if (params.length === 0) {
+            query += ' WHERE';
+        } else {
+            query += ' AND';
+        }
+
+        query += ' prix <= ?';
+        params.push(prixMax);
     }
 
     try {
