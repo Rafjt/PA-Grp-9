@@ -127,15 +127,20 @@ const GestionAnnonce = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const data = await fetchAnnonce();
+                let data;
+                if (isFilterActive()) {
+                    data = await fetchAnnonceFiltered(filterValues);
+                } else {
+                    data = await fetchAnnonce();
+                }
                 setAnnonces(data);
             } catch (error) {
                 console.error('Error fetching annonces:', error);
             }
         };
-
+    
         fetchData();
-    }, []);
+    }, [filterValues]); 
 
     const handleChange = (e) => {
         const value = e.target.type === 'checkbox' ? (e.target.checked ? 1 : 0) : e.target.value;
@@ -187,6 +192,13 @@ const GestionAnnonce = () => {
         catch (error) {
             console.error('Error applying filters:', error);
         }
+    };
+
+    const isFilterActive = () => {
+        // Check if any filter value is different from its default value
+        return Object.values(filterValues).some(value => (
+            typeof value === 'boolean' ? value === true : value !== 'Tout'
+        ));
     };
 
 
@@ -430,7 +442,6 @@ const GestionAnnonce = () => {
                         Climatisation
                     </label>
                 </div>
-                <button type='submit' className='filter-button'>Filtrer</button>
             </div>
             </form>
 
@@ -439,7 +450,8 @@ const GestionAnnonce = () => {
                     .filter(
                         (annonce) =>
                             annonce && annonce.nomBien && annonce.nomBien.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            annonce && annonce.id && annonce.id.toString() === searchTerm
+                            annonce && annonce.id && annonce.id.toString() === searchTerm ||
+                            annonce && annonce.propertyName && annonce.propertyName.toLowerCase().includes(searchTerm.toLowerCase())
                     )
                     .map((annonce) => (
                         annonce && <div key={annonce.id} className="annonce">
@@ -460,8 +472,8 @@ const GestionAnnonce = () => {
                         </div>
                     ))}
             </div>
-        </div>
-    );
+            </div>
+            );
 };
 
 export default GestionAnnonce;

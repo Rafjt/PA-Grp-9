@@ -226,7 +226,6 @@ router.put('/bienImo/:id', async (req, res) => {
 router.post('/bienImo/filter', async (req, res) => {
     let { typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation } = req.body;
 
-    // Convert boolean values to integers
     wifi = wifi ? 1 : 0;
     cuisine = cuisine ? 1 : 0;
     balcon = balcon ? 1 : 0;
@@ -237,10 +236,9 @@ router.post('/bienImo/filter', async (req, res) => {
     salleDeSport = salleDeSport ? 1 : 0;
     climatisation = climatisation ? 1 : 0;
 
-    // Convert string values to integers
-    nombreChambres = parseInt(nombreChambres);
-    nombreLits = parseInt(nombreLits);
-    nombreSallesDeBain = parseInt(nombreSallesDeBain);
+    nombreChambres = nombreChambres !== 'Tout' ? parseInt(nombreChambres) : nombreChambres;
+    nombreLits = nombreLits !== 'Tout' ? parseInt(nombreLits) : nombreLits;
+    nombreSallesDeBain = nombreSallesDeBain !== 'Tout' ? parseInt(nombreSallesDeBain) : nombreSallesDeBain;
 
     let query = 'SELECT * FROM bienImo';
     const params = [];
@@ -248,7 +246,7 @@ router.post('/bienImo/filter', async (req, res) => {
     const properties = { typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation };
     console.log(properties);
     for (const property in properties) {
-        if (properties[property] !== undefined && properties[property] !== 'Tout') {
+        if (properties[property] !== undefined && properties[property] !== 'Tout' && properties[property] !== 0) {
             if (params.length === 0) {
                 query += ' WHERE';
             } else {
