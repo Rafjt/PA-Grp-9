@@ -29,13 +29,15 @@ app.get('/index', async (req, res) => {
 });
 
 // Serve static files from the React app
-app.use(express.static(path.join(__dirname, 'front/src')));
+// app.use(express.static(path.join(__dirname, 'front/src')));
 
 // Include your routes
 // const myRoutes = require('../routes/myRoutes.js');
 
 // // Use my routes
 app.use('/api', router);
+
+app.use('/uploads', express.static('uploads'));
 
 // Handle other routes by serving the React app
 app.get('*', (req, res) => {

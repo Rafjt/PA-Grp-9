@@ -6,6 +6,8 @@ import { fetchAnnonce, deleteAnnonce, createAnnonce, fetchAnnonceFiltered } from
 // import Popup from 'reactjs-popup';
 // import 'reactjs-popup/dist/index.css';
 
+const BACK_URL = "http://localhost:3001";
+
 
 const GestionAnnonce = () => {
     const [annonces, setAnnonces] = useState([]);
@@ -410,7 +412,7 @@ const GestionAnnonce = () => {
                     )
                     .map((annonce) => (
                         annonce && <div key={annonce.id} className="annonce">
-                            <img src={`/img/bien${annonce.id}.jpeg`} alt={annonce.nomBien} className='img' />
+                            <img src={`${BACK_URL}/uploads/${annonce.cheminImg}`} alt={annonce.nomBien} className='img' />
                             <h2> ID :{annonce.id}</h2>
                             <h2> ID du client bailleur propriétaire :{annonce.id_ClientBailleur}</h2>
                             <h2>{annonce.nomBien}</h2>
