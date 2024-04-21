@@ -154,3 +154,7 @@ a.modif :hover {
 .narrow-column {
   width: 75px;
 }
+
+.seminarrow-column {
+  width: 200px;
+}

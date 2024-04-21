@@ -74,11 +74,17 @@ const Signup = () => {
       } catch (error) {
         if (error.message === "Email already exists") {
           formik.setErrors({
-            adresseMail: "Cet email est déjà utilisé. Veuillez en choisir un autre.",
+            adresseMail:
+              "Cet email est déjà utilisé. Veuillez en choisir un autre.",
           });
-        } else {
-          console.error("Error creating user:", error);
         }
+        if (error.message === "User is banned") {
+          formik.setErrors({
+            adresseMail:
+              "Cet email a été banni, veuillez contacter l'assistance",
+          });
+        }
+        console.error("Error creating user:", error);
       }
     },
   });
