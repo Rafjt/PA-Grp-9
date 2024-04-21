@@ -1,178 +1,233 @@
-const express = require('express');
-const sequelize = require('../database');
+const express = require("express");
+const sequelize = require("../database");
 // const {fs} = require('fs');
-const { QueryTypes } = require('sequelize');
-const bcrypt = require('bcrypt');
+const { QueryTypes } = require("sequelize");
+const bcrypt = require("bcrypt");
 
 const router = express.Router();
 
+router.delete("/users/:id/debannis", async (req, res) => {
+  const { id } = req.params;
 
-router.delete('/users/:userType/:id', async (req, res) => {
-    const {id} = req.params;
-    const {userType} = req.params;
+  console.log("Unbanning user:", id);
 
-    console.log('Deleting user:', id, userType);
+  try {
+    await sequelize.query(`DELETE FROM userBannis WHERE id = ${id}`);
+    res.send("User unbanned");
+  } catch (error) {
+    console.error("Error unbanning user:", error);
+    res.status(500).send("Failed to unban user");
+  }
+});
 
-    try {
-        await sequelize.query(`DELETE FROM ${userType} WHERE id = ${id}`);
-        res.send('User deleted');
-    } catch (error) {
-        console.error('Error deleting user:', error);
-        res.status(500).send('Failed to delete user');
-    }
+router.delete("/users/:userType/:id", async (req, res) => {
+  const { id } = req.params;
+  const { userType } = req.params;
+
+  console.log("Deleting user:", id, userType);
+
+  try {
+    await sequelize.query(`DELETE FROM ${userType} WHERE id = ${id}`);
+    res.send("User deleted");
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    res.status(500).send("Failed to delete user");
+  }
 });
 
 // Home route
-router.get('/', (req, res) => {
-    res.send('Home Page Route');
+router.get("/", (req, res) => {
+  res.send("Home Page Route");
 });
 
 // About route
-router.get('/about', (req, res) => {
-    res.send('About Page Route');
+router.get("/about", (req, res) => {
+  res.send("About Page Route");
 });
 
 // Portfolio route
-router.get('/portfolio', (req, res) => {
-    res.send('Portfolio Page Route');
+router.get("/portfolio", (req, res) => {
+  res.send("Portfolio Page Route");
 });
 
 // Services route
-router.get('/services', (req, res) => {
-    res.send('Services Page Route');
+router.get("/services", (req, res) => {
+  res.send("Services Page Route");
 });
 
 // GESTION DES UTILISATEURS
-router.get('/users', async (req, res) => {
-    const [voyageurs] = await sequelize.query('SELECT * FROM voyageurs');
-    const [clientsBailleurs] = await sequelize.query('SELECT * FROM clientsBailleurs');
-    const [prestataires] = await sequelize.query('SELECT * FROM prestataires');
-    console.log(voyageurs); 
-    console.log(clientsBailleurs);
-    console.log(prestataires);
+router.get("/users", async (req, res) => {
+  const [voyageurs] = await sequelize.query("SELECT * FROM voyageurs");
+  const [clientsBailleurs] = await sequelize.query(
+    "SELECT * FROM clientsBailleurs"
+  );
+  const [prestataires] = await sequelize.query("SELECT * FROM prestataires");
+  console.log(voyageurs);
+  console.log(clientsBailleurs);
+  console.log(prestataires);
 
-    res.send({voyageurs, clientsBailleurs, prestataires});
+  res.send({ voyageurs, clientsBailleurs, prestataires });
 });
 
-router.get('/users/:id/:type', async (req, res) => {
-    console.log('route /users/:id called');
-    const id = req.params.id;
-    const type = req.params.type;
-    console.log(type);
-    const [users] = await sequelize.query(`SELECT * FROM ${type} WHERE id = ${id}`);
-    console.log(users);
-    console.log("APPELER");
-    res.send(users[0]);
-}); 
+router.get("/users/:id/:type", async (req, res) => {
+  console.log("route /users/:id called");
+  const id = req.params.id;
+  const type = req.params.type;
+  console.log(type);
+  const [users] = await sequelize.query(
+    `SELECT * FROM ${type} WHERE id = ${id}`
+  );
+  console.log(users);
+  console.log("APPELER");
+  res.send(users[0]);
+});
 
-router.post('/users', async (req, res) => {
-    console.log('Creating user:', req.body);
-    const { nom, prenom, adresseMail, motDePasse, admin, dateDeNaissance, type } = req.body;
-    
-    try {
-        // Check if the email already exists in the database
-        const existingUser = await sequelize.query(`SELECT * FROM ${type} WHERE adresseMail = '${adresseMail}'`, { type: QueryTypes.SELECT });
+router.post("/users", async (req, res) => {
+  console.log("Creating user:", req.body);
+  const { nom, prenom, adresseMail, motDePasse, admin, dateDeNaissance, type } =
+    req.body;
 
-        // If the email already exists, return a 409 Conflict status
-        if (existingUser.length > 0) {
-            return res.status(409).send('Email already exists');
-        }
-
-        // Hash the password
-        const hashedPassword = await bcrypt.hash(motDePasse, 10); // 10 is the number of salt rounds
-
-        // Insert the user data into the database
-        await sequelize.query(`INSERT INTO ${type} (nom, prenom, adresseMail, motDePasse, admin, dateDeNaissance) VALUES ('${nom}', '${prenom}', '${adresseMail}', '${hashedPassword}', ${admin}, '${dateDeNaissance}')`);
-    } catch (error) {
-        console.error('Error creating user:', error);
-        return res.status(500).send('Error creating user');
+  try {
+    const existingUser = await sequelize.query(
+      `SELECT * FROM ${type} WHERE adresseMail = '${adresseMail}'`,
+      { type: QueryTypes.SELECT }
+    );
+    if (existingUser.length > 0) {
+      return res.status(409).send("Email already exists");
     }
-    
-    res.send();
-});
+    const bannedUser = await sequelize.query(
+      `SELECT * FROM userBannis WHERE adresseMail = '${adresseMail}'`,
+      { type: QueryTypes.SELECT }
+    );
+    if (bannedUser.length > 0) {
+      return res.status(403).send("User is banned");
+    }
 
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(motDePasse, 10); // 10 is the number of salt rounds
+
+    // Insert the user data into the database
+    await sequelize.query(
+      `INSERT INTO ${type} (nom, prenom, adresseMail, motDePasse, admin, dateDeNaissance) VALUES ('${nom}', '${prenom}', '${adresseMail}', '${hashedPassword}', ${admin}, '${dateDeNaissance}')`
+    );
+  } catch (error) {
+    console.error("Error creating user:", error);
+    return res.status(500).send("Error creating user");
+  }
+
+  res.send();
+});
 
 module.exports = router;
 
-
-router.put('/users/:id/:type', async (req, res) => {
-    console.log('Modifying user:', req.body);
-    const { id, type } = req.params;
-    const { nom, prenom, adresseMail, motDePasse, dateDeNaissance } = req.body;
-    console.log('date de naissance est :', dateDeNaissance);
-    try {
-        await sequelize.query(`UPDATE ${type} SET nom = '${nom}', prenom = '${prenom}', adresseMail = '${adresseMail}',dateDeNaissance = '${dateDeNaissance}', motDePasse = '${motDePasse}' WHERE id = ${id}`);
-    }
-    catch (error) {
-        console.error('Error modifying user:', error);
-    }
-    res.send('User modified');
+router.put("/users/:id/:type", async (req, res) => {
+  console.log("Modifying user:", req.body);
+  const { id, type } = req.params;
+  const { nom, prenom, adresseMail, motDePasse, dateDeNaissance } = req.body;
+  console.log("date de naissance est :", dateDeNaissance);
+  try {
+    await sequelize.query(
+      `UPDATE ${type} SET nom = '${nom}', prenom = '${prenom}', adresseMail = '${adresseMail}',dateDeNaissance = '${dateDeNaissance}', motDePasse = '${motDePasse}' WHERE id = ${id}`
+    );
+  } catch (error) {
+    console.error("Error modifying user:", error);
+  }
+  res.send("User modified");
 });
 
+router.post("/users/bannir/vatefaireenculer/:id/:type", async (req, res) => {
+  console.log("Modifying user:", req.body);
+  console.log(req);
+  const { id, type } = req.params;
+  const { nom, prenom, adresseMail } = req.body;
+  try {
+    await sequelize.query(
+      `INSERT INTO userBannis ( nom, prenom, adresseMail, dateBanissement) values ('${nom}', '${prenom}', '${adresseMail}', NOW());`
+    );
+    await sequelize.query(`DELETE FROM ${type} where id = ${id}`);
+  } catch (error) {
+    console.error("Error banning user:", error);
+    res.status(500).send("Error banning user");
+  }
+  res.send("User banned")
+});
+
+router.get("/users/bannis", async (req, res) => {
+  try {
+    const [bannedUsers] = await sequelize.query("SELECT * FROM userBannis");
+    res.json(bannedUsers);
+  } catch (error) {
+    console.error("Error fetching banned users:", error);
+    res.status(500).json({ error: "Failed to fetch banned users" });
+  }
+});
 
 // GESTION DES BIENS/ANNONCES
 
-router.get('/bienImo', async (req, res) => {
-    const [bienImo] = await sequelize.query('SELECT * FROM bienImo');
-    console.log(bienImo);
-    res.send(bienImo);
+router.get("/bienImo", async (req, res) => {
+  const [bienImo] = await sequelize.query("SELECT * FROM bienImo");
+  console.log(bienImo);
+  res.send(bienImo);
 });
 
-router.delete('/bienImo/:id', async (req, res) => {
-    const {id} = req.params;
+router.delete("/bienImo/:id", async (req, res) => {
+  const { id } = req.params;
 
-    console.log('trying to delete bien:', id);
+  console.log("trying to delete bien:", id);
 
-    try {
-        await sequelize.query(`DELETE FROM bienImo WHERE id = ${id}`);
-        res.send('Bien deleted');
-    } catch (error) {
-        console.error('Error deleting bien:', error);
-        res.status(500).send('Failed to delete bien');
-    }
+  try {
+    await sequelize.query(`DELETE FROM bienImo WHERE id = ${id}`);
+    res.send("Bien deleted");
+  } catch (error) {
+    console.error("Error deleting bien:", error);
+    res.status(500).send("Failed to delete bien");
+  }
 });
 
-
-router.post('/bienImo', async (req, res) => {
-    console.log('Creating bien:', req.body);
-    const { nomBien, description, id_ClientBailleur, prix, disponible} = req.body;
-    try {
-        await sequelize.query(`INSERT INTO bienImo (nomBien, description, id_ClientBailleur, statutValidation, prix, disponible) VALUES ('${nomBien}', '${description}', '${id_ClientBailleur}', '0', '${prix}', '${disponible}')`);
-    }
-    catch (error) {
-        console.error('Error creating bien:', error);
-    }
-    res.send('Bien created');
+router.post("/bienImo", async (req, res) => {
+  console.log("Creating bien:", req.body);
+  const { nomBien, description, id_ClientBailleur, prix, disponible } =
+    req.body;
+  try {
+    await sequelize.query(
+      `INSERT INTO bienImo (nomBien, description, id_ClientBailleur, statutValidation, prix, disponible) VALUES ('${nomBien}', '${description}', '${id_ClientBailleur}', '0', '${prix}', '${disponible}')`
+    );
+  } catch (error) {
+    console.error("Error creating bien:", error);
+  }
+  res.send("Bien created");
 });
 
-router.get('/bienImo/:id', async (req, res) => {
-    console.log('route /bienImo/:id called');
-    const id = req.params.id;
-    const [bien] = await sequelize.query(`SELECT * FROM bienImo WHERE id = ${id}`);
-    console.log(bien);
-    res.send(bien[0]);
+router.get("/bienImo/:id", async (req, res) => {
+  console.log("route /bienImo/:id called");
+  const id = req.params.id;
+  const [bien] = await sequelize.query(
+    `SELECT * FROM bienImo WHERE id = ${id}`
+  );
+  console.log(bien);
+  res.send(bien[0]);
 });
 
-router.put('/bienImo/:id', async (req, res) => {
-    console.log('Modifying bien:', req.body);
-    const { id } = req.params;
-    const { nomBien, description, id_ClientBailleur, prix, cheminImg } = req.body;
-    newDescription = description.replace(/'/g, "''");
-    console.log('prix est :', prix);
-    try {
-        await sequelize.query(`UPDATE bienImo SET nomBien = '${nomBien}', description = '${newDescription}', prix = '${prix}',cheminImg = '${cheminImg}', id_ClientBailleur = ${id_ClientBailleur} WHERE id = ${id}`);
-    }
-    catch (error) {
-        console.error('Error modifying bien:', error);
-    }
-    res.send('Bien modified');
+router.put("/bienImo/:id", async (req, res) => {
+  console.log("Modifying bien:", req.body);
+  const { id } = req.params;
+  const { nomBien, description, id_ClientBailleur, prix, cheminImg } = req.body;
+  newDescription = description.replace(/'/g, "''");
+  console.log("prix est :", prix);
+  try {
+    await sequelize.query(
+      `UPDATE bienImo SET nomBien = '${nomBien}', description = '${newDescription}', prix = '${prix}',cheminImg = '${cheminImg}', id_ClientBailleur = ${id_ClientBailleur} WHERE id = ${id}`
+    );
+  } catch (error) {
+    console.error("Error modifying bien:", error);
+  }
+  res.send("Bien modified");
 });
-
 
 // GESTION DES RESERVATIONS
 
-router.get('/reservation', async (req, res) => {
-    const [reservation] = await sequelize.query('SELECT * FROM reservation');
-    console.log(reservation);
-    res.send(reservation);
-}); 
+router.get("/reservation", async (req, res) => {
+  const [reservation] = await sequelize.query("SELECT * FROM reservation");
+  console.log(reservation);
+  res.send(reservation);
+});

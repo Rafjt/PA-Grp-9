@@ -1,8 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import './gestionUtilisateur.css';
+import React, { useState, useEffect } from "react";
+import "./gestionUtilisateur.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Link } from 'react-router-dom';
-import { fetchUsers, createUser, deleteUser } from '../services';
+import { Link } from "react-router-dom";
+import {
+  fetchUsers,
+  createUser,
+  deleteUser,
+  banUser,
+  fetchBannedUsers,
+  unbanUser,
+} from "../services";
 
 const GestionUtilisateur = () => {
   const [users, setUsers] = useState({
@@ -23,17 +30,34 @@ const GestionUtilisateur = () => {
 
   const [searchQuery, setSearchQuery] = useState("");
 
+  const [bannedUsers, setBannedUsers] = useState([]);
+
   const idFields = {
     voyageurs: "id",
     clientsBailleurs: "id",
     prestataires: "id",
   };
 
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const seconds = String(date.getSeconds()).padStart(2, "0");
+
+    return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+  }
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const data = await fetchUsers();
         setUsers(data);
+        const donnee = await fetchBannedUsers();
+        setBannedUsers(donnee);
       } catch (error) {
         console.error("Error fetching users:", error);
         // Handle error gracefully, such as displaying an error message or retrying the fetch
@@ -56,19 +80,6 @@ const GestionUtilisateur = () => {
     // window.location.reload();
   };
 
-  const handleDelete = (userId, userType) => {
-    deleteUser(userId, userType)
-      .then(() => {
-        setUsers((prevUsers) => ({
-          ...prevUsers,
-          [userType]: prevUsers[userType].filter(
-            (user) => user[idFields[userType]] !== userId
-          ),
-        }));
-      })
-      .catch((error) => console.error("Error deleting user:", error));
-  };
-
   const filteredUsers = Object.keys(users).reduce((acc, userType) => {
     const filtered = users[userType].filter(
       (user) =>
@@ -79,7 +90,47 @@ const GestionUtilisateur = () => {
     return { ...acc, [userType]: filtered };
   }, {});
 
+  const handleDelete = async (userId, userType) => {
+    try {
+      await deleteUser(userId, userType);
+      // Fetch updated data after deleting user
+      const updatedUsers = await fetchUsers();
+      setUsers(updatedUsers);
+    } catch (error) {
+      console.error("Error deleting user:", error);
+    }
+  };
 
+const handleBan = async (userId, userType, userData) => {
+  try {
+    // Ban the user
+    await banUser(userId, userType, userData);
+    // Fetch updated users after banning
+    const updatedUsers = await fetchUsers();
+    setUsers({
+      ...users,
+      [userType]: updatedUsers[userType],
+    });
+
+    // Fetch updated banned users after banning
+    const updatedBannedUsers = await fetchBannedUsers();
+    setBannedUsers(updatedBannedUsers);
+  } catch (error) {
+    console.error("Error banning user:", error);
+  }
+};
+
+
+  const unBan = async (userId) => {
+    try {
+      await unbanUser(userId);
+      // Fetch updated data after unbanning user
+      const updatedBannedUsers = await fetchBannedUsers();
+      setBannedUsers(updatedBannedUsers);
+    } catch (error) {
+      console.error("Error unbanning user:", error);
+    }
+  };
   if (!users) {
     return <div>Loading...</div>;
   }
@@ -221,10 +272,60 @@ const GestionUtilisateur = () => {
                     >
                       Modifier
                     </Link>
+
+                    <button
+                      onClick={() =>
+                        handleBan(
+                          user[idFields[userType]],
+                          userType,
+                          user // Pass user data to the handleBan function
+                        )
+                      }
+                      className="bannir ml-1"
+                    >
+                      Bannir
+                    </button>
                   </td>
                 </tr>
               ))
             )}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="greet">
+        <h2>Utilisateurs bannis</h2>
+      </div>
+      <div className="usersBannisContainer rounded shadow mt-3">
+        <table className="table table-bordered table-hover custom-table">
+          <thead>
+            <tr>
+              <th className="narrow-column">ID</th>
+              <th className="seminarrow-column">Nom</th>
+              <th className="seminarrow-column">Prénom</th>
+              <th>Adresse Email</th>
+              <th className="seminarrow-column">Date de bannissement</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {bannedUsers.map((user) => (
+              <tr key={user.id}>
+                <td>{user.id}</td>
+                <td>{user.nom}</td>
+                <td>{user.prenom}</td>
+                <td className="long-column">{user.adresseMail}</td>
+                <td>{formatDate(user.dateBanissement)}</td>
+                <td>
+                  <button
+                    onClick={() => unBan(user.id)}
+                    className="bannir ml-1"
+                  >
+                    Débannir
+                  </button>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
