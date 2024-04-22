@@ -3,8 +3,8 @@ import './gestionAnnonce.css';
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Link } from 'react-router-dom';
 import { fetchAnnonce, deleteAnnonce, createAnnonce, fetchAnnonceFiltered } from '../services';
-import Popup from 'reactjs-popup';
-import 'reactjs-popup/dist/index.css';
+// import Popup from 'reactjs-popup';
+// import 'reactjs-popup/dist/index.css';
 
 
 const GestionAnnonce = () => {
@@ -44,7 +44,7 @@ const GestionAnnonce = () => {
         nomBien: '',
         statutValidation: '',
         cheminImg: '',
-        disponible: '1', // default value set to "Oui"
+        disponible: '1', 
         id: '',
         id_ClientBailleur: '',
         prix: '',
@@ -82,15 +82,27 @@ const GestionAnnonce = () => {
     }, [filterValues]); 
 
     const handleChange = (e) => {
-        const value = e.target.type === 'checkbox' ? (e.target.checked ? 1 : 0) : e.target.value;
-        setForm({
-            ...form,
-            [e.target.name]: value,
-        });
+        if (e.target.type === 'file') {
+            // If the input is a file input, handle the file upload
+            const file = e.target.files[0]; // Get the first file from the input
+            setForm({
+                ...form,
+                pictures: file // Set the file object in the state
+            });
+        } else {
+            // For other inputs, handle as usual
+            const value = e.target.type === 'checkbox' ? (e.target.checked ? 1 : 0) : e.target.value;
+            setForm({
+                ...form,
+                [e.target.name]: value,
+            });
+        }
     };
+    
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        console.log('form:', form);
         try {
             const data = await createAnnonce({
                 ...form,
@@ -185,6 +197,7 @@ const GestionAnnonce = () => {
                         type="file"
                         placeholder="photos du bien"
                         name="pictures"
+                        accept='image/*'
                         onChange={handleChange}
                     />
                     <br />
@@ -258,8 +271,6 @@ const GestionAnnonce = () => {
                             Climatisation
                         </label>
                     </div>
-
-
                     <br />
                     <input
                         className="input"

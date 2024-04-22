@@ -3,8 +3,28 @@ const sequelize = require("../database");
 // const {fs} = require('fs');
 const { QueryTypes } = require("sequelize");
 const bcrypt = require("bcrypt");
-
+const multer = require('multer');
 const router = express.Router();
+const { exec } = require("child_process");
+
+// Multer configuration
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, 'uploads/') // Save uploaded files to the 'uploads' directory
+    },
+    filename: function (req, file, cb) {
+        // Extracting file extension
+        const fileExtension = file.originalname.split('.').pop();
+        // Getting the current timestamp
+        const timestamp = Date.now();
+        // Constructing the new filename
+        const newFilename = `image.${timestamp}.${fileExtension}`;
+        cb(null, newFilename); // Rename file with desired format
+      }
+    });
+  const upload = multer({ storage: storage });
+//
+
 
 router.delete("/users/:id/debannis", async (req, res) => {
   const { id } = req.params;
@@ -185,15 +205,20 @@ router.delete("/bienImo/:id", async (req, res) => {
 });
 
 
-router.post('/bienImo', async (req, res) => {
+router.post('/bienImo', upload.single('pictures'), async (req, res) => {
     console.log('Creating bien:', req.body);
-    const { nomBien, description, id_ClientBailleur, prix, disponible, typeDePropriete,nombreChambres,nombreLits,nombreSallesDeBain,wifi,cuisine,balcon,jardin,parking,piscine,jaccuzzi,salleDeSport,climatisation} = req.body;
-    newDescription = description.replace(/'/g, "''");
+    console.log('Uploaded file:', req.file); // Log uploaded file information
+    const { nomBien, description, id_ClientBailleur, prix, disponible, typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation} = req.body; // Get the filename of the uploaded image
+    const pictures = req.file.filename; // Get the filename of the uploaded image
+    console.log('pictures ==', pictures); // Log uploaded file information
+    // Handle description escaping single quotes
+    const newDescription = description.replace(/'/g, "''");
+
     try {
-        await sequelize.query(`INSERT INTO bienImo (nomBien, description, id_ClientBailleur, statutValidation, prix, disponible, typeDePropriete,nombreChambres,nombreLits,nombreSallesDeBain,wifi,cuisine,balcon,jardin,parking,piscine,jaccuzzi,salleDeSport,climatisation) VALUES ('${nomBien}', '${newDescription}', '${id_ClientBailleur}', '0', '${prix}', '${disponible}', '${typeDePropriete}','${nombreChambres}','${nombreLits}','${nombreSallesDeBain}','${wifi}','${cuisine}','${balcon}','${jardin}','${parking}','${piscine}','${jaccuzzi}','${salleDeSport}','${climatisation}')`);
-    }
-    catch (error) {
+        await sequelize.query(`INSERT INTO bienImo (nomBien, description, id_ClientBailleur, statutValidation, prix, disponible, typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation, cheminImg) VALUES ('${nomBien}', '${newDescription}', '${id_ClientBailleur}', '0', '${prix}', '${disponible}', '${typeDePropriete}', '${nombreChambres}', '${nombreLits}', '${nombreSallesDeBain}', '${wifi}', '${cuisine}', '${balcon}', '${jardin}', '${parking}', '${piscine}', '${jaccuzzi}', '${salleDeSport}', '${climatisation}', '${pictures}')`);
+    } catch (error) {
         console.error('Error creating bien:', error);
+        return res.status(500).send('Error creating bien');
     }
     res.send('Bien created');
 });
@@ -298,3 +323,4 @@ router.get("/reservation", async (req, res) => {
   console.log(reservation);
   res.send(reservation);
 });
+
