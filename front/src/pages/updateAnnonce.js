@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { fetchAnnonceById, updateAnnonce } from "../services";
 import { Link } from 'react-router-dom';
 import './updateAnnonce.css';
+const BACK_URL = 'http://localhost:3001';
 
 const UpdateAnnonce = () => {
 
@@ -15,7 +16,7 @@ const UpdateAnnonce = () => {
         description: '',
         nomBien: '',
         statutValidation: '',
-        cheminImg: '',
+        cheminImg: null,
         disponible: '1', // default value set to "Oui"
         id: '',
         id_ClientBailleur: '',
@@ -36,6 +37,8 @@ const UpdateAnnonce = () => {
     });
 
     const [loading, setLoading] = useState(true);
+
+    const [file, setFile] = useState(null);
 
     useEffect(() => {
         fetch(`http://localhost:3001/api/bienimo/${id}`)
@@ -77,18 +80,43 @@ const UpdateAnnonce = () => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
+        if (e.target.type === 'file') {
+            // Update both the file state and the values state
+            setFile(e.target.files[0]);
+            setValues({
+                ...values,
+                [name]: e.target.files[0],
+            });
+        } else {
+            setValues({
+                ...values,
+                [name]: value,
+            });
+        }
+    }
+
+/*
+    const handleChange = (e) => {
+        const { name, value } = e.target;
         console.log('name:', name, 'value:', value);
         setValues({
             ...values,
             [name]: value,
-        });
-    }
+        e.preventDefault();
+        console.log('Modifying annonce:', values);
+        try {
+            const data = await updateAnnonce(id, values); 
+            console.log(data);
+        } catch (error) {
+            console.log(error);
+    };
+    */
 
     const handleModify = async (e) => {
         e.preventDefault();
         console.log('Modifying annonce:', values);
         try {
-            const data = await updateAnnonce(id, values);
+            const data = await updateAnnonce(id, values, values.cheminImg);
             console.log(data);
         } catch (error) {
             console.log(error);
@@ -123,9 +151,13 @@ const UpdateAnnonce = () => {
             </div>
             {annonceData && (
                 <form className="modif">
+                    <img src={`${BACK_URL}/uploads/${values.cheminImg}`} alt={`${values.nomBien}`} />
+                    <br></br>
+                    <label htmlFor="cheminImg">Modifier l'image :</label>
+                    <input type="file" name="cheminImg" onChange={handleChange} />
+                    <br></br> 
                     <input className="input" type="text" name="nomBien" placeholder="Nom Bien" value={values.nomBien} onChange={handleChange} />
                     <input className="input" type="text" name="description" placeholder="description" value={values.description} onChange={handleChange} />
-                    <input className="input" type="text" name="cheminImg" placeholder="Chemin Image" value={values.cheminImg} onChange={handleChange} />
                     <input className="input" type="number" name="prix" placeholder="prix" value={values.prix} onChange={handleChange} />
                     <input className="input" type="number" name="id_ClientBailleur" placeholder="id_ClientBailleur" value={values.id_ClientBailleur} onChange={handleChange} />
                     <br></br>
@@ -144,7 +176,7 @@ const UpdateAnnonce = () => {
                     <input className="input" type="number" name="nombreChambres" placeholder="nombreChambres" value={values.nombreChambres} onChange={handleChange} />
                     <input className="input" type="number" name="nombreLits" placeholder="nombreLits" value={values.nombreLits} onChange={handleChange} />
                     <input className="input" type="number" name="nombreSallesDeBain" placeholder="nombreSallesDeBain" value={values.nombreSallesDeBain} onChange={handleChange} />
-                    <br></br>   
+                    <br></br>
                     <label htmlFor="wifi">Wifi :</label>
                     <select
                         name="wifi"

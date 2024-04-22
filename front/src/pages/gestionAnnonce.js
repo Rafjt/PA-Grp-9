@@ -31,7 +31,7 @@ const GestionAnnonce = () => {
         climatisation: false,
     });
 
-    
+
     const handleFilterChange = (e) => {
         const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
         setFilterValues(prevFilterValues => ({
@@ -39,14 +39,14 @@ const GestionAnnonce = () => {
             [e.target.name]: value,
         }));
     };
-        
+
 
     const [form, setForm] = useState({
         description: '',
         nomBien: '',
         statutValidation: '',
         cheminImg: '',
-        disponible: '1', 
+        disponible: '1',
         id: '',
         id_ClientBailleur: '',
         prix: '',
@@ -79,9 +79,9 @@ const GestionAnnonce = () => {
                 console.error('Error fetching annonces:', error);
             }
         };
-    
+
         fetchData();
-    }, [filterValues]); 
+    }, [filterValues]);
 
     const handleChange = (e) => {
         if (e.target.type === 'file') {
@@ -100,7 +100,7 @@ const GestionAnnonce = () => {
             });
         }
     };
-    
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -295,111 +295,111 @@ const GestionAnnonce = () => {
             />
 
             <form onSubmit={handleFilterSubmit}>
-            <div className='filters'>
-                <h2>Filtres</h2>
-                <div className='filter-section'>
-                    <label>
-                        <h5>Type de propriété</h5>
-                        <select name="typeDePropriete" id="typeDePropriete" value={filterValues.typeDePropriete} onChange={handleFilterChange}>
-                            <option value="Tout">Tout</option>
-                            <option value="Maison">Maison</option>
-                            <option value="Appartement">Appartement</option>
-                            <option value="Maison d'hôtes">Maison d'hôtes</option>
-                            <option value="Hôtel">Hôtel</option>
-                        </select>
-                    </label>
-                    <br></br>
-                    <label>
-                        <h5>Chambres</h5>
-                        <select name="nombreChambres" id="nombreChambres" value={filterValues.nombreChambres} onChange={handleFilterChange}>
-                            <option value="Tout">Tout</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8+">8+</option>
-                        </select>
-                    </label>
+                <div className='filters'>
+                    <h2>Filtres</h2>
+                    <div className='filter-section'>
+                        <label>
+                            <h5>Type de propriété</h5>
+                            <select name="typeDePropriete" id="typeDePropriete" value={filterValues.typeDePropriete} onChange={handleFilterChange}>
+                                <option value="Tout">Tout</option>
+                                <option value="Maison">Maison</option>
+                                <option value="Appartement">Appartement</option>
+                                <option value="Maison d'hôtes">Maison d'hôtes</option>
+                                <option value="Hôtel">Hôtel</option>
+                            </select>
+                        </label>
+                        <br></br>
+                        <label>
+                            <h5>Chambres</h5>
+                            <select name="nombreChambres" id="nombreChambres" value={filterValues.nombreChambres} onChange={handleFilterChange}>
+                                <option value="Tout">Tout</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8+">8+</option>
+                            </select>
+                        </label>
 
-                    <label>
-                        <h5>Lits</h5>
-                        <select name="nombreLits" id="nombreLits" value={filterValues.nombreLits} onChange={handleFilterChange}>
-                            <option value="Tout">Tout</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8+">8+</option>
-                        </select>
-                    </label>
-                    <label>
-                        <h5>Salles de bain</h5>
-                        <select name="nombreSallesDeBain" id="nombreSallesDeBain" value={filterValues.nombreSallesDeBain} onChange={handleFilterChange}>
-                            <option value="Tout">Tout</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8+">8+</option>
-                        </select>
-                    </label>
+                        <label>
+                            <h5>Lits</h5>
+                            <select name="nombreLits" id="nombreLits" value={filterValues.nombreLits} onChange={handleFilterChange}>
+                                <option value="Tout">Tout</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8+">8+</option>
+                            </select>
+                        </label>
+                        <label>
+                            <h5>Salles de bain</h5>
+                            <select name="nombreSallesDeBain" id="nombreSallesDeBain" value={filterValues.nombreSallesDeBain} onChange={handleFilterChange}>
+                                <option value="Tout">Tout</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8+">8+</option>
+                            </select>
+                        </label>
+                        <br></br>
+                        <label>
+                            <h5>Prix</h5>
+                            <input type='number' name='prixMin' value={filterValues.prixMin} onChange={handleFilterChange} placeholder='Prix min' />
+                            <input type='number' name='prixMax' value={filterValues.prixMax} onChange={handleFilterChange} placeholder='Prix max' />
+                        </label>
+                    </div>
                     <br></br>
-                    <label>
-                        <h5>Prix</h5>
-                        <input type='number' name='prixMin' value={filterValues.prixMin} onChange={handleFilterChange} placeholder='Prix min' />
-                        <input type='number' name='prixMax' value={filterValues.prixMax} onChange={handleFilterChange} placeholder='Prix max' />
-                    </label>
+                    <div className='filter-section'>
+                        <h5>Équipements</h5>
+                        <label>
+                            <input type="checkbox" name="wifi" className="form-check-input" value={filterValues.wifi} onChange={handleFilterChange} />
+                            Wifi
+                        </label>
+                        <label>
+                            <input type="checkbox" name="cuisine" className="form-check-input" value={filterValues.cuisine} onChange={handleFilterChange} />
+                            Cuisine
+                        </label>
+                        <label>
+                            <input type="checkbox" name="balcon" className="form-check-input" value={filterValues.balcon} onChange={handleFilterChange} />
+                            Balcon
+                        </label>
+                        <label>
+                            <input type="checkbox" name="jardin" className="form-check-input" value={filterValues.jardin} onChange={handleFilterChange} />
+                            Jardin
+                        </label>
+                        <label>
+                            <input type="checkbox" name="parking" className="form-check-input" value={filterValues.parking} onChange={handleFilterChange} />
+                            Parking
+                        </label>
+                        <label>
+                            <input type="checkbox" name="piscine" className="form-check-input" value={filterValues.piscine} onChange={handleFilterChange} />
+                            Piscine
+                        </label>
+                        <label>
+                            <input type="checkbox" name="jaccuzzi" className="form-check-input" value={filterValues.jaccuzzi} onChange={handleFilterChange} />
+                            Jaccuzzi
+                        </label>
+                        <label>
+                            <input type="checkbox" name="salleDeSport" className="form-check-input" value={filterValues.salleDeSport} onChange={handleFilterChange} />
+                            Salle de sport
+                        </label>
+                        <label>
+                            <input type="checkbox" name="climatisation" className="form-check-input" value={filterValues.climatisation} onChange={handleFilterChange} />
+                            Climatisation
+                        </label>
+                    </div>
                 </div>
-                <br></br>
-                <div className='filter-section'>
-                    <h5>Équipements</h5>
-                    <label>
-                        <input type="checkbox" name="wifi" className="form-check-input" value={filterValues.wifi} onChange={handleFilterChange}/>
-                        Wifi
-                    </label>
-                    <label>
-                        <input type="checkbox" name="cuisine" className="form-check-input" value={filterValues.cuisine} onChange={handleFilterChange}/>
-                        Cuisine
-                    </label>
-                    <label>
-                        <input type="checkbox" name="balcon" className="form-check-input" value={filterValues.balcon} onChange={handleFilterChange}/>
-                        Balcon
-                    </label>
-                    <label>
-                        <input type="checkbox" name="jardin" className="form-check-input" value={filterValues.jardin} onChange={handleFilterChange}/>
-                        Jardin
-                    </label>
-                    <label>
-                        <input type="checkbox" name="parking" className="form-check-input" value={filterValues.parking} onChange={handleFilterChange}/>
-                        Parking
-                    </label>
-                    <label>
-                        <input type="checkbox" name="piscine" className="form-check-input" value={filterValues.piscine} onChange={handleFilterChange}/>
-                        Piscine
-                    </label>
-                    <label>
-                        <input type="checkbox" name="jaccuzzi" className="form-check-input" value={filterValues.jaccuzzi} onChange={handleFilterChange}/>
-                        Jaccuzzi
-                    </label>
-                    <label>
-                        <input type="checkbox" name="salleDeSport" className="form-check-input" value={filterValues.salleDeSport} onChange={handleFilterChange}/>
-                        Salle de sport
-                    </label>
-                    <label>
-                        <input type="checkbox" name="climatisation" className="form-check-input" value={filterValues.climatisation} onChange={handleFilterChange}/>
-                        Climatisation
-                    </label>
-                </div>
-            </div>
             </form>
 
             <div className="annoncesContainer">
@@ -429,8 +429,8 @@ const GestionAnnonce = () => {
                         </div>
                     ))}
             </div>
-            </div>
-            );
+        </div>
+    );
 };
 
 export default GestionAnnonce;
