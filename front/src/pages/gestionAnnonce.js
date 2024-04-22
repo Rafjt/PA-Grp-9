@@ -3,6 +3,8 @@ import './gestionAnnonce.css';
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Link } from 'react-router-dom';
 import { fetchAnnonce, deleteAnnonce, createAnnonce } from '../services';
+import Popup from 'reactjs-popup';
+import 'reactjs-popup/dist/index.css';
 
 
 const GestionAnnonce = () => {
@@ -18,6 +20,19 @@ const GestionAnnonce = () => {
         id: '',
         id_ClientBailleur: '',
         prix: '',
+        typeDePropriete: 'Maison',
+        nombreChambres: 0,
+        nombreLits: 0,
+        nombreSallesDeBain: 0,
+        wifi: 0,
+        cuisine: 0,
+        balcon: 0,
+        jardin: 0,
+        parking: 0,
+        piscine: 0,
+        jaccuzzi: 0,
+        salleDeSport: 0,
+        climatisation: 0
     });
 
     useEffect(() => {
@@ -34,9 +49,10 @@ const GestionAnnonce = () => {
     }, []);
 
     const handleChange = (e) => {
+        const value = e.target.type === 'checkbox' ? (e.target.checked ? 1 : 0) : e.target.value;
         setForm({
             ...form,
-            [e.target.name]: e.target.value,
+            [e.target.name]: value,
         });
     };
 
@@ -133,6 +149,67 @@ const GestionAnnonce = () => {
                         <option value="0">Non</option>
                     </select>
                     <br />
+                    <div className='typeDePropriete'>
+                        <h5>Type de propriété</h5>
+                        <select className='input' name="typeDePropriete" id="typeDePropriete" value={form.typeDePropriete} onChange={handleChange}>
+                            <option value="Maison">Maison</option>
+                            <option value="Appartement">Appartement</option>
+                            <option value="Maison d'hôtes">Maison d'hôtes</option>
+                            <option value="Hôtel">Hôtel</option>
+                        </select>
+
+                        <h5>Chambres</h5>
+                        <input className='input' type="number" name="nombreChambres" value={form.nombreChambres} onChange={handleChange} />
+
+                        <h5>Lits</h5>
+                        <input className='input' type="number" name="nombreLits" value={form.nombreLits} onChange={handleChange} />
+
+                        <h5>Salles de bain</h5>
+                        <input className='input' type="number" name="nombreSallesDeBain" value={form.nombreSallesDeBain} onChange={handleChange} />
+
+                    </div>
+                    <div className='equipments'>
+                        <h5>Équipements</h5>
+                        <label>
+                            <input type="checkbox" name="wifi" className="form-check-input" checked={form.wifi} onChange={handleChange} />
+                            Wifi
+                        </label>
+                        <label>
+                            <input type="checkbox" name="cuisine" className="form-check-input" checked={form.cuisine} onChange={handleChange} />
+                            Cuisine
+                        </label>
+                        <label>
+                            <input type="checkbox" name="balcon" className="form-check-input" checked={form.balcon} onChange={handleChange} />
+                            Balcon
+                        </label>
+                        <label>
+                            <input type="checkbox" name="jardin" className="form-check-input" checked={form.jardin} onChange={handleChange} />
+                            Jardin
+                        </label>
+                        <label>
+                            <input type="checkbox" name="parking" className="form-check-input" checked={form.parking} onChange={handleChange} />
+                            Parking
+                        </label>
+                        <label>
+                            <input type="checkbox" name="piscine" className="form-check-input" checked={form.piscine} onChange={handleChange} />
+                            Piscine
+                        </label>
+                        <label>
+                            <input type="checkbox" name="jaccuzzi" className="form-check-input" checked={form.jaccuzzi} onChange={handleChange} />
+                            Jaccuzzi
+                        </label>
+                        <label>
+                            <input type="checkbox" name="salleDeSport" className="form-check-input" checked={form.salleDeSport} onChange={handleChange} />
+                            Salle de sport
+                        </label>
+                        <label>
+                            <input type="checkbox" name="climatisation" className="form-check-input" checked={form.climatisation} onChange={handleChange} />
+                            Climatisation
+                        </label>
+                    </div>
+
+
+                    <br />
                     <input
                         className="input"
                         type="submit"
@@ -141,6 +218,9 @@ const GestionAnnonce = () => {
                     ></input>
                 </div>
             </form>
+
+            <hr></hr>
+
             <h2>Rechercher un bien</h2>
             <input
                 type="text"
@@ -149,6 +229,106 @@ const GestionAnnonce = () => {
                 className='input'
                 id='searchBar'
             />
+
+            <div className='filters'>
+                <h2>Filtres</h2>
+                <div className='filter-section'>
+                    <label>
+                        <h5>Type de propriété</h5>
+                        <select name="typeDePropriete" id="typeDePropriete">
+                            <option value="Maison">Maison</option>
+                            <option value="Appartement">Appartement</option>
+                            <option value="Maison d'hôtes">Maison d'hôtes</option>
+                            <option value="Hôtel">Hôtel</option>
+                        </select>
+                    </label>
+                    <br></br>
+                    <label>
+                        <h5>Chambres</h5>
+                        <select name="chambres" id="chambres">
+                            <option value="Tout">Tout</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8+">8+</option>
+                        </select>
+                    </label>
+
+                    <label>
+                        <h5>Lits</h5>
+                        <select name="lits" id="lits">
+                            <option value="Tout">Tout</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8+">8+</option>
+                        </select>
+                    </label>
+                    <label>
+                        <h5>Salles de bain</h5>
+                        <select name="sallesDeBain" id="sallesDeBain">
+                            <option value="Tout">Tout</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8+">8+</option>
+                        </select>
+                    </label>
+                </div>
+                <br></br>
+                <div className='filter-section'>
+                    <h5>Équipements</h5>
+                    <label>
+                        <input type="checkbox" name="wifi" className="form-check-input" />
+                        Wifi
+                    </label>
+                    <label>
+                        <input type="checkbox" name="cuisine" className="form-check-input" />
+                        Cuisine
+                    </label>
+                    <label>
+                        <input type="checkbox" name="balcon" className="form-check-input" />
+                        Balcon
+                    </label>
+                    <label>
+                        <input type="checkbox" name="jardin" className="form-check-input" />
+                        Jardin
+                    </label>
+                    <label>
+                        <input type="checkbox" name="parking" className="form-check-input" />
+                        Parking
+                    </label>
+                    <label>
+                        <input type="checkbox" name="piscine" className="form-check-input" />
+                        Piscine
+                    </label>
+                    <label>
+                        <input type="checkbox" name="jaccuzzi" className="form-check-input" />
+                        Jaccuzzi
+                    </label>
+                    <label>
+                        <input type="checkbox" name="salleDeSport" className="form-check-input" />
+                        Salle de sport
+                    </label>
+                    <label>
+                        <input type="checkbox" name="climatisation" className="form-check-input" />
+                        Climatisation
+                    </label>
+                </div>
+            </div>
+
             <div className="annoncesContainer">
                 {annonces
                     .filter(
@@ -162,7 +342,7 @@ const GestionAnnonce = () => {
                             <h2> ID :{annonce.id}</h2>
                             <h2> ID du client bailleur propriétaire :{annonce.id_ClientBailleur}</h2>
                             <h2>{annonce.nomBien}</h2>
-                            <h3>Prix par nuits {annonce.prix}€</h3>
+                            <h3>Prix par nuits: {annonce.prix}€</h3>
                             <button onClick={() => handleDelete(annonce.id)}>
                                 Supprimer
                             </button>

@@ -184,18 +184,18 @@ router.delete("/bienImo/:id", async (req, res) => {
   }
 });
 
-router.post("/bienImo", async (req, res) => {
-  console.log("Creating bien:", req.body);
-  const { nomBien, description, id_ClientBailleur, prix, disponible } =
-    req.body;
-  try {
-    await sequelize.query(
-      `INSERT INTO bienImo (nomBien, description, id_ClientBailleur, statutValidation, prix, disponible) VALUES ('${nomBien}', '${description}', '${id_ClientBailleur}', '0', '${prix}', '${disponible}')`
-    );
-  } catch (error) {
-    console.error("Error creating bien:", error);
-  }
-  res.send("Bien created");
+
+router.post('/bienImo', async (req, res) => {
+    console.log('Creating bien:', req.body);
+    const { nomBien, description, id_ClientBailleur, prix, disponible, typeDePropriete,nombreChambres,nombreLits,nombreSallesDeBain,wifi,cuisine,balcon,jardin,parking,piscine,jaccuzzi,salleDeSport,climatisation} = req.body;
+    newDescription = description.replace(/'/g, "''");
+    try {
+        await sequelize.query(`INSERT INTO bienImo (nomBien, description, id_ClientBailleur, statutValidation, prix, disponible, typeDePropriete,nombreChambres,nombreLits,nombreSallesDeBain,wifi,cuisine,balcon,jardin,parking,piscine,jaccuzzi,salleDeSport,climatisation) VALUES ('${nomBien}', '${newDescription}', '${id_ClientBailleur}', '0', '${prix}', '${disponible}', '${typeDePropriete}','${nombreChambres}','${nombreLits}','${nombreSallesDeBain}','${wifi}','${cuisine}','${balcon}','${jardin}','${parking}','${piscine}','${jaccuzzi}','${salleDeSport}','${climatisation}')`);
+    }
+    catch (error) {
+        console.error('Error creating bien:', error);
+    }
+    res.send('Bien created');
 });
 
 router.get("/bienImo/:id", async (req, res) => {
@@ -208,20 +208,19 @@ router.get("/bienImo/:id", async (req, res) => {
   res.send(bien[0]);
 });
 
-router.put("/bienImo/:id", async (req, res) => {
-  console.log("Modifying bien:", req.body);
-  const { id } = req.params;
-  const { nomBien, description, id_ClientBailleur, prix, cheminImg } = req.body;
-  newDescription = description.replace(/'/g, "''");
-  console.log("prix est :", prix);
-  try {
-    await sequelize.query(
-      `UPDATE bienImo SET nomBien = '${nomBien}', description = '${newDescription}', prix = '${prix}',cheminImg = '${cheminImg}', id_ClientBailleur = ${id_ClientBailleur} WHERE id = ${id}`
-    );
-  } catch (error) {
-    console.error("Error modifying bien:", error);
-  }
-  res.send("Bien modified");
+router.put('/bienImo/:id', async (req, res) => {
+    console.log('Modifying bien:', req.body);
+    const { id } = req.params;
+    const {nomBien, description, id_ClientBailleur, prix, disponible, typeDePropriete,nombreChambres,nombreLits,nombreSallesDeBain,wifi,cuisine,balcon,jardin,parking,piscine,jaccuzzi,salleDeSport,climatisation } = req.body;
+    newDescription = description.replace(/'/g, "''");
+    console.log('prix est :', prix);
+    try {
+        await sequelize.query(`UPDATE bienImo SET nomBien = '${nomBien}', description = '${newDescription}', id_ClientBailleur = '${id_ClientBailleur}', prix = '${prix}', disponible = '${disponible}', typeDePropriete = '${typeDePropriete}', nombreChambres = '${nombreChambres}', nombreLits = '${nombreLits}', nombreSallesDeBain = '${nombreSallesDeBain}', wifi = '${wifi}', cuisine = '${cuisine}', balcon = '${balcon}', jardin = '${jardin}', parking = '${parking}', piscine = '${piscine}', jaccuzzi = '${jaccuzzi}', salleDeSport = '${salleDeSport}', climatisation = '${climatisation}' WHERE id = ${id}`);
+    }
+    catch (error) {
+        console.error('Error modifying bien:', error);
+    }
+    res.send('Bien modified');
 });
 
 // GESTION DES RESERVATIONS
