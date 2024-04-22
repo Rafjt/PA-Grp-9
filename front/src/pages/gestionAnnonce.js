@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './gestionAnnonce.css';
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Link } from 'react-router-dom';
-import { fetchAnnonce, deleteAnnonce, createAnnonce } from '../services';
+import { fetchAnnonce, deleteAnnonce, createAnnonce, fetchAnnonceFiltered } from '../services';
 import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
 
@@ -10,6 +10,95 @@ import 'reactjs-popup/dist/index.css';
 const GestionAnnonce = () => {
     const [annonces, setAnnonces] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
+
+    const [filterValues, setFilterValues] = useState({
+        typeDePropriete: 'Tout',
+        nombreChambres: 'Tout',
+        nombreLits: 'Tout',
+        nombreSallesDeBain: 'Tout',
+        wifi: false,
+        cuisine: false,
+        balcon: false,
+        jardin: false,
+        parking: false,
+        piscine: false,
+        jaccuzzi: false,
+        salleDeSport: false,
+        climatisation: false,
+    });
+    
+    // const filteredAnnonces = annonces.filter((annonce) => {
+    //     // Implement your filtering logic here
+    //     // Return true if the annonce passes all filter conditions, otherwise false
+    //     const {
+    //         typeDePropriete,
+    //         nombreChambres,
+    //         nombreLits,
+    //         nombreSallesDeBain,
+    //         wifi,
+    //         cuisine,
+    //         balcon,
+    //         jardin,
+    //         parking,
+    //         piscine,
+    //         jaccuzzi,
+    //         salleDeSport,
+    //         climatisation
+    //     } = filterValues;
+
+    //     // Apply filter conditions
+    //     if (typeDePropriete && annonce.typeDePropriete !== typeDePropriete) {
+    //         return false;
+    //     }
+    //     if (nombreChambres !== 'Tout' && annonce.nombrenombreChambres !== parseInt(nombreChambres)) {
+    //         return false;
+    //     }
+    //     if (nombreLits !== 'Tout' && annonce.nombrenombreLits !== parseInt(nombreLits)) {
+    //         return false;
+    //     }
+    //     if (nombreSallesDeBain !== 'Tout' && annonce.nombrenombreSallesDeBain !== parseInt(nombreSallesDeBain)) {
+    //         return false;
+    //     }
+    //     if (wifi && !annonce.wifi) {
+    //         return false;
+    //     }
+    //     if (cuisine && !annonce.cuisine) {
+    //         return false;
+    //     }
+    //     if (balcon && !annonce.balcon) {
+    //         return false;
+    //     }
+    //     if (jardin && !annonce.jardin) {
+    //         return false;
+    //     }
+    //     if (parking && !annonce.parking) {
+    //         return false;
+    //     }
+    //     if (piscine && !annonce.piscine) {
+    //         return false;
+    //     }
+    //     if (jaccuzzi && !annonce.jaccuzzi) {
+    //         return false;
+    //     }
+    //     if (salleDeSport && !annonce.salleDeSport) {
+    //         return false;
+    //     }
+    //     if (climatisation && !annonce.climatisation) {
+    //         return false;
+    //     }
+
+    //     return true;
+    // });
+
+    
+    const handleFilterChange = (e) => {
+        const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+        setFilterValues(prevFilterValues => ({
+            ...prevFilterValues,
+            [e.target.name]: value,
+        }));
+    };
+        
 
     const [form, setForm] = useState({
         description: '',
@@ -21,9 +110,9 @@ const GestionAnnonce = () => {
         id_ClientBailleur: '',
         prix: '',
         typeDePropriete: 'Maison',
-        nombreChambres: 0,
-        nombreLits: 0,
-        nombreSallesDeBain: 0,
+        nombreChambres: '',
+        nombreLits: '',
+        nombreSallesDeBain: '',
         wifi: 0,
         cuisine: 0,
         balcon: 0,
@@ -88,6 +177,18 @@ const GestionAnnonce = () => {
     if (!annonces) {
         return <div>Loading...</div>;
     }
+
+    const handleFilterSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const data = await fetchAnnonceFiltered(filterValues);
+            console.log(filterValues);
+        }
+        catch (error) {
+            console.error('Error applying filters:', error);
+        }
+    };
+
 
     return (
         <div className="gestionAnnonce">
@@ -230,12 +331,14 @@ const GestionAnnonce = () => {
                 id='searchBar'
             />
 
+            <form onSubmit={handleFilterSubmit}>
             <div className='filters'>
                 <h2>Filtres</h2>
                 <div className='filter-section'>
                     <label>
                         <h5>Type de propriété</h5>
-                        <select name="typeDePropriete" id="typeDePropriete">
+                        <select name="typeDePropriete" id="typeDePropriete" value={filterValues.typeDePropriete} onChange={handleFilterChange}>
+                            <option value="Tout">Tout</option>
                             <option value="Maison">Maison</option>
                             <option value="Appartement">Appartement</option>
                             <option value="Maison d'hôtes">Maison d'hôtes</option>
@@ -245,7 +348,7 @@ const GestionAnnonce = () => {
                     <br></br>
                     <label>
                         <h5>Chambres</h5>
-                        <select name="chambres" id="chambres">
+                        <select name="nombreChambres" id="nombreChambres" value={filterValues.nombreChambres} onChange={handleFilterChange}>
                             <option value="Tout">Tout</option>
                             <option value="1">1</option>
                             <option value="2">2</option>
@@ -260,7 +363,7 @@ const GestionAnnonce = () => {
 
                     <label>
                         <h5>Lits</h5>
-                        <select name="lits" id="lits">
+                        <select name="nombreLits" id="nombreLits" value={filterValues.nombreLits} onChange={handleFilterChange}>
                             <option value="Tout">Tout</option>
                             <option value="1">1</option>
                             <option value="2">2</option>
@@ -274,7 +377,7 @@ const GestionAnnonce = () => {
                     </label>
                     <label>
                         <h5>Salles de bain</h5>
-                        <select name="sallesDeBain" id="sallesDeBain">
+                        <select name="nombreSallesDeBain" id="nombreSallesDeBain" value={filterValues.nombreSallesDeBain} onChange={handleFilterChange}>
                             <option value="Tout">Tout</option>
                             <option value="1">1</option>
                             <option value="2">2</option>
@@ -291,43 +394,45 @@ const GestionAnnonce = () => {
                 <div className='filter-section'>
                     <h5>Équipements</h5>
                     <label>
-                        <input type="checkbox" name="wifi" className="form-check-input" />
+                        <input type="checkbox" name="wifi" className="form-check-input" value={filterValues.wifi} onChange={handleFilterChange}/>
                         Wifi
                     </label>
                     <label>
-                        <input type="checkbox" name="cuisine" className="form-check-input" />
+                        <input type="checkbox" name="cuisine" className="form-check-input" value={filterValues.cuisine} onChange={handleFilterChange}/>
                         Cuisine
                     </label>
                     <label>
-                        <input type="checkbox" name="balcon" className="form-check-input" />
+                        <input type="checkbox" name="balcon" className="form-check-input" value={filterValues.balcon} onChange={handleFilterChange}/>
                         Balcon
                     </label>
                     <label>
-                        <input type="checkbox" name="jardin" className="form-check-input" />
+                        <input type="checkbox" name="jardin" className="form-check-input" value={filterValues.jardin} onChange={handleFilterChange}/>
                         Jardin
                     </label>
                     <label>
-                        <input type="checkbox" name="parking" className="form-check-input" />
+                        <input type="checkbox" name="parking" className="form-check-input" value={filterValues.parking} onChange={handleFilterChange}/>
                         Parking
                     </label>
                     <label>
-                        <input type="checkbox" name="piscine" className="form-check-input" />
+                        <input type="checkbox" name="piscine" className="form-check-input" value={filterValues.piscine} onChange={handleFilterChange}/>
                         Piscine
                     </label>
                     <label>
-                        <input type="checkbox" name="jaccuzzi" className="form-check-input" />
+                        <input type="checkbox" name="jaccuzzi" className="form-check-input" value={filterValues.jaccuzzi} onChange={handleFilterChange}/>
                         Jaccuzzi
                     </label>
                     <label>
-                        <input type="checkbox" name="salleDeSport" className="form-check-input" />
+                        <input type="checkbox" name="salleDeSport" className="form-check-input" value={filterValues.salleDeSport} onChange={handleFilterChange}/>
                         Salle de sport
                     </label>
                     <label>
-                        <input type="checkbox" name="climatisation" className="form-check-input" />
+                        <input type="checkbox" name="climatisation" className="form-check-input" value={filterValues.climatisation} onChange={handleFilterChange}/>
                         Climatisation
                     </label>
                 </div>
+                <button type='submit' className='filter-button'>Filtrer</button>
             </div>
+            </form>
 
             <div className="annoncesContainer">
                 {annonces

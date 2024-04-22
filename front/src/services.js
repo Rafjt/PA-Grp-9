@@ -109,73 +109,114 @@ export const unbanUser = async (userId) => {
 };
 
 // GESTION DES ANNONCES
-
 export const fetchAnnonce = async () => {
-  try {
-    const response = await fetch(URL_ANNONCE);
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-export const deleteAnnonce = async (annonceId) => {
-  console.log("func :", annonceId);
-  console.log("URL :", `${URL_ANNONCE}/${annonceId}`);
-  try {
-    const response = await fetch(`${URL_ANNONCE}/${annonceId}`, {
-      method: "DELETE",
-    });
-    if (!response.ok) {
-      throw new Error("Failed to delete annonce");
+    try {
+      const response = await fetch(URL_ANNONCE);
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.log(error);
     }
-  } catch (error) {
-    console.error("Error deleting annonce:", error);
   }
-};
 
-export const createAnnonce = async (annonceData) => {
-  try {
-    const response = await fetch(URL_ANNONCE, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(annonceData),
+  export const deleteAnnonce = async (annonceId) => {
+    console.log("func :",annonceId);
+    console.log("URL :",`${URL_ANNONCE}/${annonceId}`);
+    try {
+      const response = await fetch(
+        `${URL_ANNONCE}/${annonceId}`,
+        {
+          method: "DELETE",
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to delete annonce");
+      }
+    } catch (error) {
+      console.error("Error deleting annonce:", error);
+    }
+  }
+  
+
+  export const createAnnonce = async (annonceData) => {
+    try {
+      const formData = new FormData();
+      formData.append('pictures', annonceData.pictures); // Append the file
+
+      // Append all other form values
+      for (let key in annonceData) {
+        if (key !== 'pictures') { // Exclude the file because it's already appended
+          formData.append(key, annonceData[key]);
+        }
+      }
+
+      console.log("annonceData-> p", annonceData.pictures);
+
+      const response = await fetch(URL_ANNONCE, {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.log("ici", error);
+    }
+  };
+
+  export const fetchAnnonceById = async (annonceId) => {
+    try {
+      console.log('fetchAnnonceById', annonceId);
+      const response = await fetch(`${URL_ANNONCE}/${annonceId}`);
+      const data = await response.json();
+      console.log('result = ', data);
+      return data;
+    } catch (error) {
+      console.log("nope");
+      console.log(error);
+    }
+  };
+
+  export const fetchAnnonceFiltered = async (filter) => {
+    try {
+      console.log('fetchAnnonceFiltered', filter);
+      const response = await fetch(`${URL_ANNONCE}/filter`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(filter),
+      });
+      const data = await response.json();
+      console.log('result = ', data);
+      return data;
+    } catch (error) {
+      console.log("nope");
+      console.log(error);
+    }
+  }
+
+  export const updateAnnonce = async (annonceId, annonceData, file) => {
+    try {
+
+      console.log('file', file);
+      const formData = new FormData();
+        formData.append('cheminImg', file);
+        for (let key in annonceData) {
+          if (key !== 'cheminImg') { // Exclude the file because it's already appended
+            formData.append(key, annonceData[key]);
+            console.log('key', key, annonceData[key]);
+            console.log('formData', formData);
+          }
+        }
+      console.log('formData', formData);
+      const response = await fetch(`${URL_ANNONCE}/${annonceId}`, {
+        method: "PUT",
+        body: formData,
     });
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-export const fetchAnnonceById = async (annonceId) => {
-  try {
-    console.log("fetchAnnonceById", annonceId);
-    const response = await fetch(`${URL_ANNONCE}/${annonceId}`);
-    const data = await response.json();
-    console.log("result = ", data);
-    return data;
-  } catch (error) {
-    console.log("nope");
-    console.log(error);
-  }
-};
-
-export const updateAnnonce = async (annonceId, annonceData) => {
-  try {
-    const response = await fetch(`${URL_ANNONCE}/${annonceId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(annonceData),
-    });
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.log(error);
-  }
-};
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.log(error);
+    }
+  };

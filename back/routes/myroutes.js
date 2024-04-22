@@ -223,6 +223,53 @@ router.put('/bienImo/:id', async (req, res) => {
     res.send('Bien modified');
 });
 
+router.post('/bienImo/filter', async (req, res) => {
+    let { typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation } = req.body;
+
+    // Convert boolean values to integers
+    wifi = wifi ? 1 : 0;
+    cuisine = cuisine ? 1 : 0;
+    balcon = balcon ? 1 : 0;
+    jardin = jardin ? 1 : 0;
+    parking = parking ? 1 : 0;
+    piscine = piscine ? 1 : 0;
+    jaccuzzi = jaccuzzi ? 1 : 0;
+    salleDeSport = salleDeSport ? 1 : 0;
+    climatisation = climatisation ? 1 : 0;
+
+    // Convert string values to integers
+    nombreChambres = parseInt(nombreChambres);
+    nombreLits = parseInt(nombreLits);
+    nombreSallesDeBain = parseInt(nombreSallesDeBain);
+
+    let query = 'SELECT * FROM bienImo';
+    const params = [];
+
+    const properties = { typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation };
+    console.log(properties);
+    for (const property in properties) {
+        if (properties[property] !== undefined && properties[property] !== 'Tout') {
+            if (params.length === 0) {
+                query += ' WHERE';
+            } else {
+                query += ' AND';
+            }
+
+            query += ` ${property} = ?`;
+            params.push(properties[property]);
+        }
+    }
+
+    try {
+        const result = await sequelize.query(query, { replacements: params, type: sequelize.QueryTypes.SELECT });
+        console.log(result);
+        res.json(result);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'An error occurred while filtering' });
+    }
+});
+
 // GESTION DES RESERVATIONS
 
 router.get("/reservation", async (req, res) => {
