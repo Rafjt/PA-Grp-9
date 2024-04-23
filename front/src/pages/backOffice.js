@@ -11,6 +11,9 @@ const backOffice = () => {
     const toRes = () => {
         window.location.replace("./gestionReservations");
     }
+    const toPaiement = () => {
+        window.location.replace("./gestionPaiement");
+    }
 
     return (
         <div className="backoffice">
@@ -22,7 +25,7 @@ const backOffice = () => {
                 <button onClick={toAnnonce}>Gestion des Annonces</button>
                 <button onClick={toUser}>Gestion des Utilisateurs</button>
                 <button onClick={toRes}>Gestion des Réservations</button>
-                <button>Gestion des Paiements</button>
+                <button onClick={toPaiement}>Gestion des Paiements</button>
                 <button>Statistiques et rapports</button>
             </div>
         </div>

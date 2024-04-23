@@ -352,3 +352,71 @@ router.get("/reservation", async (req, res) => {
   res.send(reservation);
 });
 
+// GESTION DES PAIEMENTS
+
+router.get("/paiement", async (req, res) => {
+  const [paiement] = await sequelize.query("SELECT * FROM paiement");
+  console.log(paiement);
+  res.send(paiement);
+});
+
+router.delete("/paiement/:id", async (req, res) => {
+  const { id } = req.params;
+
+  console.log("Deleting paiement:", id);
+
+  try {
+    await sequelize.query(`DELETE FROM paiement WHERE id = ${id}`);
+    res.send("Paiement deleted");
+  }
+  catch (error) {
+    console.error("Error deleting paiement:", error);
+    res.status(500).send("Failed to delete paiement");
+  }
+});
+
+
+router.put("/paiement/:id/validate", async (req, res) => {
+  const { id } = req.params;
+
+  console.log("Validating paiement:", id);
+
+  try {
+    await sequelize.query(`UPDATE paiement SET statut = 'Valider' WHERE id = ${id}`);
+    res.send("Paiement validated");
+  }
+  catch (error) {
+    console.error("Error validating paiement:", error);
+    res.status(500).send("Failed to validate paiement");
+  }
+});
+
+
+// router.put("/paiement/:id/pending", async (req, res) => {
+//   const { id } = req.params;
+
+//   console.log("Pending paiement:", id);
+
+//   try {
+//     await sequelize.query(`UPDATE paiement SET statut = 'En attente' WHERE id = ${id}`);
+//     res.send("Paiement pending");
+//   }
+//   catch (error) {
+//     console.error("Error pending paiement:", error);
+//     res.status(500).send("Failed to pending paiement");
+//   }
+// });
+
+router.post("/paiement", async (req, res) => {
+  console.log("Creating paiement:", req.body);
+  const { idReservation, nom, datePaiement, methodePaiement, montant, statut } = req.body;
+
+  try {
+    await sequelize.query(`INSERT INTO paiement (id_Reservation, nom, datePaiement, methodePaiement, montant, statut) VALUES ('${idReservation}', '${nom}', '${datePaiement}', '${methodePaiement}', '${montant}', '${statut}')`);
+  } catch (error) {
+    console.error("Error creating paiement:", error);
+    return res.status(500).send("Error creating paiement");
+  }
+
+  res.send("Paiement created");
+});

@@ -1,6 +1,8 @@
 // Define functions for backend calls
-const URL_USERS = "http://localhost:3001/api/users";
-const URL_ANNONCE = "http://localhost:3001/api/bienimo";
+const BASE_URL = "http://localhost:3001/api";
+const URL_USERS = `${BASE_URL}/users`;
+const URL_ANNONCE = `${BASE_URL}/bienImo`;
+const URL_PAIEMENT = `${BASE_URL}/paiement`;
 
 export const fetchUsers = async () => {
   try {
@@ -220,3 +222,66 @@ export const fetchAnnonce = async () => {
       console.log(error);
     }
   };
+
+
+// GESTION DES PAIEMENTS
+
+export const fetchPaiement = async () => {
+  try {
+    const response = await fetch(URL_PAIEMENT);
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+
+export const deletePaiement = async (paiementId) => {
+  try {
+    const response = await fetch(
+      `${URL_PAIEMENT}/${paiementId}`,
+      {
+        method: "DELETE",
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to delete paiement");
+    }
+  } catch (error) {
+    console.error("Error deleting paiement:", error);
+  }
+}
+
+
+export const validatePaiement = async (paiementId) => {
+  try {
+    const response = await fetch(
+      `${URL_PAIEMENT}/${paiementId}/validate`,
+      {
+        method: "PUT",
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to validate paiement");
+    }
+  } catch (error) {
+    console.error("Error validating paiement:", error);
+  }
+}
+
+export const createPaiement = async (paiementData) => {
+  try {
+    const response = await fetch(URL_PAIEMENT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(paiementData),
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+}

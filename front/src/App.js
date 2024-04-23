@@ -13,6 +13,7 @@ import Update from './pages/update.js';
 import UpdateAnnonce from './pages/updateAnnonce.js';
 import GestionAnnonce from './pages/gestionAnnonce.js';
 import GestionReservations from './pages/gestionReservations.js';
+import GestionPaiement from './pages/gestionPaiement.js';
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
           <Route path="/gestionReservations" element={<GestionReservations />} />
           <Route path="/gestionAnnonce" element={<GestionAnnonce />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/gestionPaiement" element={<GestionPaiement />} />
         </Routes>
         </div>
         <div className="footer">
