@@ -382,7 +382,7 @@ router.put("/paiement/:id/validate", async (req, res) => {
   console.log("Validating paiement:", id);
 
   try {
-    await sequelize.query(`UPDATE paiement SET statut = 'Valider' WHERE id = ${id}`);
+    await sequelize.query(`UPDATE paiement SET statut = 'Validé' WHERE id = ${id}`);
     res.send("Paiement validated");
   }
   catch (error) {

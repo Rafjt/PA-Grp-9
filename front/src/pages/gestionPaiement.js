@@ -71,7 +71,7 @@ const GestionPaiement = () => {
                             <select className='input' id="statut" name="statut" value={form.statut} onChange={handleChange}>
                                 <option value="">-- Statut--</option>
                                 <option value="En attente">En attente</option>
-                                <option value="Valider">Valider</option>
+                                <option value="Validé">validé</option>
                             </select>
                             <br />
                             <button type="submit">Créer un paiement</button>
@@ -112,7 +112,7 @@ const GestionPaiement = () => {
                                         <td className="long-column">
                                             <button className="ml-1">Modifier</button>
                                             <button onClick={() => handleDelete(paiement.id)} className=" ml-1">Supprimer</button>
-                                            {paiement.statut !== 'Valider' ? <button onClick={() => handleValidate(paiement.id)} className="ml-1">Valider</button> : null}
+                                            {paiement.statut !== 'Validé' ? <button onClick={() => handleValidate(paiement.id)} className="ml-1">Valider</button> : null}
                                         </td>
                                     </tr>
                                 ))}
