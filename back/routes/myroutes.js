@@ -262,7 +262,10 @@ router.get("/bienImo/:id", async (req, res) => {
 router.put('/bienImo/:id', upload.single('cheminImg'), async (req, res) => {
   console.log('Modifying bien:', req.body);
   const { id } = req.params;
-  const pictures = req.file.filename;
+  let pictures = req.body.cheminImg; // Use existing image by default
+  if (req.file) {
+    pictures = req.file.filename; // If a new file was uploaded, use it instead
+  }
   console.log('pictures ==', pictures); // Log uploaded file information
   const { nomBien, description, id_ClientBailleur, prix, disponible, typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation } = req.body;
   newDescription = description.replace(/'/g, "''");
