@@ -420,3 +420,17 @@ router.post("/paiement", async (req, res) => {
 
   res.send("Paiement created");
 });
+
+router.put("/paiement/:id", async (req, res) => {
+  console.log("Modifying paiement:", req.body);
+  const { id } = req.params;
+  const { id_Reservation, nom, datePaiement, methodePaiement, montant, statut } = req.body;
+
+  try {
+    await sequelize.query(`UPDATE paiement SET id_Reservation = '${id_Reservation}', nom = '${nom}', datePaiement = '${datePaiement}', methodePaiement = '${methodePaiement}', montant = '${montant}', statut = '${statut}' WHERE id = ${id}`);
+  } catch (error) {
+    console.error("Error modifying paiement:", error);
+  }
+
+  res.send("Paiement modified");
+});

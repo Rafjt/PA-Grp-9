@@ -285,3 +285,19 @@ export const createPaiement = async (paiementData) => {
     console.log(error);
   }
 }
+
+export const updatePaiement = async (paiementId, paiementData) => {
+  try {
+    const response = await fetch(`${URL_PAIEMENT}/${paiementId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(paiementData),
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+}
