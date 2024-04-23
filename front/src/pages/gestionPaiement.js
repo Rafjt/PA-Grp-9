@@ -131,12 +131,15 @@ const GestionPaiement = () => {
                                 {editingId === paiement.id ? (
                                     <>
                                         <td>{paiement.id}</td>
-                                        <td><input type="text" name="id_Reservation" value={editingData.id_Reservation} onChange={handleEditingChange} /></td>
+                                        <td><input type="number" name="id_Reservation" value={editingData.id_Reservation} onChange={handleEditingChange} /></td>
                                         <td><input type="text" name="nom" value={editingData.nom} onChange={handleEditingChange} /></td>
                                         <td><input type="date" name="datePaiement" value={editingData.datePaiement} onChange={handleEditingChange} /></td>
                                         <td><input type="text" name="methodePaiement" value={editingData.methodePaiement} onChange={handleEditingChange} /></td>
                                         <td><input type="number" name="montant" value={editingData.montant} onChange={handleEditingChange} /></td>
-                                        <td><input type="text" name="statut" value={editingData.statut} onChange={handleEditingChange} /></td>
+                                        <select id="statut" name="statut" value={editingData.statut} onChange={handleEditingChange}>
+                                            <option value="En attente">En attente</option>
+                                            <option value="Validé">Validé</option>
+                                        </select>
                                         <td>
                                             <button onClick={handleAccept}>Accepter</button>
                                             <button onClick={() => handleDelete(paiement.id)}>Supprimer</button>
@@ -150,7 +153,7 @@ const GestionPaiement = () => {
                                         <td>{paiement.nom}</td>
                                         <td>{paiement.datePaiement}</td>
                                         <td>{paiement.methodePaiement}</td>
-                                        <td>{paiement.montant}</td>
+                                        <td>{paiement.montant} €</td>
                                         <td>{paiement.statut}</td>
                                         <td>
                                             <button onClick={() => handleEdit(paiement)}>Modifier</button>
