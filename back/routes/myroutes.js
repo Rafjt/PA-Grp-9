@@ -409,7 +409,12 @@ router.put("/paiement/:id/validate", async (req, res) => {
 
 router.post("/paiement", async (req, res) => {
   console.log("Creating paiement:", req.body);
-  const { idReservation, nom, datePaiement, methodePaiement, montant, statut } = req.body;
+  let { idReservation, nom, datePaiement, methodePaiement, montant, statut } = req.body;
+
+  // If statut is empty, set it to "En attente"
+  if (!statut) {
+    statut = 'En attente';
+  }
 
   try {
     await sequelize.query(`INSERT INTO paiement (id_Reservation, nom, datePaiement, methodePaiement, montant, statut) VALUES ('${idReservation}', '${nom}', '${datePaiement}', '${methodePaiement}', '${montant}', '${statut}')`);
@@ -420,6 +425,8 @@ router.post("/paiement", async (req, res) => {
 
   res.send("Paiement created");
 });
+
+
 
 router.put("/paiement/:id", async (req, res) => {
   console.log("Modifying paiement:", req.body);
