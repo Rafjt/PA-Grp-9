@@ -16,6 +16,7 @@ const GestionAnnonce = () => {
     const [filterValues, setFilterValues] = useState({
         prixMin: '',
         prixMax: '',
+        ville: 'Tout',
         typeDePropriete: 'Tout',
         nombreChambres: 'Tout',
         nombreLits: 'Tout',
@@ -46,6 +47,8 @@ const GestionAnnonce = () => {
         nomBien: '',
         statutValidation: '',
         cheminImg: '',
+        ville: '',
+        adresse: '',
         disponible: '1',
         id: '',
         id_ClientBailleur: '',
@@ -193,6 +196,22 @@ const GestionAnnonce = () => {
                         onChange={handleChange}
                     />
                     <br />
+                        <h4>Localisation</h4>
+                    <br />
+                    <select
+                        className="input"
+                        name="ville"
+                        id="ville"
+                        value={form.ville}
+                        onChange={handleChange}
+                    >
+                        <option value="Paris">Paris</option>
+                        <option value="Nice">Nice</option>
+                        <option value="Biarritz">Biarritz</option>
+                    </select>
+                    <br />
+                    <input className="input" type="text" placeholder="Adresse" name="adresse" value={form.adresse} onChange={handleChange} />
+                    <br />
                     <br />
                     <label htmlFor="pictures">Photos du bien :</label>
                     <input
@@ -288,7 +307,7 @@ const GestionAnnonce = () => {
             <h2>Rechercher un bien</h2>
             <input
                 type="text"
-                placeholder="Rechercher (Nom du bien ou ID)"
+                placeholder="Rechercher (Nom du bien, adresse du bien ou ID)"
                 onChange={handleSearch}
                 className='input'
                 id='searchBar'
@@ -359,9 +378,21 @@ const GestionAnnonce = () => {
                             <input type='number' name='prixMax' value={filterValues.prixMax} onChange={handleFilterChange} placeholder='Prix max' />
                         </label>
                     </div>
+                    <h5>Localisation</h5>
+                    <select
+                        name="ville"
+                        id="ville"
+                        value={filterValues.ville}
+                        onChange={handleFilterChange}
+                    >
+                        <option value="Tout">Tout</option>
+                        <option value="Paris">Paris</option>
+                        <option value="Nice">Nice</option>
+                        <option value="Biarritz">Biarritz</option>
+                    </select>
                     <br></br>
                     <div className='filter-section'>
-                        <h5>Équipements</h5>
+                        <h4>Équipements</h4>
                         <label>
                             <input type="checkbox" name="wifi" className="form-check-input" value={filterValues.wifi} onChange={handleFilterChange} />
                             Wifi
@@ -408,15 +439,17 @@ const GestionAnnonce = () => {
                         (annonce) =>
                             annonce && annonce.nomBien && annonce.nomBien.toLowerCase().includes(searchTerm.toLowerCase()) ||
                             annonce && annonce.id && annonce.id.toString() === searchTerm ||
-                            annonce && annonce.propertyName && annonce.propertyName.toLowerCase().includes(searchTerm.toLowerCase())
+                            annonce && annonce.propertyName && annonce.propertyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            annonce && annonce.adresse && annonce.adresse.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            annonce && annonce.ville && annonce.ville.toLowerCase().includes(searchTerm.toLowerCase())
                     )
                     .map((annonce) => (
                         annonce && <div key={annonce.id} className="annonce">
                             <img src={`${BACK_URL}/uploads/${annonce.cheminImg}`} alt={annonce.nomBien} className='img' />
-                            <h2> ID :{annonce.id}</h2>
+                            <h2> ID :{annonce.id}, {annonce.nomBien} </h2>
                             <h2> ID du client bailleur propriétaire :{annonce.id_ClientBailleur}</h2>
-                            <h2>{annonce.nomBien}</h2>
                             <h3>Prix par nuits: {annonce.prix}€</h3>
+                            <h3>{annonce.ville}: {annonce.adresse}</h3>
                             <button onClick={() => handleDelete(annonce.id)}>
                                 Supprimer
                             </button>

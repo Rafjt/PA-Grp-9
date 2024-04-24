@@ -234,14 +234,14 @@ router.delete('/bienImo/:id', async (req, res) => {
 router.post('/bienImo', upload.single('pictures'), async (req, res) => {
   console.log('Creating bien:', req.body);
   console.log('Uploaded file:', req.file); // Log uploaded file information
-  const { nomBien, description, id_ClientBailleur, prix, disponible, typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation } = req.body; // Get the filename of the uploaded image
+  const { nomBien, description, id_ClientBailleur, prix, disponible, typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation, ville, adresse } = req.body; // Get the filename of the uploaded image
   const pictures = req.file.filename; // Get the filename of the uploaded image
   console.log('pictures ==', pictures); // Log uploaded file information
   // Handle description escaping single quotes
   const newDescription = description.replace(/'/g, "''");
 
   try {
-    await sequelize.query(`INSERT INTO bienImo (nomBien, description, id_ClientBailleur, statutValidation, prix, disponible, typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation, cheminImg) VALUES ('${nomBien}', '${newDescription}', '${id_ClientBailleur}', '0', '${prix}', '${disponible}', '${typeDePropriete}', '${nombreChambres}', '${nombreLits}', '${nombreSallesDeBain}', '${wifi}', '${cuisine}', '${balcon}', '${jardin}', '${parking}', '${piscine}', '${jaccuzzi}', '${salleDeSport}', '${climatisation}', '${pictures}')`);
+    await sequelize.query(`INSERT INTO bienImo (nomBien, description, id_ClientBailleur, statutValidation, prix, disponible, typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation, cheminImg, ville, adresse) VALUES ('${nomBien}', '${newDescription}', '${id_ClientBailleur}', '0', '${prix}', '${disponible}', '${typeDePropriete}', '${nombreChambres}', '${nombreLits}', '${nombreSallesDeBain}', '${wifi}', '${cuisine}', '${balcon}', '${jardin}', '${parking}', '${piscine}', '${jaccuzzi}', '${salleDeSport}', '${climatisation}', '${pictures}', '${ville}', '${adresse}')`);
   } catch (error) {
     console.error('Error creating bien:', error);
     return res.status(500).send('Error creating bien');
@@ -267,11 +267,11 @@ router.put('/bienImo/:id', upload.single('cheminImg'), async (req, res) => {
     pictures = req.file.filename; // If a new file was uploaded, use it instead
   }
   console.log('pictures ==', pictures); // Log uploaded file information
-  const { nomBien, description, id_ClientBailleur, prix, disponible, typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation } = req.body;
+  const { nomBien, description, id_ClientBailleur, prix, disponible, typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation,ville,adresse } = req.body;
   newDescription = description.replace(/'/g, "''");
   console.log('prix est :', prix);
   try {
-    await sequelize.query(`UPDATE bienImo SET nomBien = '${nomBien}', description = '${newDescription}', id_ClientBailleur = '${id_ClientBailleur}', prix = '${prix}', disponible = '${disponible}', typeDePropriete = '${typeDePropriete}', nombreChambres = '${nombreChambres}', nombreLits = '${nombreLits}', nombreSallesDeBain = '${nombreSallesDeBain}', wifi = '${wifi}', cuisine = '${cuisine}', balcon = '${balcon}', jardin = '${jardin}', parking = '${parking}', piscine = '${piscine}', jaccuzzi = '${jaccuzzi}', salleDeSport = '${salleDeSport}', climatisation = '${climatisation}', cheminImg = '${pictures}' WHERE id = ${id}`);
+    await sequelize.query(`UPDATE bienImo SET nomBien = '${nomBien}', description = '${newDescription}', id_ClientBailleur = '${id_ClientBailleur}', prix = '${prix}', disponible = '${disponible}', typeDePropriete = '${typeDePropriete}', nombreChambres = '${nombreChambres}', nombreLits = '${nombreLits}', nombreSallesDeBain = '${nombreSallesDeBain}', wifi = '${wifi}', cuisine = '${cuisine}', balcon = '${balcon}', jardin = '${jardin}', parking = '${parking}', piscine = '${piscine}', jaccuzzi = '${jaccuzzi}', salleDeSport = '${salleDeSport}', climatisation = '${climatisation}', cheminImg = '${pictures}', ville = '${ville}', adresse = '${adresse}' WHERE id = ${id}`);
   }
   catch (error) {
     console.error('Error modifying bien:', error);
@@ -280,7 +280,7 @@ router.put('/bienImo/:id', upload.single('cheminImg'), async (req, res) => {
 });
 
 router.post('/bienImo/filter', async (req, res) => {
-  let { typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation, prixMin, prixMax } = req.body;
+  let { typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation, prixMin, prixMax, ville } = req.body;
 
   wifi = wifi ? 1 : 0;
   cuisine = cuisine ? 1 : 0;
@@ -295,11 +295,12 @@ router.post('/bienImo/filter', async (req, res) => {
   nombreChambres = nombreChambres !== 'Tout' ? parseInt(nombreChambres) : nombreChambres;
   nombreLits = nombreLits !== 'Tout' ? parseInt(nombreLits) : nombreLits;
   nombreSallesDeBain = nombreSallesDeBain !== 'Tout' ? parseInt(nombreSallesDeBain) : nombreSallesDeBain;
+  ville = ville !== 'Tout' ? ville : ville;
 
   let query = 'SELECT * FROM bienImo';
   const params = [];
 
-  const properties = { typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation };
+  const properties = { typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation, ville};
   console.log(properties);
   for (const property in properties) {
     if (properties[property] !== undefined && properties[property] !== 'Tout' && properties[property] !== 0) {
