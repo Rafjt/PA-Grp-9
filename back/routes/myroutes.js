@@ -280,7 +280,7 @@ router.put('/bienImo/:id', upload.single('cheminImg'), async (req, res) => {
 });
 
 router.post('/bienImo/filter', async (req, res) => {
-  let { typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation, prixMin, prixMax } = req.body;
+  let { typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation, prixMin, prixMax, ville } = req.body;
 
   wifi = wifi ? 1 : 0;
   cuisine = cuisine ? 1 : 0;
@@ -295,11 +295,12 @@ router.post('/bienImo/filter', async (req, res) => {
   nombreChambres = nombreChambres !== 'Tout' ? parseInt(nombreChambres) : nombreChambres;
   nombreLits = nombreLits !== 'Tout' ? parseInt(nombreLits) : nombreLits;
   nombreSallesDeBain = nombreSallesDeBain !== 'Tout' ? parseInt(nombreSallesDeBain) : nombreSallesDeBain;
+  ville = ville !== 'Tout' ? ville : ville;
 
   let query = 'SELECT * FROM bienImo';
   const params = [];
 
-  const properties = { typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation };
+  const properties = { typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation, ville};
   console.log(properties);
   for (const property in properties) {
     if (properties[property] !== undefined && properties[property] !== 'Tout' && properties[property] !== 0) {

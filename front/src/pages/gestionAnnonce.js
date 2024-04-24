@@ -16,6 +16,7 @@ const GestionAnnonce = () => {
     const [filterValues, setFilterValues] = useState({
         prixMin: '',
         prixMax: '',
+        ville: 'Tout',
         typeDePropriete: 'Tout',
         nombreChambres: 'Tout',
         nombreLits: 'Tout',
@@ -377,9 +378,21 @@ const GestionAnnonce = () => {
                             <input type='number' name='prixMax' value={filterValues.prixMax} onChange={handleFilterChange} placeholder='Prix max' />
                         </label>
                     </div>
+                    <h5>Localisation</h5>
+                    <select
+                        name="ville"
+                        id="ville"
+                        value={filterValues.ville}
+                        onChange={handleFilterChange}
+                    >
+                        <option value="Tout">Tout</option>
+                        <option value="Paris">Paris</option>
+                        <option value="Nice">Nice</option>
+                        <option value="Biarritz">Biarritz</option>
+                    </select>
                     <br></br>
                     <div className='filter-section'>
-                        <h5>Équipements</h5>
+                        <h4>Équipements</h4>
                         <label>
                             <input type="checkbox" name="wifi" className="form-check-input" value={filterValues.wifi} onChange={handleFilterChange} />
                             Wifi
