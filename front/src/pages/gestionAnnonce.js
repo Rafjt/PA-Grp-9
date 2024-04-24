@@ -46,6 +46,8 @@ const GestionAnnonce = () => {
         nomBien: '',
         statutValidation: '',
         cheminImg: '',
+        ville: '',
+        adresse: '',
         disponible: '1',
         id: '',
         id_ClientBailleur: '',
@@ -192,6 +194,22 @@ const GestionAnnonce = () => {
                         value={form.prix}
                         onChange={handleChange}
                     />
+                    <br />
+                        <h4>Localisation</h4>
+                    <br />
+                    <select
+                        className="input"
+                        name="ville"
+                        id="ville"
+                        value={form.ville}
+                        onChange={handleChange}
+                    >
+                        <option value="Paris">Paris</option>
+                        <option value="Nice">Nice</option>
+                        <option value="Biarritz">Biarritz</option>
+                    </select>
+                    <br />
+                    <input className="input" type="text" placeholder="Adresse" name="adresse" value={form.adresse} onChange={handleChange} />
                     <br />
                     <br />
                     <label htmlFor="pictures">Photos du bien :</label>

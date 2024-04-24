@@ -234,14 +234,14 @@ router.delete('/bienImo/:id', async (req, res) => {
 router.post('/bienImo', upload.single('pictures'), async (req, res) => {
   console.log('Creating bien:', req.body);
   console.log('Uploaded file:', req.file); // Log uploaded file information
-  const { nomBien, description, id_ClientBailleur, prix, disponible, typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation } = req.body; // Get the filename of the uploaded image
+  const { nomBien, description, id_ClientBailleur, prix, disponible, typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation, ville, adresse } = req.body; // Get the filename of the uploaded image
   const pictures = req.file.filename; // Get the filename of the uploaded image
   console.log('pictures ==', pictures); // Log uploaded file information
   // Handle description escaping single quotes
   const newDescription = description.replace(/'/g, "''");
 
   try {
-    await sequelize.query(`INSERT INTO bienImo (nomBien, description, id_ClientBailleur, statutValidation, prix, disponible, typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation, cheminImg) VALUES ('${nomBien}', '${newDescription}', '${id_ClientBailleur}', '0', '${prix}', '${disponible}', '${typeDePropriete}', '${nombreChambres}', '${nombreLits}', '${nombreSallesDeBain}', '${wifi}', '${cuisine}', '${balcon}', '${jardin}', '${parking}', '${piscine}', '${jaccuzzi}', '${salleDeSport}', '${climatisation}', '${pictures}')`);
+    await sequelize.query(`INSERT INTO bienImo (nomBien, description, id_ClientBailleur, statutValidation, prix, disponible, typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation, cheminImg, ville, adresse) VALUES ('${nomBien}', '${newDescription}', '${id_ClientBailleur}', '0', '${prix}', '${disponible}', '${typeDePropriete}', '${nombreChambres}', '${nombreLits}', '${nombreSallesDeBain}', '${wifi}', '${cuisine}', '${balcon}', '${jardin}', '${parking}', '${piscine}', '${jaccuzzi}', '${salleDeSport}', '${climatisation}', '${pictures}', '${ville}', '${adresse}')`);
   } catch (error) {
     console.error('Error creating bien:', error);
     return res.status(500).send('Error creating bien');
