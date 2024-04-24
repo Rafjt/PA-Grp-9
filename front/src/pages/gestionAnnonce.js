@@ -446,10 +446,10 @@ const GestionAnnonce = () => {
                     .map((annonce) => (
                         annonce && <div key={annonce.id} className="annonce">
                             <img src={`${BACK_URL}/uploads/${annonce.cheminImg}`} alt={annonce.nomBien} className='img' />
-                            <h2> ID :{annonce.id}</h2>
+                            <h2> ID :{annonce.id}, {annonce.nomBien} </h2>
                             <h2> ID du client bailleur propriétaire :{annonce.id_ClientBailleur}</h2>
-                            <h2>{annonce.nomBien}</h2>
                             <h3>Prix par nuits: {annonce.prix}€</h3>
+                            <h3>{annonce.ville}: {annonce.adresse}</h3>
                             <button onClick={() => handleDelete(annonce.id)}>
                                 Supprimer
                             </button>
