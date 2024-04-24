@@ -306,7 +306,7 @@ const GestionAnnonce = () => {
             <h2>Rechercher un bien</h2>
             <input
                 type="text"
-                placeholder="Rechercher (Nom du bien ou ID)"
+                placeholder="Rechercher (Nom du bien, adresse du bien ou ID)"
                 onChange={handleSearch}
                 className='input'
                 id='searchBar'
@@ -426,7 +426,8 @@ const GestionAnnonce = () => {
                         (annonce) =>
                             annonce && annonce.nomBien && annonce.nomBien.toLowerCase().includes(searchTerm.toLowerCase()) ||
                             annonce && annonce.id && annonce.id.toString() === searchTerm ||
-                            annonce && annonce.propertyName && annonce.propertyName.toLowerCase().includes(searchTerm.toLowerCase())
+                            annonce && annonce.propertyName && annonce.propertyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            annonce && annonce.adresse && annonce.adresse.toLowerCase().includes(searchTerm.toLowerCase())
                     )
                     .map((annonce) => (
                         annonce && <div key={annonce.id} className="annonce">
