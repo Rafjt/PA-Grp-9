@@ -17,6 +17,8 @@ const UpdateAnnonce = () => {
         nomBien: '',
         statutValidation: '',
         cheminImg: null,
+        ville: '',
+        adresse: '',
         disponible: '1', // default value set to "Oui"
         id: '',
         id_ClientBailleur: '',
@@ -49,6 +51,8 @@ const UpdateAnnonce = () => {
                         description: data.description,
                         nomBien: data.nomBien,
                         cheminImg: data.cheminImg,
+                        ville: data.ville,
+                        adresse: data.adresse,
                         disponible: data.disponible,
                         id_ClientBailleur: data.id_ClientBailleur,
                         prix: data.prix,
@@ -151,7 +155,11 @@ const UpdateAnnonce = () => {
             </div>
             {annonceData && (
                 <form className="modif">
-                    <img src={`${BACK_URL}/uploads/${values.cheminImg}`} alt={`${values.nomBien}`} />
+                    <img 
+                        src={`${BACK_URL}/uploads/${values.cheminImg}`} 
+                        alt={`${values.nomBien}`} 
+                        style={{ width: '30%' }} 
+                    />
                     <br></br>
                     <label htmlFor="cheminImg">Modifier l'image :</label>
                     <input type="file" name="cheminImg" onChange={handleChange} />
@@ -172,6 +180,15 @@ const UpdateAnnonce = () => {
                         <option value="Maison d'hôtes">Maison d'hôtes</option>
                         <option value="Hôtel">Hôtel</option>
                     </select>
+                    <br></br>
+                    <label htmlFor="ville">Ville :</label>
+                    <select name="ville" value={values.ville} onChange={handleChange}>
+                        <option value="Paris">Paris</option>
+                        <option value="Nice">Nice</option>
+                        <option value="Biarritz">Biarritz</option>
+                    </select>
+                    <br></br>
+                    <input className="input" type="text" name="adresse" placeholder="adresse" value={values.adresse} onChange={handleChange} />
                     <br></br>
                     <input className="input" type="number" name="nombreChambres" placeholder="nombreChambres" value={values.nombreChambres} onChange={handleChange} />
                     <input className="input" type="number" name="nombreLits" placeholder="nombreLits" value={values.nombreLits} onChange={handleChange} />
