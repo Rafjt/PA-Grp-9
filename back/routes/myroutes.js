@@ -91,6 +91,19 @@ router.get('/users/count/:type', async (req, res) => {
     }
 });
 
+router.get('/users/count/:type', async (req, res) => {
+    console.log('Route /count called');
+    const type = req.params.type;
+    try {
+        const [result] = await sequelize.query(`SELECT COUNT(*) AS count FROM ${type}`);
+        console.log(result);
+        res.json({ count: result[0].count });
+    } catch (error) {
+        console.error('Error fetching user count:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 router.get('/users/:id/:type', async (req, res) => {
     console.log('route /users/:id called');
     const id = req.params.id;
@@ -157,9 +170,9 @@ router.delete('/bienImo/:id', async (req, res) => {
 
 router.post('/bienImo', async (req, res) => {
     console.log('Creating bien:', req.body);
-    const { nomBien, description, id_ClientBailleur, prix, disponible} = req.body;
+    const { nomBien, description, idClientBailleur } = req.body;
     try {
-        await sequelize.query(`INSERT INTO bienImo (nomBien, description, id_ClientBailleur, statutValidation, prix, disponible) VALUES ('${nomBien}', '${description}', '${id_ClientBailleur}', '0', '${prix}', '${disponible}')`);
+        await sequelize.query(`INSERT INTO bienImo (nomBien, description, idClientBailleur) VALUES ('${nomBien}', '${description}', ${idClientBailleur})`);
     }
     catch (error) {
         console.error('Error creating bien:', error);
@@ -178,11 +191,10 @@ router.get('/bienImo/:id', async (req, res) => {
 router.put('/bienImo/:id', async (req, res) => {
     console.log('Modifying bien:', req.body);
     const { id } = req.params;
-    const { nomBien, description, id_ClientBailleur, prix, cheminImg } = req.body;
-    newDescription = description.replace(/'/g, "''");
+    const { nomBien, description, id_ClientBailleur, prix } = req.body;
     console.log('prix est :', prix);
     try {
-        await sequelize.query(`UPDATE bienImo SET nomBien = '${nomBien}', description = '${newDescription}', prix = '${prix}',cheminImg = '${cheminImg}', id_ClientBailleur = ${id_ClientBailleur} WHERE id = ${id}`);
+        await sequelize.query(`UPDATE bienImo SET nomBien = '${nomBien}', description = '${description}', prix = '${prix}', id_ClientBailleur = ${id_ClientBailleur} WHERE id = ${id}`);
     }
     catch (error) {
         console.error('Error modifying bien:', error);

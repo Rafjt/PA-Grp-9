@@ -1,83 +1,142 @@
-import React, { useState, useEffect } from 'react';
-import './gestionUtilisateur.css';
+import React, { useState, useEffect } from "react";
+import "./gestionUtilisateur.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Link } from 'react-router-dom';
-import { fetchUsers, createUser, deleteUser } from '../services';
+import { Link } from "react-router-dom";
+import {
+  fetchUsers,
+  createUser,
+  deleteUser,
+  banUser,
+  fetchBannedUsers,
+  unbanUser,
+} from "../services";
 
 const GestionUtilisateur = () => {
-    const [users, setUsers] = useState({
-        voyageurs: [],
-        clientsBailleurs: [],
-        prestataires: [],
-      });
-    
-      const [form, setForm] = useState({
-        nom: '',
-        prenom: '',
-        dateDeNaissance: '',
-        adresseMail: '',
-        motDePasse: '',
-        admin: '0',
-        type: 'voyageurs',
-      });
-    
-      const [searchTerm, setSearchTerm] = useState('');
-    
-      const idFields = {
-        voyageurs: 'id',
-        clientsBailleurs: 'id',
-        prestataires: 'id',
-      };
-    
-      useEffect(() => {
-        const fetchData = async () => {
-          try {
-            const data = await fetchUsers();
-            setUsers(data);
-          } catch (error) {
-            console.error('Error fetching users:', error);
-            // Handle error gracefully, such as displaying an error message or retrying the fetch
-          }
-        };
-    
-        fetchData();
-      }, []);
-    
-      const handleChange = (e) => {
-        setForm({
-          ...form,
-          [e.target.name]: e.target.value,
-        });
-      };
-    
-      const handleSubmit = async (e) => {
-        // e.preventDefault();
-        const data = await createUser(form);
-        // window.location.reload();
-      };
-    
-      const handleDelete = (userId, userType) => {
-        deleteUser(userId, userType)
-          .then(() => {
-            setUsers((prevUsers) => ({
-              ...prevUsers,
-              [userType]: prevUsers[userType].filter(
-                (user) => user[idFields[userType]] !== userId
-              ),
-            }));
-          })
-          .catch((error) => console.error('Error deleting user:', error));
-      };
-    
-      const handleSearch = (event) => {
-        setSearchTerm(event.target.value);
-      };
-    
-      if (!users) {
-        return <div>Loading...</div>;
+  const [users, setUsers] = useState({
+    voyageurs: [],
+    clientsBailleurs: [],
+    prestataires: [],
+  });
+
+  const [form, setForm] = useState({
+    nom: "",
+    prenom: "",
+    dateDeNaissance: "",
+    adresseMail: "",
+    motDePasse: "",
+    admin: "0",
+    type: "voyageurs",
+  });
+
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const [bannedUsers, setBannedUsers] = useState([]);
+
+  const idFields = {
+    voyageurs: "id",
+    clientsBailleurs: "id",
+    prestataires: "id",
+  };
+
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const seconds = String(date.getSeconds()).padStart(2, "0");
+
+    return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+  }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await fetchUsers();
+        setUsers(data);
+        const donnee = await fetchBannedUsers();
+        setBannedUsers(donnee);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+        // Handle error gracefully, such as displaying an error message or retrying the fetch
       }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleChange = (e) => {
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    // e.preventDefault();
+    const data = await createUser(form);
+    // window.location.reload();
+  };
+
+  const filteredUsers = Object.keys(users).reduce((acc, userType) => {
+    const filtered = users[userType].filter(
+      (user) =>
+        user.nom.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        user.prenom.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        user.adresseMail.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    return { ...acc, [userType]: filtered };
+  }, {});
+
+  const handleDelete = async (userId, userType) => {
+    try {
+      await deleteUser(userId, userType);
+      // Fetch updated data after deleting user
+      const updatedUsers = await fetchUsers();
+      setUsers(updatedUsers);
+    } catch (error) {
+      console.error("Error deleting user:", error);
+    }
+  };
+
+const handleBan = async (userId, userType, userData) => {
+  try {
+    // Ban the user
+    await banUser(userId, userType, userData);
+    // Fetch updated users after banning
+    const updatedUsers = await fetchUsers();
+    setUsers({
+      ...users,
+      [userType]: updatedUsers[userType],
+    });
+
+    // Fetch updated banned users after banning
+    const updatedBannedUsers = await fetchBannedUsers();
+    setBannedUsers(updatedBannedUsers);
+  } catch (error) {
+    console.error("Error banning user:", error);
+  }
+};
+
+
+  const unBan = async (userId) => {
+    try {
+      await unbanUser(userId);
+      // Fetch updated data after unbanning user
+      const updatedBannedUsers = await fetchBannedUsers();
+      setBannedUsers(updatedBannedUsers);
+    } catch (error) {
+      console.error("Error unbanning user:", error);
+    }
+  };
+  if (!users) {
+    return <div>Loading...</div>;
+  }
+
   return (
-    <div className="gestionUtilisateur">
+    <div className="gestionUtilisateur2">
       <div className="greet">
         <h1>Gestion des Utilisateurs</h1>
         <h2>
@@ -85,14 +144,14 @@ const GestionUtilisateur = () => {
           utilisateurs
         </h2>
       </div>
-      <div className="createUser">
+      <div className="createUser rounded shadow">
         <h2>Ajouter un utilisateur</h2>
         <form onSubmit={handleSubmit}>
           <input
             className="input"
-            type='text'
-            placeholder='Nom'
-            name='nom'
+            type="text"
+            placeholder="Nom"
+            name="nom"
             value={form.nom}
             onChange={handleChange}
           />
@@ -154,59 +213,121 @@ const GestionUtilisateur = () => {
           </select>
           <br />
           <input
-            className="input"
+            className="input shadow"
             type="submit"
             value="Créer"
             method="POST"
           ></input>
         </form>
       </div>
-      <h2>Rechercher un utilisateur</h2>
-      <input
-        className="input"
-        type="text"
-        placeholder="Rechercher (Nom/prénom)"
-        onChange={handleSearch}
-      />
-      <div className="usersContainer">
-        {["voyageurs", "clientsBailleurs", "prestataires"].map((userType) => (
-          <div key={userType}>
-            <h2>{userType}</h2>
-            {users[userType]
-              .filter(
-                (user) =>
-                  user.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                  user.prenom.toLowerCase().includes(searchTerm.toLowerCase())
-              )
-              .map((user) => (
-                <div key={user[idFields[userType]]} className="user">
-                  <p>ID: {user[idFields[userType]]}</p>
-                  <p>Nom: {user.nom}</p>
-                  <p>Prénom: {user.prenom}</p>
-                  <p>Date de Naissance: {user.dateDeNaissance}</p>
-                  <p>Adresse Email: {user.adresseMail}</p>
-                  <p>Mot de Passe: {user.motDePasse}</p>
-                  <p>Admin: {user.admin}</p>
+      <div className="search-bar mt-3">
+        <input
+          class="mt-3"
+          className="input"
+          type="text"
+          placeholder="Rechercher un utilisateur..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </div>
+      <div className="usersContainer rounded shadow mt-3">
+        <table className="table table-bordered table-hover custom-table">
+          <thead>
+            <tr>
+              <th className="narrow-column">ID</th>
+              <th>Type</th>
+              <th>Nom</th>
+              <th>Prénom</th>
+              <th>Date de Naissance</th>
+              <th>Adresse Email</th>
+              <th>Mot de Passe</th>
+              <th className="narrow-column">Admin</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {["voyageurs", "clientsBailleurs", "prestataires"].map((userType) =>
+              filteredUsers[userType].map((user) => (
+                <tr key={user[idFields[userType]]}>
+                  <td>{user[idFields[userType]]}</td>
+                  <td>{userType}</td>
+                  <td className="long-column">{user.nom}</td>
+                  <td className="long-column">{user.prenom}</td>
+                  <td>{user.dateDeNaissance}</td>
+                  <td className="long-column">{user.adresseMail}</td>
+                  <td className="long-column">{user.motDePasse}</td>
+                  <td>{user.admin}</td>
+                  <td className="long-column">
+                    <button
+                      onClick={() =>
+                        handleDelete(user[idFields[userType]], userType)
+                      }
+                      className="delete"
+                    >
+                      Supprimer
+                    </button>
+                    <Link
+                      className="modif"
+                      to={`/update/${user[idFields[userType]]}/${userType}`}
+                    >
+                      Modifier
+                    </Link>
+
+                    <button
+                      onClick={() =>
+                        handleBan(
+                          user[idFields[userType]],
+                          userType,
+                          user // Pass user data to the handleBan function
+                        )
+                      }
+                      className="bannir ml-1"
+                    >
+                      Bannir
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="greet">
+        <h2>Utilisateurs bannis</h2>
+      </div>
+      <div className="usersBannisContainer rounded shadow mt-3">
+        <table className="table table-bordered table-hover custom-table">
+          <thead>
+            <tr>
+              <th className="narrow-column">ID</th>
+              <th className="seminarrow-column">Nom</th>
+              <th className="seminarrow-column">Prénom</th>
+              <th>Adresse Email</th>
+              <th className="seminarrow-column">Date de bannissement</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {bannedUsers.map((user) => (
+              <tr key={user.id}>
+                <td>{user.id}</td>
+                <td>{user.nom}</td>
+                <td>{user.prenom}</td>
+                <td className="long-column">{user.adresseMail}</td>
+                <td>{formatDate(user.dateBanissement)}</td>
+                <td>
                   <button
-                    onClick={() =>
-                      handleDelete(user[idFields[userType]], userType)
-                    }
+                    onClick={() => unBan(user.id)}
+                    className="bannir ml-1"
                   >
-                    Supprimer
+                    Débannir
                   </button>
-                  <Link
-                    className="modif"
-                    to={`/update/${user[idFields[userType]]}/${userType}`}
-                  >
-                    Modifier
-                  </Link>
-                  {/* <button onClick={() => handleModify(user[idFields[userType]], userType, user.admin, user.nom, user.prenom, user.adresseMail, user.motDePasse)}>
-                                                Modifier
-                                            </button> */}
-                </div>
-              ))}
-          </div>
-        ))}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );

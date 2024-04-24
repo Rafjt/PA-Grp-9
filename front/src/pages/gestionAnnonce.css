@@ -43,3 +43,61 @@
     cursor: pointer;
     margin: 2%;
 }
+
+
+.filters {
+    align-items: flex-start;
+  }
+  
+  .filter-section {
+    display: block;
+    margin-bottom: 20px;
+  }
+  
+  .filter-section h5 {
+    margin-bottom: 5px;
+  }
+  
+  .filter-section select,
+  .filter-section label {
+    margin-right: 10px;
+  }
+  
+  .filter-section input[type="checkbox"] {
+    margin-right: 5px;
+  }
+
+.typeDePropriete {
+    margin: 30px;
+    background-color: black;
+    color: white;
+    border-radius: 20px;
+    padding: 10px;
+}
+
+.equipments {
+    margin: 30px;
+    background-color: black;
+    color: white;
+    border-radius: 20px;
+    padding: 10px;
+}
+
+.equipments label {
+    margin: 10px;
+}
+
+.filters {
+    margin: 30px;
+    background-color: black;
+    color: white;
+    border-radius: 20px;
+    padding: 10px;
+}
+
+hr {
+    border: 1px solid black;
+    margin: 50px;
+}
+  
+  

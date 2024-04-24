@@ -2,7 +2,6 @@ import React from 'react';
 import './backOffice.css'
 import { Link, NavLink } from 'react-router-dom';
 
-
 const backOffice = () => {
     const toUser = () => {
         window.location.replace("./gestionUtilisateur");
