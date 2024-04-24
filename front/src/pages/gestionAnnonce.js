@@ -442,7 +442,6 @@ const GestionAnnonce = () => {
                             annonce && annonce.propertyName && annonce.propertyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                             annonce && annonce.adresse && annonce.adresse.toLowerCase().includes(searchTerm.toLowerCase()) ||
                             annonce && annonce.ville && annonce.ville.toLowerCase().includes(searchTerm.toLowerCase())
-
                     )
                     .map((annonce) => (
                         annonce && <div key={annonce.id} className="annonce">
