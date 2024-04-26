@@ -30,7 +30,13 @@ export const createUser = async (userData) => {
       // Return an empty object or null, depending on your preference
       return {};
     }
-
+    if (response.status === 409) {
+      throw new Error("Email already exists");
+    }
+    if (response.status === 403) {
+      throw new Error("User is banned");
+    }
+    
     const data = await response.json();
     return data;
   } catch (error) {
