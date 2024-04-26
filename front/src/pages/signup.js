@@ -66,19 +66,18 @@ const Signup = () => {
           return [key, typeof value === "string" ? value.trim() : value];
         })
       );
-
+    
       try {
-        const data = await createUser(trimmedValues);
-        console.log(data);
-        window.location.reload();
+        await createUser(trimmedValues);
+        console.log(trimmedValues);
+        window.location.replace('/mailConfirm');
       } catch (error) {
         if (error.message === "Email already exists") {
           formik.setErrors({
             adresseMail:
               "Cet email est déjà utilisé. Veuillez en choisir un autre.",
           });
-        }
-        if (error.message === "User is banned") {
+        } else if (error.message === "User is banned") {
           formik.setErrors({
             adresseMail:
               "Cet email a été banni, veuillez contacter l'assistance",
