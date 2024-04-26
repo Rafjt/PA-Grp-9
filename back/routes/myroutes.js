@@ -6,12 +6,13 @@ const bcrypt = require("bcrypt");
 const multer = require('multer');
 const router = express.Router();
 const { exec } = require("child_process");
-
+const mailRoute = require("./mailCode");
+router.use("/mail", mailRoute);
 
 // Multer configuration
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/') // Save uploaded files to the 'uploads' directory
+    cb(null, 'uploads/'); // Save uploaded files to the 'uploads' directory
   },
   filename: function (req, file, cb) {
     // Extracting file extension
@@ -21,11 +22,10 @@ const storage = multer.diskStorage({
     // Constructing the new filename
     const newFilename = `image.${timestamp}.${fileExtension}`;
     cb(null, newFilename); // Rename file with desired format
-  }
+  },
 });
 const upload = multer({ storage: storage });
 //
-
 
 router.delete("/users/:id/debannis", async (req, res) => {
   const { id } = req.params;
@@ -103,40 +103,45 @@ router.get("/users/:id/:type", async (req, res) => {
   res.send(users[0]);
 });
 
-router.post("/users", async (req, res) => {
-  console.log("Creating user:", req.body);
-  const { nom, prenom, adresseMail, motDePasse, admin, dateDeNaissance, type } =
-    req.body;
+router.post("/users/code/:code", async (req, res) => {
+  const { code } = req.params;
+  console.log("Verifying code...", code);
 
   try {
-    const existingUser = await sequelize.query(
-      `SELECT * FROM ${type} WHERE adresseMail = '${adresseMail}'`,
-      { type: QueryTypes.SELECT }
-    );
-    if (existingUser.length > 0) {
-      return res.status(409).send("Email already exists");
-    }
-    const bannedUser = await sequelize.query(
-      `SELECT * FROM userBannis WHERE adresseMail = '${adresseMail}'`,
-      { type: QueryTypes.SELECT }
-    );
-    if (bannedUser.length > 0) {
-      return res.status(403).send("User is banned");
+    // Check if the temporary table exists
+    const tableExists = await sequelize.query(`SHOW TABLES LIKE '${code}'`, {
+      type: QueryTypes.SELECT,
+    });
+
+    if (tableExists.length === 0) {
+      return res.status(404).send("Table temporaire introuvable");
+    } else {
+      // Get data from the temporary table
+      const tempTableData = await sequelize.query(`SELECT * FROM \`${code}\``, {
+        type: QueryTypes.SELECT,
+      });
+
+      if (tempTableData.length === 0) {
+        return res.status(404).send("La table temporaire est vide");
+      }
+
+      // Insert data into the permanent table
+      for (const row of tempTableData) {
+        await sequelize.query(
+          `INSERT INTO ${row.type} (nom, prenom, adresseMail, motDePasse, admin, dateDeNaissance) 
+        VALUES ('${row.nom}', '${row.prenom}', '${row.adresseMail}', '${row.motDePasse}', ${row.admin}, '${row.dateDeNaissance}')`
+        );
+      }
+
+      // Drop the temporary table
+      await sequelize.query(`DROP TABLE \`${code}\``);
     }
 
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(motDePasse, 10); // 10 is the number of salt rounds
-
-    // Insert the user data into the database
-    await sequelize.query(
-      `INSERT INTO ${type} (nom, prenom, adresseMail, motDePasse, admin, dateDeNaissance) VALUES ('${nom}', '${prenom}', '${adresseMail}', '${hashedPassword}', ${admin}, '${dateDeNaissance}')`
-    );
+    return res.status(200).send("User created successfully");
   } catch (error) {
     console.error("Error creating user:", error);
     return res.status(500).send("Error creating user");
   }
-
-  res.send();
 });
 
 module.exports = router;
@@ -170,7 +175,7 @@ router.post("/users/bannir/vatefaireenculer/:id/:type", async (req, res) => {
     console.error("Error banning user:", error);
     res.status(500).send("Error banning user");
   }
-  res.send("User banned")
+  res.send("User banned");
 });
 
 router.get("/users/bannis", async (req, res) => {
@@ -195,7 +200,9 @@ router.delete('/bienImo/:id', async (req, res) => {
   const { id } = req.params;
   let cheminImg;
   try {
-    const [[result]] = await sequelize.query(`SELECT cheminImg FROM bienImo WHERE id = ${id}`);
+    const [[result]] = await sequelize.query(
+      `SELECT cheminImg FROM bienImo WHERE id = ${id}`
+    );
     cheminImg = result.cheminImg;
   } catch (error) {
     console.error('Error getting bien:', error);
@@ -234,14 +241,37 @@ router.delete('/bienImo/:id', async (req, res) => {
 router.post('/bienImo', upload.single('pictures'), async (req, res) => {
   console.log('Creating bien:', req.body);
   console.log('Uploaded file:', req.file); // Log uploaded file information
-  const { nomBien, description, id_ClientBailleur, prix, disponible, typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation, ville, adresse } = req.body; // Get the filename of the uploaded image
+  const {
+    nomBien,
+    description,
+    id_ClientBailleur,
+    prix,
+    disponible,
+    typeDePropriete,
+    nombreChambres,
+    nombreLits,
+    nombreSallesDeBain,
+    wifi,
+    cuisine,
+    balcon,
+    jardin,
+    parking,
+    piscine,
+    jaccuzzi,
+    salleDeSport,
+    climatisation,
+    ville,
+    adresse,
+  } = req.body; // Get the filename of the uploaded image
   const pictures = req.file.filename; // Get the filename of the uploaded image
   console.log('pictures ==', pictures); // Log uploaded file information
   // Handle description escaping single quotes
   const newDescription = description.replace(/'/g, "''");
 
   try {
-    await sequelize.query(`INSERT INTO bienImo (nomBien, description, id_ClientBailleur, statutValidation, prix, disponible, typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation, cheminImg, ville, adresse) VALUES ('${nomBien}', '${newDescription}', '${id_ClientBailleur}', '0', '${prix}', '${disponible}', '${typeDePropriete}', '${nombreChambres}', '${nombreLits}', '${nombreSallesDeBain}', '${wifi}', '${cuisine}', '${balcon}', '${jardin}', '${parking}', '${piscine}', '${jaccuzzi}', '${salleDeSport}', '${climatisation}', '${pictures}', '${ville}', '${adresse}')`);
+    await sequelize.query(
+      `INSERT INTO bienImo (nomBien, description, id_ClientBailleur, statutValidation, prix, disponible, typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation, cheminImg, ville, adresse) VALUES ('${nomBien}', '${newDescription}', '${id_ClientBailleur}', '0', '${prix}', '${disponible}', '${typeDePropriete}', '${nombreChambres}', '${nombreLits}', '${nombreSallesDeBain}', '${wifi}', '${cuisine}', '${balcon}', '${jardin}', '${parking}', '${piscine}', '${jaccuzzi}', '${salleDeSport}', '${climatisation}', '${pictures}', '${ville}', '${adresse}')`
+    );
   } catch (error) {
     console.error('Error creating bien:', error);
     return res.status(500).send('Error creating bien');
@@ -267,20 +297,59 @@ router.put('/bienImo/:id', upload.single('cheminImg'), async (req, res) => {
     pictures = req.file.filename; // If a new file was uploaded, use it instead
   }
   console.log('pictures ==', pictures); // Log uploaded file information
-  const { nomBien, description, id_ClientBailleur, prix, disponible, typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation,ville,adresse } = req.body;
+  const {
+    nomBien,
+    description,
+    id_ClientBailleur,
+    prix,
+    disponible,
+    typeDePropriete,
+    nombreChambres,
+    nombreLits,
+    nombreSallesDeBain,
+    wifi,
+    cuisine,
+    balcon,
+    jardin,
+    parking,
+    piscine,
+    jaccuzzi,
+    salleDeSport,
+    climatisation,
+    ville,
+    adresse,
+  } = req.body;
   newDescription = description.replace(/'/g, "''");
   console.log('prix est :', prix);
   try {
-    await sequelize.query(`UPDATE bienImo SET nomBien = '${nomBien}', description = '${newDescription}', id_ClientBailleur = '${id_ClientBailleur}', prix = '${prix}', disponible = '${disponible}', typeDePropriete = '${typeDePropriete}', nombreChambres = '${nombreChambres}', nombreLits = '${nombreLits}', nombreSallesDeBain = '${nombreSallesDeBain}', wifi = '${wifi}', cuisine = '${cuisine}', balcon = '${balcon}', jardin = '${jardin}', parking = '${parking}', piscine = '${piscine}', jaccuzzi = '${jaccuzzi}', salleDeSport = '${salleDeSport}', climatisation = '${climatisation}', cheminImg = '${pictures}', ville = '${ville}', adresse = '${adresse}' WHERE id = ${id}`);
-  }
-  catch (error) {
+    await sequelize.query(
+      `UPDATE bienImo SET nomBien = '${nomBien}', description = '${newDescription}', id_ClientBailleur = '${id_ClientBailleur}', prix = '${prix}', disponible = '${disponible}', typeDePropriete = '${typeDePropriete}', nombreChambres = '${nombreChambres}', nombreLits = '${nombreLits}', nombreSallesDeBain = '${nombreSallesDeBain}', wifi = '${wifi}', cuisine = '${cuisine}', balcon = '${balcon}', jardin = '${jardin}', parking = '${parking}', piscine = '${piscine}', jaccuzzi = '${jaccuzzi}', salleDeSport = '${salleDeSport}', climatisation = '${climatisation}', cheminImg = '${pictures}', ville = '${ville}', adresse = '${adresse}' WHERE id = ${id}`
+    );
+  } catch (error) {
     console.error('Error modifying bien:', error);
   }
   res.send('Bien modified');
 });
 
 router.post('/bienImo/filter', async (req, res) => {
-  let { typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation, prixMin, prixMax, ville } = req.body;
+  let {
+    typeDePropriete,
+    nombreChambres,
+    nombreLits,
+    nombreSallesDeBain,
+    wifi,
+    cuisine,
+    balcon,
+    jardin,
+    parking,
+    piscine,
+    jaccuzzi,
+    salleDeSport,
+    climatisation,
+    prixMin,
+    prixMax,
+    ville,
+  } = req.body;
 
   wifi = wifi ? 1 : 0;
   cuisine = cuisine ? 1 : 0;
@@ -292,18 +361,41 @@ router.post('/bienImo/filter', async (req, res) => {
   salleDeSport = salleDeSport ? 1 : 0;
   climatisation = climatisation ? 1 : 0;
 
-  nombreChambres = nombreChambres !== 'Tout' ? parseInt(nombreChambres) : nombreChambres;
+  nombreChambres =
+    nombreChambres !== 'Tout' ? parseInt(nombreChambres) : nombreChambres;
   nombreLits = nombreLits !== 'Tout' ? parseInt(nombreLits) : nombreLits;
-  nombreSallesDeBain = nombreSallesDeBain !== 'Tout' ? parseInt(nombreSallesDeBain) : nombreSallesDeBain;
+  nombreSallesDeBain =
+    nombreSallesDeBain !== 'Tout'
+      ? parseInt(nombreSallesDeBain)
+      : nombreSallesDeBain;
   ville = ville !== 'Tout' ? ville : ville;
 
   let query = 'SELECT * FROM bienImo';
   const params = [];
 
-  const properties = { typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation, ville};
+  const properties = {
+    typeDePropriete,
+    nombreChambres,
+    nombreLits,
+    nombreSallesDeBain,
+    wifi,
+    cuisine,
+    balcon,
+    jardin,
+    parking,
+    piscine,
+    jaccuzzi,
+    salleDeSport,
+    climatisation,
+    ville,
+  };
   console.log(properties);
   for (const property in properties) {
-    if (properties[property] !== undefined && properties[property] !== 'Tout' && properties[property] !== 0) {
+    if (
+      properties[property] !== undefined &&
+      properties[property] !== 'Tout' &&
+      properties[property] !== 0
+    ) {
       if (params.length === 0) {
         query += ' WHERE';
       } else {
@@ -339,7 +431,10 @@ router.post('/bienImo/filter', async (req, res) => {
   }
 
   try {
-    const result = await sequelize.query(query, { replacements: params, type: sequelize.QueryTypes.SELECT });
+    const result = await sequelize.query(query, {
+      replacements: params,
+      type: sequelize.QueryTypes.SELECT,
+    });
     console.log(result);
     res.json(result);
   } catch (err) {
@@ -372,13 +467,11 @@ router.delete("/paiement/:id", async (req, res) => {
   try {
     await sequelize.query(`DELETE FROM paiement WHERE id = ${id}`);
     res.send("Paiement deleted");
-  }
-  catch (error) {
+  } catch (error) {
     console.error("Error deleting paiement:", error);
     res.status(500).send("Failed to delete paiement");
   }
 });
-
 
 router.put("/paiement/:id/validate", async (req, res) => {
   const { id } = req.params;
@@ -386,15 +479,15 @@ router.put("/paiement/:id/validate", async (req, res) => {
   console.log("Validating paiement:", id);
 
   try {
-    await sequelize.query(`UPDATE paiement SET statut = 'Validé' WHERE id = ${id}`);
+    await sequelize.query(
+      `UPDATE paiement SET statut = 'Validé' WHERE id = ${id}`
+    );
     res.send("Paiement validated");
-  }
-  catch (error) {
+  } catch (error) {
     console.error("Error validating paiement:", error);
     res.status(500).send("Failed to validate paiement");
   }
 });
-
 
 // router.put("/paiement/:id/pending", async (req, res) => {
 //   const { id } = req.params;
@@ -413,7 +506,8 @@ router.put("/paiement/:id/validate", async (req, res) => {
 
 router.post("/paiement", async (req, res) => {
   console.log("Creating paiement:", req.body);
-  let { idReservation, nom, datePaiement, methodePaiement, montant, statut } = req.body;
+  let { idReservation, nom, datePaiement, methodePaiement, montant, statut } =
+    req.body;
 
   // If statut is empty, set it to "En attente"
   if (!statut) {
@@ -421,7 +515,9 @@ router.post("/paiement", async (req, res) => {
   }
 
   try {
-    await sequelize.query(`INSERT INTO paiement (id_Reservation, nom, datePaiement, methodePaiement, montant, statut) VALUES ('${idReservation}', '${nom}', '${datePaiement}', '${methodePaiement}', '${montant}', '${statut}')`);
+    await sequelize.query(
+      `INSERT INTO paiement (id_Reservation, nom, datePaiement, methodePaiement, montant, statut) VALUES ('${idReservation}', '${nom}', '${datePaiement}', '${methodePaiement}', '${montant}', '${statut}')`
+    );
   } catch (error) {
     console.error("Error creating paiement:", error);
     return res.status(500).send("Error creating paiement");
@@ -430,15 +526,22 @@ router.post("/paiement", async (req, res) => {
   res.send("Paiement created");
 });
 
-
-
 router.put("/paiement/:id", async (req, res) => {
   console.log("Modifying paiement:", req.body);
   const { id } = req.params;
-  const { id_Reservation, nom, datePaiement, methodePaiement, montant, statut } = req.body;
+  const {
+    id_Reservation,
+    nom,
+    datePaiement,
+    methodePaiement,
+    montant,
+    statut,
+  } = req.body;
 
   try {
-    await sequelize.query(`UPDATE paiement SET id_Reservation = '${id_Reservation}', nom = '${nom}', datePaiement = '${datePaiement}', methodePaiement = '${methodePaiement}', montant = '${montant}', statut = '${statut}' WHERE id = ${id}`);
+    await sequelize.query(
+      `UPDATE paiement SET id_Reservation = '${id_Reservation}', nom = '${nom}', datePaiement = '${datePaiement}', methodePaiement = '${methodePaiement}', montant = '${montant}', statut = '${statut}' WHERE id = ${id}`
+    );
   } catch (error) {
     console.error("Error modifying paiement:", error);
   }

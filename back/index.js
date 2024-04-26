@@ -4,6 +4,7 @@ const port = 3001;
 const bodyParser = require('body-parser');
 const path = require('path');
 const router = require('./routes/myroutes');
+const mailCodeRouter = require('./routes/mailCode');
 const sequelize = require('./database');
 const cors = require('cors');
 
@@ -46,5 +47,5 @@ app.get('*', (req, res) => {
 
 const PORT = process.env.PORT || port;
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`Server is running on port ${PORT}, triple monnnnstre`);
 });
