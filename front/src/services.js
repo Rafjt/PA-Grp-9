@@ -15,9 +15,29 @@ export const fetchUsers = async () => {
   }
 };
 
+export const fetchNombreUsers = async (type) => {
+  try {
+    const response = await fetch(`${URL_USERS}/count/${type}`);
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const fetchAgeMoyenUsers = async () => {
+  try {
+    const response = await fetch(`${URL_USERS}/mean-age`);
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching mean age:", error);
+    throw error;
+  }
+};
+
 export const createUser = async (userData) => {
   try {
-    debugger
     const response = await fetch(`${URL_ENVOI_MAIL}/sendCode`, {
       method: "POST",
       headers: {
@@ -25,7 +45,7 @@ export const createUser = async (userData) => {
       },
       body: JSON.stringify(userData),
     });
-
+    
     if (response.status === 204 || response.status === 200) {
       // Return an empty object or null, depending on your preference
       return {};
@@ -36,11 +56,11 @@ export const createUser = async (userData) => {
     if (response.status === 403) {
       throw new Error("User is banned");
     }
-    
+
     const data = await response.json();
     return data;
   } catch (error) {
-    throw error; // Re-throw the error to be handled by the calling function
+    console.log(error);
   }
 };
 
@@ -150,6 +170,7 @@ export const verifConfCode = async (code) => {
 };
 
 // GESTION DES ANNONCES
+
 export const fetchAnnonce = async () => {
   try {
     const response = await fetch(URL_ANNONCE);

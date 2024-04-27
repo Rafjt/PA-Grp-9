@@ -38,7 +38,6 @@ async function sendEmail(email, randomNumber) {
 
 router.post("/sendCode", async (req, res) => {
   console.log("Creating user and sending code:", req.body);
-  debugger;
   const { nom, prenom, adresseMail, motDePasse, admin, dateDeNaissance, type } =
     req.body;
 
@@ -87,10 +86,10 @@ router.post("/sendCode", async (req, res) => {
     // Send email with the confirmation code
     await sendEmail(adresseMail, randomNumber);
 
-    // Schedule dropping of the temporary table after 10 seconds
+    // Schedule dropping of the temporary table after 10 minutes
     setTimeout(async () => {
       await sequelize.query(`DROP TABLE IF EXISTS \`${randomNumber}\``);
-      console.log(`Temporary table ${randomNumber} dropped after 10 seconds`);
+      console.log(`Temporary table ${randomNumber} dropped after 10 minutes`);
     }, 10 * 60 * 1000); // 10 seconds in milliseconds
 
   } catch (error) {
