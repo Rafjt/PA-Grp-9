@@ -225,30 +225,6 @@ router.get("/users/bannis", async (req, res) => {
   }
 });
 
-router.get('/users/mean-age', async (req, res) => {
-  try {
-      // SQL query to calculate mean age
-      const query = 
-      `SELECT AVG(age) AS mean_age FROM (
-          SELECT TIMESTAMPDIFF(YEAR, dateDeNaissance, CURDATE()) AS age FROM voyageurs
-          UNION ALL
-          SELECT TIMESTAMPDIFF(YEAR, dateDeNaissance, CURDATE()) AS age FROM clientsBailleurs
-          UNION ALL
-          SELECT TIMESTAMPDIFF(YEAR, dateDeNaissance, CURDATE()) AS age FROM prestataires
-      ) AS all_users;`
-      ;
-
-      // Execute the query
-      const [result] = await sequelize.query(query, { type: QueryTypes.SELECT });
-
-      // Send the result as a response
-      res.json(result);
-  } catch (error) {
-      console.error('Error fetching mean age:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
-
 // GESTION DES BIENS/ANNONCES
 
 router.get("/bienImo", async (req, res) => {
