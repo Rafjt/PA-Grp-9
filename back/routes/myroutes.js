@@ -242,16 +242,14 @@ router.get('/bienImo/count', async (req, res) => {
 
 router.get('/bienImo/prixMoy', async (req, res) => {
   try {
-      // SQL query to calculate mean age
-      const query = `
+    const result = await sequelize.query(`
       SELECT AVG(prix) AS prixMoy FROM bienImo;
-      `;
-      console.log(result);
-      const count = result[0].count;
-      res.json(count);
+    `);
+    const prixMoy = result[0][0].prixMoy; // Extracting the average price from the result
+    res.json({ prixMoy });
   } catch (error) {
-      console.error('Error fetching prixMoy:', error);
-      res.status(500).json({ error: "l'ordinateur s'autodétruira dans 3 secondes" });
+    console.error('Error fetching prixMoy:', error);
+    res.status(500).json({ error: "L'ordinateur s'autodétruira dans 3 secondes" });
   }
 });
 
