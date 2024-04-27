@@ -7,6 +7,7 @@ const multer = require('multer');
 const router = express.Router();
 const { exec } = require("child_process");
 const mailRoute = require("./mailCode");
+const { Console } = require("console");
 router.use("/mail", mailRoute);
 
 router.get('/users/mean-age', async (req, res) => {
@@ -611,4 +612,29 @@ router.put("/paiement/:id", async (req, res) => {
   }
 
   res.send("Paiement modified");
+});
+
+
+// GESTION DES REQUETES UTILISATEURS
+
+router.post("/bienDispo", async (req, res) => {
+  console.log("route /bienDispo called");
+  const {ville, arrivee, depart} = req.body;
+  console.log("ville", ville);
+  console.log("arrivee", arrivee);
+  console.log("depart", depart);
+  const [bienDispo] = await sequelize.query(`SELECT id, cheminImg, ville, adresse, prix, nomBien, description, statutValidation, disponible, typeDePropriete,
+  nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi,
+  salleDeSport, climatisation
+  FROM bienImo
+  WHERE ville = '${ville}'
+  AND disponible = 1
+  AND id NOT IN (
+      SELECT id_BienImmobilier
+      FROM reservation
+      WHERE dateDebut <= '${arrivee}' AND dateFin >= '${depart}'
+  );`,);
+  // { replacements: { ville: ville, arrivee: arrivee, depart: depart }, type: sequelize.QueryTypes.SELECT });
+  console.log(bienDispo);
+  res.send(bienDispo);
 });
