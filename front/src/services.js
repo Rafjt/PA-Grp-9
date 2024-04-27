@@ -1,6 +1,7 @@
 // Define functions for backend calls
 const BASE_URL = "http://localhost:3001/api";
 const URL_USERS = `${BASE_URL}/users`;
+export const BACK_URL = "http://localhost:3001";
 const URL_ANNONCE = `${BASE_URL}/bienImo`;
 const URL_PAIEMENT = `${BASE_URL}/paiement`;
 const URL_ENVOI_MAIL = `${BASE_URL}/mail`;

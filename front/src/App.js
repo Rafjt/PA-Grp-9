@@ -15,6 +15,8 @@ import GestionAnnonce from './pages/gestionAnnonce.js';
 import GestionReservations from './pages/gestionReservations.js';
 import GestionPaiement from './pages/gestionPaiement.js';
 import MailConfirm from './pages/mailConfirm.js';
+import PageBien from './pages/pageBien.js';
+
 
 function App() {
   return (
@@ -36,6 +38,7 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/gestionPaiement" element={<GestionPaiement />} />
           <Route path="/mailConfirm" element={<MailConfirm />} />
+          <Route path="/Biens" element={<PageBien />} />
         </Routes>
         </div>
         <div className="footer">
