@@ -16,26 +16,6 @@ export const fetchUsers = async () => {
   }
 };
 
-export const fetchNombreUsers = async (type) => {
-  try {
-    const response = await fetch(`${URL_USERS}/count/${type}`);
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-export const fetchAgeMoyenUsers = async () => {
-  try {
-    const response = await fetch(`${URL_USERS}/mean-age`);
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error fetching mean age:", error);
-    throw error;
-  }
-};
 
 export const createUser = async (userData) => {
   try {

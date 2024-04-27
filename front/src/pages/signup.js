@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup"; // Import Yup for validation
 import { createUser } from "../services";
+import { FadeLoader } from "react-spinners";
 
 const Signup = () => {
   const nomRegex =
@@ -17,6 +18,8 @@ const Signup = () => {
   const maxDate = new Date(now);
   maxDate.setFullYear(maxDate.getFullYear() - 18);
   maxDate.setDate(now.getDate());
+
+  const [loading, setLoading] = useState(false);
 
   const formik = useFormik({
     initialValues: {
@@ -61,16 +64,19 @@ const Signup = () => {
         .required("Ce champ est requis"),
     }),
     onSubmit: async (values) => {
+      var button = document.getElementById('boutonload');
+      button.disabled = true;
+      setLoading(true);
       const trimmedValues = Object.fromEntries(
         Object.entries(values).map(([key, value]) => {
           return [key, typeof value === "string" ? value.trim() : value];
         })
       );
-    
+
       try {
         await createUser(trimmedValues);
         console.log(trimmedValues);
-        window.location.replace('/mailConfirm');
+        window.location.replace("/mailConfirm");
       } catch (error) {
         if (error.message === "Email already exists") {
           formik.setErrors({
@@ -84,6 +90,9 @@ const Signup = () => {
           });
         }
         console.error("Error creating user:", error);
+      } finally {
+        button.disabled = false;
+        setLoading(false); // Set loading to false after the request completes
       }
     },
   });
@@ -218,11 +227,16 @@ const Signup = () => {
 
         <br></br>
         <button
-          className="input"
+        id="boutonload"
+          className="btn btn-dark btn-lg mt-4 position-relative"
           type="submit"
-          class="btn btn-dark btn-lg mt-4"
+          disabled={loading} // Disable button when loading is true
         >
-          Créer un compte
+          {loading ? (
+            <FadeLoader color="#ffffff" size={20} className="spinner" />
+          ) : (
+            "Créer un compte"
+          )}
         </button>
       </form>
     </div>

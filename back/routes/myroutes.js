@@ -227,6 +227,35 @@ router.get("/users/bannis", async (req, res) => {
 
 // GESTION DES BIENS/ANNONCES
 
+router.get('/bienImo/count', async (req, res) => {
+  console.log('Route /count called');
+  try {
+    const [result] = await sequelize.query('SELECT COUNT(*) AS count FROM bienImo');
+    console.log(result);
+    const count = result[0].count;
+    res.json(count);
+  } catch (error) {
+    console.error('Error fetching bienImo count:', error);
+    res.status(500).json({ error: 'Erreur interne serveur, appelez tout de suite la police' });
+  }
+});
+
+router.get('/bienImo/prixMoy', async (req, res) => {
+  try {
+      // SQL query to calculate mean age
+      const query = `
+      SELECT AVG(prix) AS prixMoy FROM bienImo;
+      `;
+      console.log(result);
+      const count = result[0].count;
+      res.json(count);
+  } catch (error) {
+      console.error('Error fetching prixMoy:', error);
+      res.status(500).json({ error: "l'ordinateur s'autodétruira dans 3 secondes" });
+  }
+});
+
+
 router.get("/bienImo", async (req, res) => {
   const [bienImo] = await sequelize.query("SELECT * FROM bienImo");
   console.log(bienImo);
