@@ -1,5 +1,5 @@
 dist
 .envnode_modules
 /back/node_modules/*
-/back/uploads/*
+# /back/uploads/*
 *.log
