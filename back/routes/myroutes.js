@@ -32,11 +32,6 @@ router.get('/users/mean-age', async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
-
-const { exec } = require("child_process");
-const mailRoute = require("./mailCode");
-router.use("/mail", mailRoute);
-
 // Multer configuration
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {

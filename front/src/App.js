@@ -15,6 +15,8 @@ import GestionAnnonce from "./pages/gestionAnnonce.js";
 import GestionReservations from "./pages/gestionReservations.js";
 import Statistiques from "./pages/statistiques.js";
 import PageBien from "./pages/pageBien.js";
+import MailConfirm from "./pages/mailConfirm.js";
+import GestionPaiement from "./pages/gestionPaiement.js";
 
 function App() {
   return (
@@ -43,6 +45,8 @@ function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/statistiques" element={<Statistiques />} />
             <Route path="/Biens" element={<PageBien />} />
+            <Route path="/mailConfirm" element={<MailConfirm />} />
+            <Route path="/gestionPaiement" element={<GestionPaiement/>} />
           </Routes>
         </div>
         <div className="footer">
