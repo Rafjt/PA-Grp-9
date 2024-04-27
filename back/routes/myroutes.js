@@ -619,22 +619,71 @@ router.put("/paiement/:id", async (req, res) => {
 
 router.post("/bienDispo", async (req, res) => {
   console.log("route /bienDispo called");
-  const {ville, arrivee, depart} = req.body;
-  console.log("ville", ville);
-  console.log("arrivee", arrivee);
-  console.log("depart", depart);
-  const [bienDispo] = await sequelize.query(`SELECT id, cheminImg, ville, adresse, prix, nomBien, description, statutValidation, disponible, typeDePropriete,
+  const {ville, arrivee, depart, typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain,
+  prixMin, prixMax, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation } = req.body;
+
+  let query = `SELECT bienImo.id, cheminImg, ville, adresse, prix, nomBien, description, statutValidation, disponible, typeDePropriete,
   nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi,
-  salleDeSport, climatisation
+  salleDeSport, climatisation, clientsBailleurs.nom, clientsBailleurs.prenom
   FROM bienImo
-  WHERE ville = '${ville}'
-  AND disponible = 1
-  AND id NOT IN (
+  JOIN clientsBailleurs ON bienImo.Id_ClientBailleur = clientsBailleurs.id
+  WHERE disponible = 1
+  AND bienImo.id NOT IN (
       SELECT id_BienImmobilier
       FROM reservation
       WHERE dateDebut <= '${arrivee}' AND dateFin >= '${depart}'
-  );`,);
-  // { replacements: { ville: ville, arrivee: arrivee, depart: depart }, type: sequelize.QueryTypes.SELECT });
+  )`;
+
+  if (ville) {
+    query += ` AND ville = '${ville}'`;
+  }
+  if (typeDePropriete) {
+    query += ` AND typeDePropriete = '${typeDePropriete}'`;
+  }
+  if (nombreChambres) {
+    query += ` AND nombreChambres = ${nombreChambres}`;
+  }
+  if (nombreLits) {
+    query += ` AND nombreLits = ${nombreLits}`;
+  }
+  if (nombreSallesDeBain) {
+    query += ` AND nombreSallesDeBain = ${nombreSallesDeBain}`;
+  }
+  if (prixMin) {
+    query += ` AND prix >= ${prixMin}`;
+  }
+  if (prixMax) {
+    query += ` AND prix <= ${prixMax}`;
+  }
+  if (wifi) {
+    query += ` AND wifi = ${wifi}`;
+  }
+  if (cuisine) {
+    query += ` AND cuisine = ${cuisine}`;
+  }
+  if (balcon) {
+    query += ` AND balcon = ${balcon}`;
+  }
+  if (jardin) {
+    query += ` AND jardin = ${jardin}`;
+  }
+  if (parking) {
+    query += ` AND parking = ${parking}`;
+  }
+  if (piscine) {
+    query += ` AND piscine = ${piscine}`;
+  }
+  if (jaccuzzi) {
+    query += ` AND jaccuzzi = ${jaccuzzi}`;
+  }
+  if (salleDeSport) {
+    query += ` AND salleDeSport = ${salleDeSport}`;
+  }
+  if (climatisation) {
+    query += ` AND climatisation = ${climatisation}`;
+  }
+
+  const [bienDispo] = await sequelize.query(query);
   console.log(bienDispo);
   res.send(bienDispo);
 });
