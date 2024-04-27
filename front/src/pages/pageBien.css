@@ -9,6 +9,7 @@
     gap: 20px; 
     text-align: left;
     row-gap: 18%;
+    cursor: pointer;
 }
 
 .img {
@@ -33,7 +34,7 @@
     background-color: #FFFFFF;
 }
 
-.searchbar input {
+.searchbar select, .searchbar input {
     flex: 1;
     margin-right: 10px;
     padding: 10px;
@@ -42,6 +43,25 @@
     font-size: 16px;
 }
 
-.searchbar input:last-child {
+.searchbar select:last-child, .searchbar input:last-child, .searchbar button:last-child {
     margin-right: 0;
+}
+
+.searchbar button {
+    /* padding: 10px 20px; */
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    background-color: #000000;
+    color: #FFFFFF;
+    cursor: pointer;
+    position: relative;
+    top: 30px;
+}
+
+hr {
+    border: 0;
+    height: 1px;
+    width: 100%;
+    background: grey;
 }

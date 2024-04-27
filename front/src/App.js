@@ -5,7 +5,6 @@ import Header from './components/header.js';
 import BackOffice from './pages/backOffice.js'; 
 import Footer from './components/footer.js';
 import GestionUtilisateur from './pages/gestionUtilisateur.js';
-import './App.css';
 import Acceuil from './pages/acceuil.js';
 import Login from './pages/login';
 import Signup from './pages/signup.js';

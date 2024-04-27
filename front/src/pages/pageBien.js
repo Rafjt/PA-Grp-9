@@ -5,6 +5,12 @@ import { BACK_URL } from "../services";
 
 const PageBien = () => {
 
+    const [arriveeDate, setArriveeDate] = React.useState(new Date().toISOString().split('T')[0]);
+
+    // const handleArriveeChange = (event) => {
+    //     setArriveeDate(event.target.value);
+    // };
+
     const [bailleur, setBailleur] = React.useState([]);
     useEffect(() => {
         fetchUsers().then((response) => {
@@ -25,16 +31,41 @@ const PageBien = () => {
         console.log("here");
     };
 
+    const [filtres, setFiltres] = React.useState({
+        ville: '',
+        arrivee: new Date().toISOString().split('T')[0],
+        depart: new Date().toISOString().split('T')[0]
+    });
+
+    const handleInputChange = (event) => {
+        setFiltres({
+            ...filtres,
+            [event.target.name]: event.target.value
+        });
+    };
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        console.log(filtres);
+    }
+
     return (
         <div>
-            <h1>Page Bien</h1>
+            <h1>Page Bien</h1> 
             <div className="filtres">
-                <form className="searchbar">
-                    <input type="text" placeholder="Ville" />
-                    <input type="date" placeholder="arrivée"/>
-                    <input type="date" placeholder="départ"/>
+                <form className="searchbar" onSubmit={handleSubmit}>
+                    <select name="ville" value={filtres.ville} onChange={handleInputChange}>
+                        <option value="">-- Ville --</option>
+                        <option value="Paris">Paris</option>
+                        <option value="Nice">Nice</option>
+                        <option value="Biarritz">Biarritz</option>
+                    </select>
+                    <input type="date" name="arrivee" placeholder="arrivée" min={new Date().toISOString().split('T')[0]} value={filtres.arrivee} onChange={handleInputChange}/>
+                    <input type="date" name="depart" placeholder="départ" min={filtres.arrivee} value={filtres.depart} onChange={handleInputChange}/>
+                    <button type="submit">Rechercher</button>
                 </form>
             </div>
+            <hr />
             <div className="grid-container" onClick={handleClick}>
                 {data.map((annonce) => {
                     const bailleurForThisAnnonce = bailleur.find(b => b.id === annonce.id_ClientBailleur);
