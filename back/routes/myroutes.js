@@ -7,12 +7,13 @@ const multer = require('multer');
 const router = express.Router();
 const { exec } = require("child_process");
 const mailRoute = require("./mailCode");
+const { Console } = require("console");
 router.use("/mail", mailRoute);
 
 router.get('/users/mean-age', async (req, res) => {
-    try {
-        // SQL query to calculate mean age
-        const query = `
+  try {
+    // SQL query to calculate mean age
+    const query = `
         SELECT AVG(age) AS mean_age FROM (
             SELECT TIMESTAMPDIFF(YEAR, dateDeNaissance, CURDATE()) AS age FROM voyageurs
             UNION ALL
@@ -22,15 +23,15 @@ router.get('/users/mean-age', async (req, res) => {
         ) AS all_users;
         `;
 
-        // Execute the query
-        const [result] = await sequelize.query(query, { type: QueryTypes.SELECT });
+    // Execute the query
+    const [result] = await sequelize.query(query, { type: QueryTypes.SELECT });
 
-        // Send the result as a response
-        res.json(result);
-    } catch (error) {
-        console.error('Error fetching mean age:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
+    // Send the result as a response
+    res.json(result);
+  } catch (error) {
+    console.error('Error fetching mean age:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 // Multer configuration
 const storage = multer.diskStorage({
@@ -105,12 +106,12 @@ router.get('/users/count/:type', async (req, res) => {
   console.log('Route /count called');
   const type = req.params.type;
   try {
-      const [result] = await sequelize.query(`SELECT COUNT(*) AS count FROM ${type}`);
-      console.log(result);
-      res.json({ count: result[0].count });
+    const [result] = await sequelize.query(`SELECT COUNT(*) AS count FROM ${type}`);
+    console.log(result);
+    res.json({ count: result[0].count });
   } catch (error) {
-      console.error('Error fetching user count:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
+    console.error('Error fetching user count:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -611,4 +612,78 @@ router.put("/paiement/:id", async (req, res) => {
   }
 
   res.send("Paiement modified");
+});
+
+
+// GESTION DES REQUETES UTILISATEURS
+
+router.post("/bienDispo", async (req, res) => {
+  console.log("route /bienDispo called");
+  const { ville, arrivee, depart, typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain,
+    prixMin, prixMax, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation } = req.body;
+
+  let query = `SELECT bienImo.id, cheminImg, ville, adresse, prix, nomBien, description, statutValidation, disponible, typeDePropriete,
+  nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi,
+  salleDeSport, climatisation, clientsBailleurs.nom, clientsBailleurs.prenom
+  FROM bienImo
+  JOIN clientsBailleurs ON bienImo.Id_ClientBailleur = clientsBailleurs.id
+  WHERE disponible = 1
+  AND bienImo.id NOT IN (
+      SELECT id_BienImmobilier
+      FROM reservation
+      WHERE dateDebut <= '${arrivee}' AND dateFin >= '${depart}'
+  )`;
+
+  if (ville) {
+    query += ` AND ville = '${ville}'`;
+  }
+  if (typeDePropriete) {
+    query += ` AND typeDePropriete = '${typeDePropriete}'`;
+  }
+  if (nombreChambres) {
+    query += ` AND nombreChambres = ${nombreChambres}`;
+  }
+  if (nombreLits) {
+    query += ` AND nombreLits = ${nombreLits}`;
+  }
+  if (nombreSallesDeBain) {
+    query += ` AND nombreSallesDeBain = ${nombreSallesDeBain}`;
+  }
+  if (prixMin) {
+    query += ` AND prix >= ${prixMin}`;
+  }
+  if (prixMax) {
+    query += ` AND prix <= ${prixMax}`;
+  }
+  if (wifi) {
+    query += ` AND wifi = ${wifi}`;
+  }
+  if (cuisine) {
+    query += ` AND cuisine = ${cuisine}`;
+  }
+  if (balcon) {
+    query += ` AND balcon = ${balcon}`;
+  }
+  if (jardin) {
+    query += ` AND jardin = ${jardin}`;
+  }
+  if (parking) {
+    query += ` AND parking = ${parking}`;
+  }
+  if (piscine) {
+    query += ` AND piscine = ${piscine}`;
+  }
+  if (jaccuzzi) {
+    query += ` AND jaccuzzi = ${jaccuzzi}`;
+  }
+  if (salleDeSport) {
+    query += ` AND salleDeSport = ${salleDeSport}`;
+  }
+  if (climatisation) {
+    query += ` AND climatisation = ${climatisation}`;
+  }
+
+  const [bienDispo] = await sequelize.query(query);
+  console.log(bienDispo);
+  res.send(bienDispo);
 });

@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const router = require('./routes/myroutes');
 const mailCodeRouter = require('./routes/mailCode');
+const userRoutes = require('./routes/userRoutes');
 const sequelize = require('./database');
 const cors = require('cors');
 
