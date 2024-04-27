@@ -5,7 +5,6 @@ import Header from './components/header.js';
 import BackOffice from './pages/backOffice.js'; 
 import Footer from './components/footer.js';
 import GestionUtilisateur from './pages/gestionUtilisateur.js';
-import './App.css';
 import Acceuil from './pages/acceuil.js';
 import Login from './pages/login';
 import Signup from './pages/signup.js';
@@ -15,6 +14,8 @@ import GestionAnnonce from './pages/gestionAnnonce.js';
 import GestionReservations from './pages/gestionReservations.js';
 import GestionPaiement from './pages/gestionPaiement.js';
 import MailConfirm from './pages/mailConfirm.js';
+import PageBien from './pages/pageBien.js';
+
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/gestionPaiement" element={<GestionPaiement />} />
           <Route path="/mailConfirm" element={<MailConfirm />} />
+          <Route path="/Biens" element={<PageBien />} />
         </Routes>
         </div>
         <div className="footer">
