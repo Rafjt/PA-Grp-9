@@ -20,10 +20,22 @@ const PageBien = () => {
         });
     }, []);
 
+    const handleClick = (e) => {
+        console.log(e.target);
+        console.log("here");
+    };
+
     return (
         <div>
             <h1>Page Bien</h1>
-            <div className="grid-container">
+            <div className="filtres">
+                <form className="searchbar">
+                    <input type="text" placeholder="Ville" />
+                    <input type="date" placeholder="arrivée"/>
+                    <input type="date" placeholder="départ"/>
+                </form>
+            </div>
+            <div className="grid-container" onClick={handleClick}>
                 {data.map((annonce) => {
                     const bailleurForThisAnnonce = bailleur.find(b => b.id === annonce.id_ClientBailleur);
                     return (
