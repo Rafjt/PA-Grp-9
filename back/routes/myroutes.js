@@ -11,9 +11,9 @@ const { Console } = require("console");
 router.use("/mail", mailRoute);
 
 router.get('/users/mean-age', async (req, res) => {
-    try {
-        // SQL query to calculate mean age
-        const query = `
+  try {
+    // SQL query to calculate mean age
+    const query = `
         SELECT AVG(age) AS mean_age FROM (
             SELECT TIMESTAMPDIFF(YEAR, dateDeNaissance, CURDATE()) AS age FROM voyageurs
             UNION ALL
@@ -23,15 +23,15 @@ router.get('/users/mean-age', async (req, res) => {
         ) AS all_users;
         `;
 
-        // Execute the query
-        const [result] = await sequelize.query(query, { type: QueryTypes.SELECT });
+    // Execute the query
+    const [result] = await sequelize.query(query, { type: QueryTypes.SELECT });
 
-        // Send the result as a response
-        res.json(result);
-    } catch (error) {
-        console.error('Error fetching mean age:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
+    // Send the result as a response
+    res.json(result);
+  } catch (error) {
+    console.error('Error fetching mean age:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 // Multer configuration
 const storage = multer.diskStorage({
@@ -106,12 +106,12 @@ router.get('/users/count/:type', async (req, res) => {
   console.log('Route /count called');
   const type = req.params.type;
   try {
-      const [result] = await sequelize.query(`SELECT COUNT(*) AS count FROM ${type}`);
-      console.log(result);
-      res.json({ count: result[0].count });
+    const [result] = await sequelize.query(`SELECT COUNT(*) AS count FROM ${type}`);
+    console.log(result);
+    res.json({ count: result[0].count });
   } catch (error) {
-      console.error('Error fetching user count:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
+    console.error('Error fetching user count:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -619,8 +619,8 @@ router.put("/paiement/:id", async (req, res) => {
 
 router.post("/bienDispo", async (req, res) => {
   console.log("route /bienDispo called");
-  const {ville, arrivee, depart, typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain,
-  prixMin, prixMax, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation } = req.body;
+  const { ville, arrivee, depart, typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain,
+    prixMin, prixMax, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation } = req.body;
 
   let query = `SELECT bienImo.id, cheminImg, ville, adresse, prix, nomBien, description, statutValidation, disponible, typeDePropriete,
   nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi,
