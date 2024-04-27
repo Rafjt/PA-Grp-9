@@ -11,3 +11,10 @@
     display: flex !important;
     margin: 0 auto;
   }
+
+  .app {
+    text-align: left; /* Override text-align */
+    padding-left: 0; /* Override padding */
+    padding-right: 0; /* Override padding */
+    padding-bottom: 0; /* Override padding */
+  }
