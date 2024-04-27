@@ -9,6 +9,29 @@ const { exec } = require("child_process");
 const mailRoute = require("./mailCode");
 router.use("/mail", mailRoute);
 
+router.get('/users/mean-age', async (req, res) => {
+    try {
+        // SQL query to calculate mean age
+        const query = `
+        SELECT AVG(age) AS mean_age FROM (
+            SELECT TIMESTAMPDIFF(YEAR, dateDeNaissance, CURDATE()) AS age FROM voyageurs
+            UNION ALL
+            SELECT TIMESTAMPDIFF(YEAR, dateDeNaissance, CURDATE()) AS age FROM clientsBailleurs
+            UNION ALL
+            SELECT TIMESTAMPDIFF(YEAR, dateDeNaissance, CURDATE()) AS age FROM prestataires
+        ) AS all_users;
+        `;
+
+        // Execute the query
+        const [result] = await sequelize.query(query, { type: QueryTypes.SELECT });
+
+        // Send the result as a response
+        res.json(result);
+    } catch (error) {
+        console.error('Error fetching mean age:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
 // Multer configuration
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -77,6 +100,20 @@ router.get("/services", (req, res) => {
 });
 
 // GESTION DES UTILISATEURS
+
+router.get('/users/count/:type', async (req, res) => {
+  console.log('Route /count called');
+  const type = req.params.type;
+  try {
+      const [result] = await sequelize.query(`SELECT COUNT(*) AS count FROM ${type}`);
+      console.log(result);
+      res.json({ count: result[0].count });
+  } catch (error) {
+      console.error('Error fetching user count:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 router.get("/users", async (req, res) => {
   const [voyageurs] = await sequelize.query("SELECT * FROM voyageurs");
   const [clientsBailleurs] = await sequelize.query(
