@@ -101,25 +101,24 @@ const GestionUtilisateur = () => {
     }
   };
 
-const handleBan = async (userId, userType, userData) => {
-  try {
-    // Ban the user
-    await banUser(userId, userType, userData);
-    // Fetch updated users after banning
-    const updatedUsers = await fetchUsers();
-    setUsers({
-      ...users,
-      [userType]: updatedUsers[userType],
-    });
+  const handleBan = async (userId, userType, userData) => {
+    try {
+      // Ban the user
+      await banUser(userId, userType, userData);
+      // Fetch updated users after banning
+      const updatedUsers = await fetchUsers();
+      setUsers({
+        ...users,
+        [userType]: updatedUsers[userType],
+      });
 
-    // Fetch updated banned users after banning
-    const updatedBannedUsers = await fetchBannedUsers();
-    setBannedUsers(updatedBannedUsers);
-  } catch (error) {
-    console.error("Error banning user:", error);
-  }
-};
-
+      // Fetch updated banned users after banning
+      const updatedBannedUsers = await fetchBannedUsers();
+      setBannedUsers(updatedBannedUsers);
+    } catch (error) {
+      console.error("Error banning user:", error);
+    }
+  };
 
   const unBan = async (userId) => {
     try {
@@ -230,104 +229,109 @@ const handleBan = async (userId, userType, userData) => {
           onChange={(e) => setSearchQuery(e.target.value)}
         />
       </div>
-      <div className="usersContainer rounded shadow mt-3">
-        <table className="table table-bordered table-hover custom-table">
-          <thead>
-            <tr>
-              <th className="narrow-column">ID</th>
-              <th>Type</th>
-              <th>Nom</th>
-              <th>Prénom</th>
-              <th>Date de Naissance</th>
-              <th>Adresse Email</th>
-              <th>Mot de Passe</th>
-              <th className="narrow-column">Admin</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {["voyageurs", "clientsBailleurs", "prestataires"].map((userType) =>
-              filteredUsers[userType].map((user) => (
-                <tr key={user[idFields[userType]]}>
-                  <td>{user[idFields[userType]]}</td>
-                  <td>{userType}</td>
-                  <td className="long-column">{user.nom}</td>
-                  <td className="long-column">{user.prenom}</td>
-                  <td>{user.dateDeNaissance}</td>
-                  <td className="long-column">{user.adresseMail}</td>
-                  <td className="long-column">{user.motDePasse}</td>
-                  <td>{user.admin}</td>
-                  <td className="long-column">
-                    <button
-                      onClick={() =>
-                        handleDelete(user[idFields[userType]], userType)
-                      }
-                      className="delete"
-                    >
-                      Supprimer
-                    </button>
-                    <Link
-                      className="modif"
-                      to={`/update/${user[idFields[userType]]}/${userType}`}
-                    >
-                      Modifier
-                    </Link>
+      <div className="usersContainer rounded shadow mt-3 tableWrapper">
+      <div className="table-responsive">
+        <table className="table table-bordered table-hover custom-table style={{ maxHeight: '500px', overflowY: 'auto' }}">
+            <thead>
+              <tr>
+                <th className="narrow-column">ID</th>
+                <th>Type</th>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th>Date de Naissance</th>
+                <th>Adresse Email</th>
+                <th>Mot de Passe</th>
+                <th className="narrow-column">Admin</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {["voyageurs", "clientsBailleurs", "prestataires"].map(
+                (userType) =>
+                  filteredUsers[userType].map((user) => (
+                    <tr key={user[idFields[userType]]}>
+                      <td>{user[idFields[userType]]}</td>
+                      <td>{userType}</td>
+                      <td className="long-column">{user.nom}</td>
+                      <td className="long-column">{user.prenom}</td>
+                      <td>{user.dateDeNaissance}</td>
+                      <td className="long-column">{user.adresseMail}</td>
+                      <td className="long-column">{user.motDePasse}</td>
+                      <td>{user.admin}</td>
+                      <td className="long-column">
+                        <button
+                          onClick={() =>
+                            handleDelete(user[idFields[userType]], userType)
+                          }
+                          className="delete"
+                        >
+                          Supprimer
+                        </button>
+                        <Link
+                          className="modif"
+                          to={`/update/${user[idFields[userType]]}/${userType}`}
+                        >
+                          Modifier
+                        </Link>
 
-                    <button
-                      onClick={() =>
-                        handleBan(
-                          user[idFields[userType]],
-                          userType,
-                          user // Pass user data to the handleBan function
-                        )
-                      }
-                      className="bannir ml-1"
-                    >
-                      Bannir
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
+                        <button
+                          onClick={() =>
+                            handleBan(
+                              user[idFields[userType]],
+                              userType,
+                              user // Pass user data to the handleBan function
+                            )
+                          }
+                          className="bannir ml-1"
+                        >
+                          Bannir
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+              )}
+            </tbody>
         </table>
+        </div>
       </div>
 
       <div className="greet">
         <h2>Utilisateurs bannis</h2>
       </div>
-      <div className="usersBannisContainer rounded shadow mt-3">
-        <table className="table table-bordered table-hover custom-table">
-          <thead>
-            <tr>
-              <th className="narrow-column">ID</th>
-              <th className="seminarrow-column">Nom</th>
-              <th className="seminarrow-column">Prénom</th>
-              <th>Adresse Email</th>
-              <th className="seminarrow-column">Date de bannissement</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {bannedUsers.map((user) => (
-              <tr key={user.id}>
-                <td>{user.id}</td>
-                <td>{user.nom}</td>
-                <td>{user.prenom}</td>
-                <td className="long-column">{user.adresseMail}</td>
-                <td>{formatDate(user.dateBanissement)}</td>
-                <td>
-                  <button
-                    onClick={() => unBan(user.id)}
-                    className="bannir ml-1"
-                  >
-                    Débannir
-                  </button>
-                </td>
+      <div className="usersBannisContainer rounded shadow mt-3 tableWrapper">
+        <div className="table-responsive">
+          <table className="table table-bordered table-hover custom-table style={{ maxHeight: '500px', overflowY: 'auto' }}">
+            <thead>
+              <tr>
+                <th className="narrow-column">ID</th>
+                <th className="seminarrow-column">Nom</th>
+                <th className="seminarrow-column">Prénom</th>
+                <th>Adresse Email</th>
+                <th className="seminarrow-column">Date de bannissement</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {bannedUsers.map((user) => (
+                <tr key={user.id}>
+                  <td>{user.id}</td>
+                  <td>{user.nom}</td>
+                  <td>{user.prenom}</td>
+                  <td className="long-column">{user.adresseMail}</td>
+                  <td>{formatDate(user.dateBanissement)}</td>
+                  <td>
+                    <button
+                      onClick={() => unBan(user.id)}
+                      className="bannir ml-1"
+                    >
+                      Débannir
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

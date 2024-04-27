@@ -29,8 +29,21 @@ async function sendEmail(email, randomNumber) {
     from: '"Paris Caretaker Services" <pcsnoreply75@gmail.com>', // Sender address
     to: email, // List of recipients
     subject: "Code de Confirmation", // Subject line
-    text: `Le code de confirmation est ${randomNumber}\nCe dernier est valable 10 minutes`, // Plain text body
-    // html: "<b>Hello world?</b>", // Html body
+    html: `
+    <div style="text-align: center;">
+    <img src="cid:logopcsmail" alt="Image" style="max-width: 50%; height: auto; margin-bottom: 20px; margin-top: 50px;" />
+    <p style="font-size: 18px;">Le code de confirmation est :</p>
+    <h1 style="font-size: 24px;">${randomNumber}</h1>
+    <p style="font-size: 16px;">Ce dernier est valable 10 minutes</p>
+  </div>
+    `,
+    attachments: [
+      {
+        filename: "logopcsmail.png",
+        path: __dirname + "/logopcsmail.png",
+        cid: "logopcsmail",
+      },
+    ], // HTML body
   });
 
   console.log("Message sent: %s", info.messageId);
@@ -91,7 +104,6 @@ router.post("/sendCode", async (req, res) => {
       await sequelize.query(`DROP TABLE IF EXISTS \`${randomNumber}\``);
       console.log(`Temporary table ${randomNumber} dropped after 10 minutes`);
     }, 10 * 60 * 1000); // 10 seconds in milliseconds
-
   } catch (error) {
     console.error("Error creating temp table", error);
     return res.status(500).send("Error creating temp table");

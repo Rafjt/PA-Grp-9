@@ -158,3 +158,16 @@ a.modif :hover {
 .seminarrow-column {
   width: 200px;
 }
+
+.tableWrapper {
+  width: 100%; /* Set the width of the wrapper */
+  overflow-y: auto; /* Enable vertical scrolling */
+}
+
+.table-responsive {
+  max-height: 500px;
+  display: block;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: -ms-autohiding-scrollbar;
+}
