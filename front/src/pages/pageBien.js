@@ -15,6 +15,7 @@ const PageBien = () => {
         });
 
         const defaultFilters = {
+            id: '',
             ville: '',
             arrivee: new Date().toISOString().split('T')[0],
             depart: new Date().toISOString().split('T')[0],
@@ -46,9 +47,8 @@ const PageBien = () => {
             .then(data => setData(data));
     }, []);
 
-    const handleClick = (e) => {
-        console.log(e.target);
-        console.log("here");
+    const handleClick = (id) => {
+        window.location.replace(`./viewBien/${id}`);
     };
 
     const [filtres, setFiltres] = React.useState({
@@ -201,12 +201,12 @@ const PageBien = () => {
                 <button type="submit">Rechercher</button>
             </form>
             <hr />
-            <div className="grid-container" onClick={handleClick}>
+            <div className="grid-container">
                 {data.map((annonce) => {
                     const bailleurInfo = bailleur.find(b => b.id === annonce.bailleurId);
                     const clientName = annonce.prenom && annonce.nom ? annonce.prenom + ' ' + annonce.nom : bailleurInfo ? bailleurInfo.prenom + ' ' + bailleurInfo.nom : 'Unknown';
                     return (
-                        <div key={annonce.id}>
+                        <div key={annonce.id} onClick={() => handleClick(annonce.id)}>
                             <img src={`${BACK_URL}/uploads/${annonce.cheminImg}`} alt={annonce.nomBien} className='img' />
                             <h2>{annonce.ville}, {annonce.nomBien}</h2>
                             <p className="grey">Proposé par {clientName}</p>
