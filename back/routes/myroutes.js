@@ -706,6 +706,7 @@ router.post("/bienDispo", async (req, res) => {
   }
 
   const [bienDispo] = await sequelize.query(query);
+
   console.log(bienDispo);
   res.send(bienDispo);
 });
