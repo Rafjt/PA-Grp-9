@@ -17,32 +17,33 @@ export const fetchUsers = async () => {
   }
 };
 
-export const createUser = async (userData) => {
-  try {
-    const response = await fetch(`${URL_ENVOI_MAIL}/sendCode`, {
+export const createUser = (userData) => {
+  return new Promise((resolve, reject) => {
+    fetch(`${URL_ENVOI_MAIL}/sendCode`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(userData),
-    });
-    
-    if (response.status === 204 || response.status === 200) {
-      // Return an empty object or null, depending on your preference
-      return {};
-    }
-    if (response.status === 409) {
-      throw new Error("Email already exists");
-    }
-    if (response.status === 403) {
-      throw new Error("User is banned");
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.log(error);
-  }
+    })
+      .then((response) => {
+        if (response.status === 204 || response.status === 200) {
+          resolve({});
+        } else if (response.status === 409) {
+          reject("EmailDuplicate");
+        } else if (response.status === 403) {
+          reject("UserBanned");
+        } else {
+          // Handle other response statuses here if needed
+          reject("UnknownError");
+        }
+      })
+      .catch((error) => {
+        // Handle network errors or other exceptions
+        console.error("Error creating user:", error);
+        reject("UnknownError");
+      });
+  });
 };
 
 export const deleteUser = async (userId, userType) => {

@@ -63,8 +63,8 @@ const Signup = () => {
         )
         .required("Ce champ est requis"),
     }),
-    onSubmit: async (values) => {
-      var button = document.getElementById('boutonload');
+    onSubmit: (values) => {
+      var button = document.getElementById("boutonload");
       button.disabled = true;
       setLoading(true);
       const trimmedValues = Object.fromEntries(
@@ -73,27 +73,31 @@ const Signup = () => {
         })
       );
 
-      try {
-        await createUser(trimmedValues);
-        console.log(trimmedValues);
-        window.location.replace("/mailConfirm");
-      } catch (error) {
-        if (error.message === "Email already exists") {
-          formik.setErrors({
-            adresseMail:
-              "Cet email est déjà utilisé. Veuillez en choisir un autre.",
-          });
-        } else if (error.message === "User is banned") {
-          formik.setErrors({
-            adresseMail:
-              "Cet email a été banni, veuillez contacter l'assistance",
-          });
-        }
-        console.error("Error creating user:", error);
-      } finally {
-        button.disabled = false;
-        setLoading(false); // Set loading to false after the request completes
-      }
+      createUser(trimmedValues)
+        .then((data) => {
+          console.log(data);
+          console.log(trimmedValues);
+          window.location.replace("/mailConfirm");
+        })
+        .catch((error) => {
+          if (error === "EmailDuplicate") {
+            formik.setErrors({
+              adresseMail:
+                "Cet email est déjà utilisé. Veuillez en choisir un autre.",
+            });
+          } else if (error === "UserBanned") {
+            formik.setErrors({
+              adresseMail:
+                "Cet email a été banni, veuillez contacter l'assistance",
+            });
+          } else {
+            console.error("Error creating user:", error);
+          }
+        })
+        .finally(() => {
+          button.disabled = false;
+          setLoading(false); // Set loading to false after the request completes
+        });
     },
   });
 
@@ -227,7 +231,7 @@ const Signup = () => {
 
         <br></br>
         <button
-        id="boutonload"
+          id="boutonload"
           className="btn btn-dark btn-lg mt-4 position-relative"
           type="submit"
           disabled={loading} // Disable button when loading is true

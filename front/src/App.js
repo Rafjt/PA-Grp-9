@@ -21,7 +21,6 @@ import GestionPaiement from "./pages/gestionPaiement.js";
 
 function App() {
   return (
-    <Router>
       <div className="Page">
         <div className="header">
           <Header />
@@ -56,7 +55,6 @@ function App() {
           <Footer />
         </div>
       </div>
-    </Router>
   );
 }
 
