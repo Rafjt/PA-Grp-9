@@ -510,11 +510,34 @@ router.post('/bienImo/filter', async (req, res) => {
 
 // GESTION DES RESERVATIONS
 
-router.get("/reservation", async (req, res) => {
-  const [reservation] = await sequelize.query("SELECT * FROM reservation");
+router.get('/reservation', async (req, res) => {
+  const [reservation] = await sequelize.query('SELECT * FROM reservation');
   console.log(reservation);
   res.send(reservation);
+}); 
+
+router.delete('/reservation/:id', async (req, res) => {
+  const {id} = req.params;
+
+  console.log('trying to delete bien:', id);
+
+  try {
+      await sequelize.query(`DELETE FROM reservation WHERE id = ${id}`);
+      res.send('Rservation deleted');
+  } catch (error) {
+      console.error('Error deleting reservation:', error);
+      res.status(500).send('Failed to delete reservation');
+  }
 });
+
+router.get('/reservation/:id', async (req, res) => {
+  console.log('route /reservation/:id called');
+  const id = req.params.id;
+  const [reservation] = await sequelize.query(`SELECT * FROM reservation WHERE id = ${id}`);
+  console.log(reservation);
+  res.send(reservation[0]);
+});
+
 
 // GESTION DES PAIEMENTS
 
