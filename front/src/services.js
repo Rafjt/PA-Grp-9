@@ -5,6 +5,7 @@ export const BACK_URL = "http://localhost:3001";
 const URL_ANNONCE = `${BASE_URL}/bienImo`;
 const URL_PAIEMENT = `${BASE_URL}/paiement`;
 const URL_ENVOI_MAIL = `${BASE_URL}/mail`;
+const URL_RESERVATION = `${BASE_URL}/reservation`;
 
 export const fetchUsers = async () => {
   try {
@@ -330,3 +331,64 @@ export const updatePaiement = async (paiementId, paiementData) => {
     console.log(error);
   }
 };
+
+// GESTION DES RESERVATIONS
+
+export const fetchReservation = async () => {
+  try {
+    const response = await fetch(URL_RESERVATION);
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const deleteReservation = async (reservationId) => {
+  console.log("func :",reservationId);
+  console.log("URL :",`${URL_RESERVATION}/${reservationId}`);
+  try {
+    const response = await fetch(
+      `${URL_RESERVATION}/${reservationId}`,
+      {
+        method: "DELETE",
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to delete reservation");
+    }
+  } catch (error) {
+    console.error("Error deleting reservation:", error);
+  }
+}
+
+export const updateReservation = async (reservationId, reservationData) => {
+  try {
+    const response = await fetch(`${URL_RESERVATION}/${reservationId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(reservationData),
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const fetchReservationById = async (reservationId) => {
+  try {
+    console.log("fetchReservationById", reservationId);
+    const response = await fetch(`${URL_RESERVATION}/${reservationId}`);
+    const data = await response.json();
+    console.log("result = ", data);
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+
+

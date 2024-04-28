@@ -49,11 +49,17 @@ CREATE TABLE reservation (
   id INT PRIMARY KEY AUTO_INCREMENT,
   id_BienImmobilier INT,
   id_ClientVoyageur INT,
+  nomBien VARCHAR(255),
+  prix DECIMAL(10,2),
   dateDebut DATE,
   dateFin DATE,
+  cheminImg VARCHAR(255),
   statut VARCHAR(50),
+  FOREIGN KEY (cheminImg) REFERENCES bienImo(id),
   FOREIGN KEY (id_BienImmobilier) REFERENCES bienImo(id),
-  FOREIGN KEY (id_ClientVoyageur) REFERENCES voyageurs(id)
+  FOREIGN KEY (id_ClientVoyageur) REFERENCES voyageurs(id),
+  FOREIGN KEY (nomBien) REFERENCES bienImo(id),
+  FOREIGN KEY (prix) REFERENCES bienImo(id)
 );
 
 -- Table finances
