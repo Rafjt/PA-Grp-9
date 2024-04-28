@@ -621,7 +621,6 @@ router.post("/bienDispo", async (req, res) => {
   console.log("route /bienDispo called");
   const { ville, arrivee, depart, typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain,
     prixMin, prixMax, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation } = req.body;
-
   let query = `SELECT bienImo.id, cheminImg, ville, adresse, prix, nomBien, description, statutValidation, disponible, typeDePropriete,
   nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi,
   salleDeSport, climatisation, clientsBailleurs.nom, clientsBailleurs.prenom
