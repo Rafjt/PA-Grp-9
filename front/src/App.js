@@ -13,6 +13,7 @@ import Update from "./pages/update.js";
 import UpdateAnnonce from "./pages/updateAnnonce.js";
 import GestionAnnonce from "./pages/gestionAnnonce.js";
 import GestionReservations from "./pages/gestionReservations.js";
+import UpdateReservation from "./pages/updateReservation.js";
 import Statistiques from "./pages/statistiques.js";
 import PageBien from "./pages/pageBien.js";
 import MailConfirm from "./pages/mailConfirm.js";
@@ -40,6 +41,8 @@ function App() {
               path="/gestionReservations"
               element={<GestionReservations />}
             />
+            <Route path="/update/:id/reservation" element={<UpdateReservation />} />
+
             <Route path="/gestionAnnonce" element={<GestionAnnonce />} />
             <Route path="/statistiques" element={<Statistiques />} />
             <Route path="/signup" element={<Signup />} />
