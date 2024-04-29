@@ -86,21 +86,50 @@ const ViewBien = () => {
                     <form className="resForm" >
                         <p>Total: <strong>{Math.ceil(Math.abs(depart - arrivee) / (1000 * 60 * 60 * 24)) * data.prix}€</strong> pour {Math.ceil(Math.abs(depart - arrivee) / (1000 * 60 * 60 * 24))} nuits</p>
                         <label htmlFor="dateDebut">Arrivée</label>
-                        <DatePicker selected={arrivee} onChange={date => setArrivee(date)} minDate={new Date()} excludeDates={disabledDates} />
+                        <DatePicker 
+                            selected={arrivee} 
+                            onChange={date => {
+                                if (date <= depart) {
+                                    setArrivee(date);
+                                } else {
+                                    setArrivee(depart);
+                                }
+                            }}
+                            onBlur={e => {
+                                const date = new Date(e.target.value);
+                                if (date > depart) {
+                                    setArrivee(depart);
+                                }
+                            }}
+                            shouldCloseOnSelect={false}
+                            minDate={new Date()} 
+                            excludeDates={disabledDates} 
+                        />
                         <label htmlFor="dateFin">Départ</label>
                         <DatePicker
                             selected={depart}
                             onChange={date => {
-                                const rangeIncludesDisabledDate = disabledDates.some(disabledDate => {
-                                    return disabledDate >= arrivee && disabledDate <= date;
-                                });
-                                if (!rangeIncludesDisabledDate) {
-                                    setDepart(date);
-                                    setShowErrorMessage(false);
+                                if (date >= arrivee) {
+                                    const rangeIncludesDisabledDate = disabledDates.some(disabledDate => {
+                                        return disabledDate >= arrivee && disabledDate <= date;
+                                    });
+                                    if (!rangeIncludesDisabledDate) {
+                                        setDepart(date);
+                                        setShowErrorMessage(false);
+                                    } else {
+                                        setShowErrorMessage(true);
+                                    }
                                 } else {
-                                    setShowErrorMessage(true);
+                                    setDepart(arrivee);
                                 }
                             }}
+                            onBlur={e => {
+                                const date = new Date(e.target.value);
+                                if (date < arrivee) {
+                                    setDepart(arrivee);
+                                }
+                            }}
+                            shouldCloseOnSelect={false}
                             minDate={arrivee}
                             excludeDates={disabledDates}
                         />
