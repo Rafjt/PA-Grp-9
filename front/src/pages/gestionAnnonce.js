@@ -391,8 +391,8 @@ const GestionAnnonce = () => {
                         <option value="Biarritz">Biarritz</option>
                     </select>
                     <br></br>
-                    <div className='filter-section'>
-                        <h4>Équipements</h4>
+                    <h4>Équipements</h4>
+                    <div className='filter-checkboxes'>
                         <label>
                             <input type="checkbox" name="wifi" className="form-check-input" value={filterValues.wifi} onChange={handleFilterChange} />
                             Wifi

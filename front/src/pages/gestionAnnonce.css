@@ -68,6 +68,12 @@
     margin-right: 5px;
   }
 
+  .filter-checkboxes {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+
 .typeDePropriete {
     margin: 30px;
     background-color: black;

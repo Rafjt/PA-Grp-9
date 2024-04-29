@@ -48,7 +48,8 @@ const PageBien = () => {
     }, []);
 
     const handleClick = (id) => {
-        window.location.replace(`./viewBien/${id}`);
+        const { arrivee, depart } = filtres;
+        window.location.replace(`./viewBien/${id}?arrivee=${arrivee}&depart=${depart}`);
     };
 
     const [filtres, setFiltres] = React.useState({
@@ -158,8 +159,8 @@ const PageBien = () => {
                         </label>
                     </div>
                     <br></br>
-                    <div className='filter-section'>
-                        <h4>Équipements</h4>
+                    <h4>Équipements</h4>
+                    <div className='filter-checkboxes'>
                         <label>
                             <input type="checkbox" name="wifi" className="form-check-input" value={filtres.wifi} onChange={handleInputChange} />
                             Wifi
