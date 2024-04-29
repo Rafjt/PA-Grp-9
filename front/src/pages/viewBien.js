@@ -11,8 +11,8 @@ const ViewBien = () => {
     const [arrivee, setArrivee] = useState(new Date());
     const [depart, setDepart] = useState(new Date());
     const [disabledDates, setDisabledDates] = useState([]);
-
     const today = new Date().toISOString().split('T')[0];
+    const [showErrorMessage, setShowErrorMessage] = useState(false);
 
     const { id } = useParams();
     const [data, setData] = useState(null);
@@ -88,7 +88,25 @@ const ViewBien = () => {
                         <label htmlFor="dateDebut">Arrivée</label>
                         <DatePicker selected={arrivee} onChange={date => setArrivee(date)} minDate={new Date()} excludeDates={disabledDates} />
                         <label htmlFor="dateFin">Départ</label>
-                        <DatePicker selected={depart} onChange={date => setDepart(date)} minDate={arrivee} excludeDates={disabledDates} />
+                        <DatePicker
+                            selected={depart}
+                            onChange={date => {
+                                const rangeIncludesDisabledDate = disabledDates.some(disabledDate => {
+                                    return disabledDate >= arrivee && disabledDate <= date;
+                                });
+                                if (!rangeIncludesDisabledDate) {
+                                    setDepart(date);
+                                    setShowErrorMessage(false);
+                                } else {
+                                    setShowErrorMessage(true);
+                                }
+                            }}
+                            minDate={arrivee}
+                            excludeDates={disabledDates}
+                        />
+                        {showErrorMessage && <div class="alert alert-danger">
+                            <strong>Attention!</strong> Vous ne pouvez pas sélectionner une date déjà réservée.
+                        </div>}
                         <button className="btn btn-dark">Réserver</button>
                     </form>
                     <hr />
