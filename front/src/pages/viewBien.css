@@ -1,0 +1,65 @@
+.containerViewBien {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.nomDuBien {
+    font-size: 3em;
+    color: #000000;
+    text-align: left;
+    margin-bottom: 5%;
+    padding: 20px 0;
+}
+
+.photoDuBien {
+    width: 75%;
+    height: 75%;
+    object-fit: cover;
+    position: relative;
+}
+
+.containerViewBien p {
+    font-size: 1.5em;
+    color: #000000;
+    text-align: left;
+    margin: 0;
+    padding: 20px 0;
+}
+
+p.assets {
+    color: grey;
+    font-size:medium;
+}
+
+.equipment-table {
+    width: 20%;
+    border-collapse: collapse;
+}
+
+.equipment-table th, .equipment-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.equipment-table th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #212121;
+    color: white;
+}
+
+.resForm {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: 5%;
+    border: solid 1px black;
+    padding: 20px;
+    padding-right: 7%;
+}
+
+.resForm button {
+    margin-top: 10%;
+}

@@ -18,6 +18,7 @@ import Statistiques from "./pages/statistiques.js";
 import PageBien from "./pages/pageBien.js";
 import MailConfirm from "./pages/mailConfirm.js";
 import GestionPaiement from "./pages/gestionPaiement.js";
+import ViewBien from "./pages/viewBien.js";
 
 function App() {
   return (
@@ -49,6 +50,7 @@ function App() {
             <Route path="/Biens" element={<PageBien />} />
             <Route path="/mailConfirm" element={<MailConfirm />} />
             <Route path="/gestionPaiement" element={<GestionPaiement/>} />
+            <Route path="/viewBien/:id" element={<ViewBien />} />
           </Routes>
         </div>
         <div className="footer">

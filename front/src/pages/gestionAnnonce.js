@@ -391,8 +391,8 @@ const GestionAnnonce = () => {
                         <option value="Biarritz">Biarritz</option>
                     </select>
                     <br></br>
-                    <div className='filter-section'>
-                        <h4>Équipements</h4>
+                    <h4>Équipements</h4>
+                    <div className='filter-checkboxes'>
                         <label>
                             <input type="checkbox" name="wifi" className="form-check-input" value={filterValues.wifi} onChange={handleFilterChange} />
                             Wifi
@@ -445,7 +445,7 @@ const GestionAnnonce = () => {
                     )
                     .map((annonce) => (
                         annonce && <div key={annonce.id} className="annonce">
-                            <img src={`${BACK_URL}/uploads/${annonce.cheminImg}`} alt={annonce.nomBien} className='img' />
+                            <img src={`${BACK_URL}/uploads/${annonce.cheminImg}`} alt={annonce.nomBien} className='gestionAnnonceImg' />
                             <h2> ID :{annonce.id}, {annonce.nomBien} </h2>
                             <h2> ID du client bailleur propriétaire :{annonce.id_ClientBailleur}</h2>
                             <h3>Prix par nuits: {annonce.prix}€</h3>

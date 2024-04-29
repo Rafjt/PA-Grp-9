@@ -19,12 +19,12 @@ const Header = () => {
           <ul class="list-unstyled">
             <li class="locali">
               <a href="#">
-                <img className="icon" src="logouk.ico" alt="Logo UK" />
+                <img className="icon" src="/logouk.ico" alt="Logo UK" />
               </a>
             </li>
             <li class="locali">
               <a href="#">
-                <img className="icon" src="logofrance.ico" alt="Logo France" />
+                <img className="icon" src="/logofrance.ico" alt="Logo France" />
               </a>
             </li>
             <li class="locali">

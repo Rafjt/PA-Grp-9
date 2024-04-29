@@ -538,6 +538,28 @@ router.get('/reservation/:id', async (req, res) => {
   res.send(reservation[0]);
 });
 
+router.get('/reservation/:id/dates', async (req, res) => {
+  const id = req.params.id;
+  console.log('route /reservation/:id/dates called with id:', id);
+  const [reservation] = await sequelize.query(`SELECT dateDebut, dateFin FROM reservation WHERE id_BienImmobilier = ${id}`);
+  res.send(JSON.stringify(reservation));
+  console.log(reservation);
+});
+
+router.post('/reservation', async (req, res) => {
+  const { id_BienImmobilier, id_Voyageur, dateDebut, dateFin, prixTotal } = req.body;
+  console.log('Creating reservation:', req.body);
+  try {
+    await sequelize.query(`INSERT INTO reservation (id_BienImmobilier, id_Voyageur, dateDebut, dateFin, prixTotal) VALUES ('${id_BienImmobilier}', '${id_Voyageur}', '${dateDebut}', '${dateFin}', '${prixTotal}')`);
+  }
+  catch (error) {
+    console.error('Error creating reservation:', error);
+    return res.status(500).send('Error creating reservation');
+  }
+  res.send('Reservation created');
+});
+
+
 
 // GESTION DES PAIEMENTS
 
