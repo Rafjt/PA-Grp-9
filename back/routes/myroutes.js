@@ -538,6 +538,14 @@ router.get('/reservation/:id', async (req, res) => {
   res.send(reservation[0]);
 });
 
+router.get('/reservation/:id/dates', async (req, res) => {
+  const id = req.params.id;
+  console.log('route /reservation/:id/dates called with id:', id);
+  const [reservation] = await sequelize.query(`SELECT dateDebut, dateFin FROM reservation WHERE id_BienImmobilier = ${id}`);
+  res.send(JSON.stringify(reservation));
+  console.log(reservation);
+});
+
 
 // GESTION DES PAIEMENTS
 

@@ -1,21 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { fetchAnnonceById,fetchReservationById } from "../services";
+import { fetchAnnonceById, fetchDisabledDates } from "../services";
 import { BACK_URL } from "../services";
 import "./viewBien.css";
-
-
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 const ViewBien = () => {
 
-    const [arrivee, setArrivee] = useState('');
-    const [depart, setDepart] = useState('');
+    // const [arrivee, setArrivee] = useState('');
+    // const [depart, setDepart] = useState('');
 
-    useEffect(() => {
-        let params = new URLSearchParams(window.location.search);
-        setArrivee(params.get('arrivee'));
-        setDepart(params.get('depart'));
-    }, []);
+    // useEffect(() => {
+    //     let params = new URLSearchParams(window.location.search);
+    //     setArrivee(params.get('arrivee'));
+    //     setDepart(params.get('depart'));
+    // }, []);
+
+    const [arrivee, setArrivee] = useState(new Date());
+    const [depart, setDepart] = useState(new Date());
+    const [disabledDates, setDisabledDates] = useState([]);
 
     const today = new Date().toISOString().split('T')[0];
 
@@ -29,12 +33,40 @@ const ViewBien = () => {
             });
     }, [id]);
 
-    useEffect(() => {
-        fetchReservationById(id)
-            .then((reservationData) => {
-                console.log("reservation",reservationData);
-            });
-    }, [id]);
+
+
+useEffect(() => {
+    let params = new URLSearchParams(window.location.search);
+    setArrivee(new Date(params.get('arrivee')));
+    setDepart(new Date(params.get('depart')));
+
+    // Fetch disabled dates from your API and set them in the state
+    fetchDisabledDates(id).then((dates) => {
+        if (Array.isArray(dates)) {
+            // Create an array of Date objects from the dateDebut and dateFin properties
+            const disabledDatesArray = dates.reduce((acc, curr) => {
+                let startDate = new Date(curr.dateDebut);
+                let endDate = new Date(curr.dateFin);
+
+                // Set the time to the start of the day
+                startDate.setHours(0, 0, 0, 0);
+                endDate.setHours(0, 0, 0, 0);
+
+                for (let d = startDate; d <= endDate; d.setDate(d.getDate() + 1)) {
+                    acc.push(new Date(d));
+                }
+                return acc;
+            }, []);
+            setDisabledDates(disabledDatesArray);
+        } else {
+            console.error('Dates is not an array:', dates);
+        }
+    });
+}, []);
+
+
+
+
 
     if (!data) {
         return <div>Loading...</div>;
@@ -49,12 +81,12 @@ const ViewBien = () => {
             <p>{data.typeDePropriete} - {data.ville},{data.adresse}</p>
             <p className="assets">{data.nombreChambres} Chambres - {data.nombreLits} Lits - {data.nombreSallesDeBain} Salles de bain</p>
             <form className="resForm">
-            <label htmlFor="dateDebut">Arrivée</label>
-            <input type="date" id="dateDebut" name="dateDebut" className="form-control" value={arrivee} min={today} />
-            <label htmlFor="dateFin">Départ</label>
-            <input type="date" id="dateFin" name="dateFin" className="form-control" value={depart} min={arrivee} />
-            <button className="btn btn-dark">Réserver</button>
-        </form>
+                <label htmlFor="dateDebut">Arrivée</label>
+                <DatePicker selected={arrivee} onChange={date => setArrivee(date)} minDate={new Date()} excludeDates={disabledDates} />
+                <label htmlFor="dateFin">Départ</label>
+                <DatePicker selected={depart} onChange={date => setDepart(date)} minDate={arrivee} excludeDates={disabledDates} />
+                <button className="btn btn-dark">Réserver</button>
+            </form>
             <hr />
             <p><strong>{data.prix}€</strong> par nuits</p>
             <p>{data.description}</p>
