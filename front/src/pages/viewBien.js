@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { fetchAnnonceById, fetchDisabledDates,createReservation } from "../services";
+import { fetchAnnonceById, fetchDisabledDates, createReservation } from "../services";
 import { BACK_URL } from "../services";
 import "./viewBien.css";
 import DatePicker from 'react-datepicker';
@@ -35,34 +35,34 @@ const ViewBien = () => {
 
 
 
-useEffect(() => {
-    let params = new URLSearchParams(window.location.search);
-    setArrivee(new Date(params.get('arrivee')));
-    setDepart(new Date(params.get('depart')));
+    useEffect(() => {
+        let params = new URLSearchParams(window.location.search);
+        setArrivee(new Date(params.get('arrivee')));
+        setDepart(new Date(params.get('depart')));
 
-    // Fetch disabled dates from your API and set them in the state
-    fetchDisabledDates(id).then((dates) => {
-        if (Array.isArray(dates)) {
-            // Create an array of Date objects from the dateDebut and dateFin properties
-            const disabledDatesArray = dates.reduce((acc, curr) => {
-                let startDate = new Date(curr.dateDebut);
-                let endDate = new Date(curr.dateFin);
+        // Fetch disabled dates from your API and set them in the state
+        fetchDisabledDates(id).then((dates) => {
+            if (Array.isArray(dates)) {
+                // Create an array of Date objects from the dateDebut and dateFin properties
+                const disabledDatesArray = dates.reduce((acc, curr) => {
+                    let startDate = new Date(curr.dateDebut);
+                    let endDate = new Date(curr.dateFin);
 
-                // Set the time to the start of the day
-                startDate.setHours(0, 0, 0, 0);
-                endDate.setHours(0, 0, 0, 0);
+                    // Set the time to the start of the day
+                    startDate.setHours(0, 0, 0, 0);
+                    endDate.setHours(0, 0, 0, 0);
 
-                for (let d = startDate; d <= endDate; d.setDate(d.getDate() + 1)) {
-                    acc.push(new Date(d));
-                }
-                return acc;
-            }, []);
-            setDisabledDates(disabledDatesArray);
-        } else {
-            console.error('Dates is not an array:', dates);
-        }
-    });
-}, []);
+                    for (let d = startDate; d <= endDate; d.setDate(d.getDate() + 1)) {
+                        acc.push(new Date(d));
+                    }
+                    return acc;
+                }, []);
+                setDisabledDates(disabledDatesArray);
+            } else {
+                console.error('Dates is not an array:', dates);
+            }
+        });
+    }, []);
 
 
     // const handleSubmit = (e) => {
@@ -78,78 +78,84 @@ useEffect(() => {
     // };
 
 
-        const diffTime = Math.abs(depart - arrivee);
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        const totalPrice = diffDays * data.prix;
+    // Calculate the number of days
+    // const diffTime = Math.abs(depart - arrivee);
+    // const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    // // Calculate the total price
+    // const totalPrice = diffDays * data.prix;
 
     if (!data) {
         return <div>Loading...</div>;
     }
 
     return (
-        <div className="container">
-            <div>
-                <h1 className="nomDuBien">{data.nomBien}</h1>
-            </div>
-            <img className="photoDuBien" src={`${BACK_URL}/uploads/${data.cheminImg}`} alt={data.nomBien} />
-            <p>{data.typeDePropriete} - {data.ville},{data.adresse}</p>
-            <p className="assets">{data.nombreChambres} Chambres - {data.nombreLits} Lits - {data.nombreSallesDeBain} Salles de bain</p>
-            <form className="resForm" >
-                <p>Total: <strong>{totalPrice}€</strong> pour {diffDays} nuits</p>
-                <label htmlFor="dateDebut">Arrivée</label>
-                <DatePicker selected={arrivee} onChange={date => setArrivee(date)} minDate={new Date()} excludeDates={disabledDates} />
-                <label htmlFor="dateFin">Départ</label>
-                <DatePicker selected={depart} onChange={date => setDepart(date)} minDate={arrivee} excludeDates={disabledDates} />
-                <button className="btn btn-dark">Réserver</button>
-            </form>
-            <hr />
-            <p><strong>{data.prix}€</strong> par nuits</p>
-            <p>{data.description}</p>
-            <hr />
-            <p>Equipements:</p>
-            <table className="equipment-table">
-                <tr>
-                    <th>wifi</th>
-                    <td>{data.wifi == 1 ? "oui" : "non"}</td>
-                </tr>
-                <tr>
-                    <th>Cuisine</th>
-                    <td>{data.cuisine == 1 ? "oui" : "non"}</td>
-                </tr>
-                <tr>
-                    <th>Balcon</th>
-                    <td>{data.balcon == 1 ? "oui" : "non"}</td>
-                </tr>
-                <tr>
-                    <th>Jardin</th>
-                    <td>{data.jardin == 1 ? "oui" : "non"}</td>
-                </tr>
-                <tr>
-                    <th>Parking</th>
-                    <td>{data.parking == 1 ? "oui" : "non"}</td>
-                </tr>
-                <tr>
-
-                </tr>
-                <tr>
-                    <th>Piscine</th>
-                    <td>{data.piscine == 1 ? "oui" : "non"}</td>
-                </tr>
-                <tr>
-                    <th>Jaccuzzi</th>
-                    <td>{data.jaccuzzi == 1 ? "oui" : "non"} </td>
-                </tr>
-                <tr>
-                    <th>Salle de sport</th>
-                    <td>{data.salleDeSport == 1 ? "oui" : "non"}</td>
-                </tr>
-                <tr>
-                    <th>Climatisation</th>
-                    <td>{data.climatisation == 1 ? "oui" : "non"}</td>
-                </tr>
-            </table>
-            <hr />
+        <div className="containerViewBien">
+            {data ? (
+                <>
+                    <div>
+                        <h1 className="nomDuBien">{data.nomBien}</h1>
+                    </div>
+                    <img className="photoDuBien" src={`${BACK_URL}/uploads/${data.cheminImg}`} alt={data.nomBien} />
+                    <p>{data.typeDePropriete} - {data.ville},{data.adresse}</p>
+                    <p className="assets">{data.nombreChambres} Chambres - {data.nombreLits} Lits - {data.nombreSallesDeBain} Salles de bain</p>
+                    <form className="resForm" >
+                        <p>Total: <strong>{Math.ceil(Math.abs(depart - arrivee) / (1000 * 60 * 60 * 24)) * data.prix}€</strong> pour {Math.ceil(Math.abs(depart - arrivee) / (1000 * 60 * 60 * 24))} nuits</p>
+                        <label htmlFor="dateDebut">Arrivée</label>
+                        <DatePicker selected={arrivee} onChange={date => setArrivee(date)} minDate={new Date()} excludeDates={disabledDates} />
+                        <label htmlFor="dateFin">Départ</label>
+                        <DatePicker selected={depart} onChange={date => setDepart(date)} minDate={arrivee} excludeDates={disabledDates} />
+                        <button className="btn btn-dark">Réserver</button>
+                    </form>
+                    <hr />
+                    <p><strong>{data.prix}€</strong> par nuits</p>
+                    <p>{data.description}</p>
+                    <hr />
+                    <p>Equipements:</p>
+                    <table className="equipment-table">
+                        <tr>
+                            <th>wifi</th>
+                            <td>{data.wifi == 1 ? "oui" : "non"}</td>
+                        </tr>
+                        <tr>
+                            <th>Cuisine</th>
+                            <td>{data.cuisine == 1 ? "oui" : "non"}</td>
+                        </tr>
+                        <tr>
+                            <th>Balcon</th>
+                            <td>{data.balcon == 1 ? "oui" : "non"}</td>
+                        </tr>
+                        <tr>
+                            <th>Jardin</th>
+                            <td>{data.jardin == 1 ? "oui" : "non"}</td>
+                        </tr>
+                        <tr>
+                            <th>Parking</th>
+                            <td>{data.parking == 1 ? "oui" : "non"}</td>
+                        </tr>
+                        <tr>
+                            <th>Piscine</th>
+                            <td>{data.piscine == 1 ? "oui" : "non"}</td>
+                        </tr>
+                        <tr>
+                            <th>Jaccuzzi</th>
+                            <td>{data.jaccuzzi == 1 ? "oui" : "non"} </td>
+                        </tr>
+                        <tr>
+                            <th>Salle de sport</th>
+                            <td>{data.salleDeSport == 1 ? "oui" : "non"}</td>
+                        </tr>
+                        <tr>
+                            <th>Climatisation</th>
+                            <td>{data.climatisation == 1 ? "oui" : "non"}</td>
+                        </tr>
+                    </table>
+                    <hr />
+                </>
+            ) : (
+                <div>Loading...</div>
+            )}
         </div>
     );
-}
+};
 export default ViewBien;

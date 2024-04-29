@@ -1,4 +1,4 @@
-.container {
+.containerViewBien {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -19,7 +19,7 @@
     position: relative;
 }
 
-.container p {
+.containerViewBien p {
     font-size: 1.5em;
     color: #000000;
     text-align: left;
@@ -58,7 +58,7 @@ p.assets {
     margin-top: 5%;
     border: solid 1px black;
     padding: 20px;
-    padding-right: 75%;
+    padding-right: 7%;
 }
 
 .resForm button {
