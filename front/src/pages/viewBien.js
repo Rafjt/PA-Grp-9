@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { fetchAnnonceById, fetchDisabledDates } from "../services";
+import { fetchAnnonceById, fetchDisabledDates,createReservation } from "../services";
 import { BACK_URL } from "../services";
 import "./viewBien.css";
 import DatePicker from 'react-datepicker';
@@ -65,8 +65,22 @@ useEffect(() => {
 }, []);
 
 
+    // const handleSubmit = (e) => {
+    //     e.preventDefault();
+    //     createReservation(id, arrivee, depart,)
+    //         .then((res) => {
+    //             if (res.status === 200) {
+    //                 alert('Reservation created successfully');
+    //             } else {
+    //                 alert('Error creating reservation');
+    //             }
+    //         });
+    // };
 
 
+        const diffTime = Math.abs(depart - arrivee);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        const totalPrice = diffDays * data.prix;
 
     if (!data) {
         return <div>Loading...</div>;
@@ -80,7 +94,8 @@ useEffect(() => {
             <img className="photoDuBien" src={`${BACK_URL}/uploads/${data.cheminImg}`} alt={data.nomBien} />
             <p>{data.typeDePropriete} - {data.ville},{data.adresse}</p>
             <p className="assets">{data.nombreChambres} Chambres - {data.nombreLits} Lits - {data.nombreSallesDeBain} Salles de bain</p>
-            <form className="resForm">
+            <form className="resForm" >
+                <p>Total: <strong>{totalPrice}€</strong> pour {diffDays} nuits</p>
                 <label htmlFor="dateDebut">Arrivée</label>
                 <DatePicker selected={arrivee} onChange={date => setArrivee(date)} minDate={new Date()} excludeDates={disabledDates} />
                 <label htmlFor="dateFin">Départ</label>

@@ -401,18 +401,18 @@ export const fetchDisabledDates = async (reservationId) => {
   }
 };
 
-// export const createReservation = async (reservationData) => {
-//   try {
-//     const response = await fetch(URL_RESERVATION, {
-//       method: "POST",
-//       headers: {
-//         "Content-Type": "application/json",
-//       },
-//       body: JSON.stringify(reservationData),
-//     });
-//     const data = await response.json();
-//     return data;
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
+export const createReservation = async (reservationData) => {
+  try {
+    const response = await fetch(URL_RESERVATION, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(reservationData),
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
