@@ -8,15 +8,6 @@ import 'react-datepicker/dist/react-datepicker.css';
 
 const ViewBien = () => {
 
-    // const [arrivee, setArrivee] = useState('');
-    // const [depart, setDepart] = useState('');
-
-    // useEffect(() => {
-    //     let params = new URLSearchParams(window.location.search);
-    //     setArrivee(params.get('arrivee'));
-    //     setDepart(params.get('depart'));
-    // }, []);
-
     const [arrivee, setArrivee] = useState(new Date());
     const [depart, setDepart] = useState(new Date());
     const [disabledDates, setDisabledDates] = useState([]);
@@ -77,13 +68,6 @@ const ViewBien = () => {
     //         });
     // };
 
-
-    // Calculate the number of days
-    // const diffTime = Math.abs(depart - arrivee);
-    // const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    // // Calculate the total price
-    // const totalPrice = diffDays * data.prix;
 
     if (!data) {
         return <div>Loading...</div>;
