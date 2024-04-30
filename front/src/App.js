@@ -19,6 +19,28 @@ import PageBien from "./pages/pageBien.js";
 import MailConfirm from "./pages/mailConfirm.js";
 import GestionPaiement from "./pages/gestionPaiement.js";
 import ViewBien from "./pages/viewBien.js";
+import { Navigate, useLocation } from 'react-router-dom';
+import Cookies from 'js-cookie';
+
+
+const adminCookie = Cookies.get('connect.sid');
+console.log('OGadminCookie:', adminCookie);
+
+if (adminCookie !== undefined) {
+  console.log('The admin cookie exists.');
+} else {
+  console.log('The admin cookie does not exist.');
+}
+
+function ProtectedRoute({ component: Component }) {
+  const adminCookie = Cookies.get('admin');
+  console.log('HERE adminCookie:', adminCookie);
+  const isAdmin = adminCookie !== undefined && adminCookie !== '0';
+  const location = useLocation();
+
+  return isAdmin ? <Component /> : <Navigate to="/login" state={{ from: location }} />;
+}
+
 
 function App() {
   return (
@@ -28,7 +50,8 @@ function App() {
         </div>
         <div className="app">
           <Routes>
-            <Route path="/backoffice" element={<BackOffice />} />
+          {/* <Route path="/backOffice" element={<ProtectedRoute component={BackOffice} />} /> */}
+            <Route path="/backOffice" element={<BackOffice />} />
             <Route path="/" element={<Acceuil />} />
             <Route path="/login" element={<Login />} />
             <Route path="/update/:id/:type" element={<Update />} />

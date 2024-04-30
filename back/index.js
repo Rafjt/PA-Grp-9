@@ -4,10 +4,12 @@ const port = 3001;
 const bodyParser = require('body-parser');
 const path = require('path');
 const router = require('./routes/myroutes');
+const auth = require('./routes/auth');
 const mailCodeRouter = require('./routes/mailCode');
 const userRoutes = require('./routes/userRoutes');
 const sequelize = require('./database');
 const cors = require('cors');
+const session = require('express-session');
 
 
 sequelize.authenticate().then(() => {
@@ -19,8 +21,9 @@ sequelize.authenticate().then(() => {
 app.use(bodyParser.json());
 
 app.use(cors({
-  origin: '*',
+  origin: 'http://localhost:3000', 
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
 }));
 
 app.get('/index', async (req, res) => {
@@ -30,23 +33,35 @@ app.get('/index', async (req, res) => {
   // res.send(`Server is running on port ${port}`);
 });
 
-// Serve static files from the React app
-// app.use(express.static(path.join(__dirname, 'front/src')));
+app.use(session({
+  secret: 'your-secret-key',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: false , sameSite: 'lax', httpOnly: false, maxAge: 60*60000}, // Set secure to true if you're using HTTPS
+}));
 
-// Include your routes
-// const myRoutes = require('../routes/myRoutes.js');
+const verifySession = (req, res, next) => {
+  if (!req.session.user) {
+    return res.status(401).send("Unauthorized");
+  }
+  next();
+};
 
-// // Use my routes
+// app.use('/api', verifySession);
+
 app.use('/api', router);
+
+app.use('/auth', auth);
 
 app.use('/uploads', express.static('uploads'));
 
-// Handle other routes by serving the React app
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../front/src', 'App.js'));
-});
+// app.get('*', (req, res) => {
+//   res.sendFile(path.join(__dirname, '../front/src', 'App.js'));
+// });
 
 const PORT = process.env.PORT || port;
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}, triple monnnnstre`);
+  console.log(`Server is running on port ${PORT}`);
 });
+
+

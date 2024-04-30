@@ -101,7 +101,7 @@ const ViewBien = () => {
                                     setArrivee(depart);
                                 }
                             }}
-                            shouldCloseOnSelect={false}
+                            shouldCloseOnSelect={true}
                             minDate={new Date()} 
                             excludeDates={disabledDates} 
                         />
@@ -129,8 +129,8 @@ const ViewBien = () => {
                                     setDepart(arrivee);
                                 }
                             }}
-                            shouldCloseOnSelect={false}
-                            minDate={arrivee}
+                            shouldCloseOnSelect={true}
+                            minDate={arrivee} // Change this line
                             excludeDates={disabledDates}
                         />
                         {showErrorMessage && <div class="alert alert-danger">

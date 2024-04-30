@@ -10,8 +10,9 @@ const Update = () => {
     prenom: '',
     dateDeNaissance: '',
     adresseMail: '',
-    motDePasse: '', 
+    motDePasse: '',
     type: type || 'VOYAGEURS',
+    admin: '',
   });
 
   useEffect(() => {
@@ -26,9 +27,10 @@ const Update = () => {
           adresseMail: data.adresseMail,
           motDePasse: data.motDePasse,
           type: values.type,
+          admin: data.admin,
         });
       });
-  }, [id, values.type]); 
+  }, [id, values.type]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -46,16 +48,16 @@ const Update = () => {
       x.type = "password";
     }
   }
-  
+
   const handleModify = async (e) => {
     e.preventDefault();
     console.log('Modifyinggg user:', values);
     try {
-        const data = await updateUser(id, values.type, values); 
+      const data = await updateUser(id, values.type, values);
     } catch (error) {
-        console.log(error);
+      console.log(error);
     }
-}
+  }
 
   return (
     <><div className="container-fluid mt-5 mr-0 ml-0 w-100">
@@ -88,6 +90,11 @@ const Update = () => {
               <input type="checkbox" className="ntm" onClick={showPassword} />{" "}
               Afficher
             </label>
+           <br/>
+            <select className="input mt-3" name="admin" value={values.admin} onChange={handleChange}>
+              <option value="0">Utilisateur</option>
+              <option value="1">Admin</option>
+            </select>
           </div>
         </div>
 

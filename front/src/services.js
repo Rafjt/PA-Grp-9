@@ -1,4 +1,5 @@
 // Define functions for backend calls
+const URL = "http://localhost:3001";
 const BASE_URL = "http://localhost:3001/api";
 const URL_USERS = `${BASE_URL}/users`;
 export const BACK_URL = "http://localhost:3001";
@@ -6,6 +7,7 @@ const URL_ANNONCE = `${BASE_URL}/bienImo`;
 const URL_PAIEMENT = `${BASE_URL}/paiement`;
 const URL_ENVOI_MAIL = `${BASE_URL}/mail`;
 const URL_RESERVATION = `${BASE_URL}/reservation`;
+const URL_AUTH = `${URL}/auth`;
 
 export const fetchUsers = async () => {
   try {
@@ -150,6 +152,33 @@ export const verifConfCode = async (code) => {
     throw error;
   }
 };
+
+
+export const login = async (email, password, type) => {
+  console.log("login", email, password, type);
+  try {
+    const response = await fetch(`${URL_AUTH}/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password, type }),
+      credentials: 'include', // Include cookies in the request
+    });
+
+    if (response.status === 401) {
+      throw new Error("Unauthorized");
+    }
+
+    if (response.status === 200) {
+      return response;
+    }
+
+    throw new Error("Unknown error occurred");
+  } catch (error) {
+    throw error;
+  }
+}
 
 // GESTION DES ANNONCES
 
