@@ -182,16 +182,15 @@ router.post("/users/code/:code", async (req, res) => {
   }
 });
 
-module.exports = router;
 
 router.put("/users/:id/:type", async (req, res) => {
   console.log("Modifying user:", req.body);
   const { id, type } = req.params;
-  const { nom, prenom, adresseMail, motDePasse, dateDeNaissance } = req.body;
+  const { nom, prenom, adresseMail, motDePasse, dateDeNaissance,admin } = req.body;
   console.log("date de naissance est :", dateDeNaissance);
   try {
     await sequelize.query(
-      `UPDATE ${type} SET nom = '${nom}', prenom = '${prenom}', adresseMail = '${adresseMail}',dateDeNaissance = '${dateDeNaissance}', motDePasse = '${motDePasse}' WHERE id = ${id}`
+      `UPDATE ${type} SET nom = '${nom}', prenom = '${prenom}', adresseMail = '${adresseMail}',dateDeNaissance = '${dateDeNaissance}', motDePasse = '${motDePasse}', admin = '${admin}' WHERE id = ${id}`
     );
   } catch (error) {
     console.error("Error modifying user:", error);
@@ -730,4 +729,13 @@ router.post("/bienDispo", async (req, res) => {
   const [bienDispo] = await sequelize.query(query);
   console.log(bienDispo);
   res.send(bienDispo);
+});
+
+module.exports = router;
+
+
+router.get('/biens', async (req, res) => {
+  const { user } = req.session;
+  const [bienImo] = await sequelize.query(`SELECT * FROM bienImo WHERE id_ClientBailleur = ${user.id}`);
+  res.send(bienImo);
 });
