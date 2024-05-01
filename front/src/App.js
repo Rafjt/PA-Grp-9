@@ -20,68 +20,79 @@ import MailConfirm from "./pages/mailConfirm.js";
 import GestionPaiement from "./pages/gestionPaiement.js";
 import ViewBien from "./pages/viewBien.js";
 import EspaceBailleur from "./pages/espaceBailleur.js";
-import { Navigate, useLocation } from 'react-router-dom';
-import Cookies from 'js-cookie';
+import UserProfile from "./pages/userProfile.js";
+import { Navigate, useLocation } from "react-router-dom";
+import Cookies from "js-cookie";
 
+const authentCookie = Cookies.get("connect.sid");
+console.log("OGadminCookie:", authentCookie);
 
-const adminCookie = Cookies.get('connect.sid');
-console.log('OGadminCookie:', adminCookie);
-
-if (adminCookie !== undefined) {
-  console.log('The admin cookie exists.');
+if (authentCookie !== undefined) {
+  console.log("The admin cookie exists.");
 } else {
-  console.log('The admin cookie does not exist.');
+  console.log("The admin cookie does not exist.");
 }
 
 function ProtectedRoute({ component: Component }) {
-  const adminCookie = Cookies.get('admin');
-  console.log('HERE adminCookie:', adminCookie);
-  const isAdmin = adminCookie !== undefined && adminCookie !== '0';
+  const adminCookie = Cookies.get("admin");
+  console.log("HERE adminCookie:", adminCookie);
+  const isAdmin = adminCookie !== undefined && adminCookie !== "0";
   const location = useLocation();
 
-  return isAdmin ? <Component /> : <Navigate to="/login" state={{ from: location }} />;
+  return isAdmin ? (
+    <Component />
+  ) : (
+    <Navigate to="/login" state={{ from: location }} />
+  );
 }
 
+function ProtectedAuthRoute({ component: Component }) {
+  const isAuthenticated = Cookies.get("connect.sid") !== undefined;
+  const location = useLocation();
+
+  return isAuthenticated ? (
+    <Component />
+  ) : (
+    <Navigate to="/login" state={{ from: location }} />
+  );
+}
 
 function App() {
   return (
-      <div className="Page">
-        <div className="header">
-          <Header />
-        </div>
-        <div className="app">
-          <Routes>
-          {/* <Route path="/backOffice" element={<ProtectedRoute component={BackOffice} />} /> */}
-            <Route path="/backOffice" element={<BackOffice />} />
-            <Route path="/" element={<Acceuil />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/update/:id/:type" element={<Update />} />
-            <Route path="/update/:id/bien" element={<UpdateAnnonce />} />
-            <Route
-              path="/gestionUtilisateur"
-              element={<GestionUtilisateur />}
-            />
-            <Route
-              path="/gestionReservations"
-              element={<GestionReservations />}
-            />
-            <Route path="/update/:id/reservation" element={<UpdateReservation />} />
-
-            <Route path="/gestionAnnonce" element={<GestionAnnonce />} />
-            <Route path="/statistiques" element={<Statistiques />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/statistiques" element={<Statistiques />} />
-            <Route path="/Biens" element={<PageBien />} />
-            <Route path="/mailConfirm" element={<MailConfirm />} />
-            <Route path="/gestionPaiement" element={<GestionPaiement/>} />
-            <Route path="/viewBien/:id" element={<ViewBien />} />
-            <Route path="/espaceBailleur" element={<EspaceBailleur />} />
-          </Routes>
-        </div>
-        <div className="footer">
-          <Footer />
-        </div>
+    <div className="Page">
+      <div className="header">
+        <Header />
       </div>
+      <div className="app">
+        <Routes>
+          {/* Routes publiques */}
+          <Route path="/" element={<Acceuil />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/viewBien/:id" element={<ViewBien />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/Biens" element={<PageBien />} />
+          <Route path="/mailConfirm" element={<MailConfirm />} />
+
+          {/* Routes Authent */}
+          <Route path="/espaceBailleur" element={<ProtectedAuthRoute component={EspaceBailleur} />} />
+          <Route path="/userProfile" element={<ProtectedAuthRoute component={UserProfile} />} />
+
+          {/* Routes admin */}
+          <Route path="/backOffice" element={<ProtectedRoute component={BackOffice} />} />
+          <Route path="/update/:id/:type" element={<ProtectedRoute component={Update} />} />
+          <Route path="/update/:id/bien" element={<ProtectedRoute component={UpdateAnnonce} />} />
+          <Route path="/gestionUtilisateur" element={<ProtectedRoute component={GestionUtilisateur} />} />
+          <Route path="/gestionReservations" element={<ProtectedRoute component={GestionReservations} />} />
+          <Route path="/update/:id/reservation" element={<ProtectedRoute component={UpdateReservation} />} />
+          <Route path="/gestionAnnonce" element={<ProtectedRoute component={GestionAnnonce} />} />
+          <Route path="/statistiques" element={<ProtectedRoute component={Statistiques} />} />
+          <Route path="/gestionPaiement" element={<ProtectedRoute component={GestionPaiement} />} />
+        </Routes>
+      </div>
+      <div className="footer">
+        <Footer />
+      </div>
+    </div>
   );
 }
 
