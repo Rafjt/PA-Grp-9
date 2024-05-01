@@ -170,6 +170,14 @@ export const login = async (email, password, type) => {
       throw new Error("Unauthorized");
     }
 
+    if (response.status === 403) {
+      throw new Error("WrongPWD");
+    }
+
+    if (response.status === 409) {
+      throw new Error("UserBanned");
+    }
+
     if (response.status === 200) {
       return response;
     }
