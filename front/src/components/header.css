@@ -68,4 +68,7 @@ span.env a:hover {
   height: 20px; 
 }
 
-
+.user-logo {
+  height: 20px; /* Set the height to the same size as text */
+  filter: brightness(0) invert(1);
+}
