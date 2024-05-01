@@ -19,6 +19,7 @@ import PageBien from "./pages/pageBien.js";
 import MailConfirm from "./pages/mailConfirm.js";
 import GestionPaiement from "./pages/gestionPaiement.js";
 import ViewBien from "./pages/viewBien.js";
+import EspaceBailleur from "./pages/espaceBailleur.js";
 import { Navigate, useLocation } from 'react-router-dom';
 import Cookies from 'js-cookie';
 
@@ -74,6 +75,7 @@ function App() {
             <Route path="/mailConfirm" element={<MailConfirm />} />
             <Route path="/gestionPaiement" element={<GestionPaiement/>} />
             <Route path="/viewBien/:id" element={<ViewBien />} />
+            <Route path="/espaceBailleur" element={<EspaceBailleur />} />
           </Routes>
         </div>
         <div className="footer">
