@@ -32,7 +32,10 @@ router.post("/login", async (req, res) => {
                 };
                 // console.log("LA",req.session.user); // Add this line
                 // res.send("Logged in");
-                res.json(req.session.user);
+                res.cookie('admin', user.admin); // Set cookies before sending the response
+                res.cookie('id', user.id);
+                res.cookie('type', type);
+                res.json(req.session.user); // Send the response
             }else {
                 res.status(401).send("Unauthorized");
                 console.log("Unauthorized");
@@ -45,7 +48,6 @@ router.post("/login", async (req, res) => {
         res.status(500).send("Server error");
     }
 });
-
 
 router.get("/logout", (req, res) => {
     req.session.destroy();
