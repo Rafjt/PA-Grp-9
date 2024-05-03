@@ -453,3 +453,17 @@ export const createReservation = async (reservationData) => {
     console.log(error);
   }
 };
+
+export const getCredentials = async() => {
+  console.log("getCredentials");
+  try {
+    const response = await fetch(`${URL_AUTH}/me`, {
+      credentials: 'include', 
+    });
+    const data = await response.json();
+    return data;
+  }
+  catch (error) {
+    console.log(error);
+  }
+}

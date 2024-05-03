@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
+import Cookies from 'js-cookie';
 import { useParams } from 'react-router-dom';
 import { fetchAnnonceById, updateAnnonce } from "../services";
 import { Link } from 'react-router-dom';
 import './updateAnnonce.css';
 const BACK_URL = 'http://localhost:3001';
+
 
 const UpdateAnnonce = () => {
 

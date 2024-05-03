@@ -21,23 +21,31 @@ import GestionPaiement from "./pages/gestionPaiement.js";
 import ViewBien from "./pages/viewBien.js";
 import EspaceBailleur from "./pages/espaceBailleur.js";
 import UserProfile from "./pages/userProfile.js";
+import MesBiens from "./pages/mesBiens.js";
 import { Navigate, useLocation } from "react-router-dom";
 import Cookies from "js-cookie";
-
-const authentCookie = Cookies.get("connect.sid");
-console.log("OGadminCookie:", authentCookie);
-
-if (authentCookie !== undefined) {
-  console.log("The admin cookie exists.");
-} else {
-  console.log("The admin cookie does not exist.");
-}
+import { useEffect } from "react";
+import { getCredentials } from "./services.js";
+import { useState } from "react";
+// import { use } from "../../back/routes/auth.js";
 
 function ProtectedRoute({ component: Component }) {
-  const adminCookie = Cookies.get("admin");
-  console.log("HERE adminCookie:", adminCookie);
-  const isAdmin = adminCookie !== undefined && adminCookie !== "0";
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
   const location = useLocation();
+
+  useEffect(() => {
+    getCredentials().then(data => {
+      setUser(data);
+      setLoading(false);
+    });
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>; // Replace this with your loading indicator
+  }
+
+  const isAdmin = user && user.admin === 1;
 
   return isAdmin ? (
     <Component />
@@ -47,8 +55,22 @@ function ProtectedRoute({ component: Component }) {
 }
 
 function ProtectedAuthRoute({ component: Component }) {
-  const isAuthenticated = Cookies.get("connect.sid") !== undefined;
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
   const location = useLocation();
+
+  useEffect(() => {
+    getCredentials().then(data => {
+      setUser(data);
+      setLoading(false);
+    });
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>; // Replace this with your loading indicator
+  }
+
+  const isAuthenticated = user !== null;
 
   return isAuthenticated ? (
     <Component />
@@ -57,7 +79,15 @@ function ProtectedAuthRoute({ component: Component }) {
   );
 }
 
+
 function App() {
+
+  useEffect(() => {
+    getCredentials().then(data => {
+      console.log(data);
+    });
+  });
+
   return (
     <div className="Page">
       <div className="header">
@@ -76,11 +106,12 @@ function App() {
           {/* Routes Authent */}
           <Route path="/espaceBailleur" element={<ProtectedAuthRoute component={EspaceBailleur} />} />
           <Route path="/userProfile" element={<ProtectedAuthRoute component={UserProfile} />} />
+          <Route path="/mesBiens" element={<ProtectedAuthRoute component={MesBiens} />} />
+          <Route path="/update/:id/bien" element={<ProtectedAuthRoute component={UpdateAnnonce} />} />
 
           {/* Routes admin */}
           <Route path="/backOffice" element={<ProtectedRoute component={BackOffice} />} />
           <Route path="/update/:id/:type" element={<ProtectedRoute component={Update} />} />
-          <Route path="/update/:id/bien" element={<ProtectedRoute component={UpdateAnnonce} />} />
           <Route path="/gestionUtilisateur" element={<ProtectedRoute component={GestionUtilisateur} />} />
           <Route path="/gestionReservations" element={<ProtectedRoute component={GestionReservations} />} />
           <Route path="/update/:id/reservation" element={<ProtectedRoute component={UpdateReservation} />} />
