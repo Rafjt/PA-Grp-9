@@ -27,7 +27,7 @@ router.post("/login", async (req, res) => {
       const match = await bcrypt.compare(password, hashedPasswordFromDB); // Use bcrypt.compare()
 
       if (match) {
-        // Store the user's information in the session
+
         req.session.user = {
           id: user.id,
           nom: user.nom,
@@ -36,12 +36,7 @@ router.post("/login", async (req, res) => {
           dateDeNaissance: user.dateDeNaissance,
           admin: user.admin,
         };
-        // console.log("LA",req.session.user); // Add this line
-        // res.send("Logged in");
-        res.cookie("admin", user.admin); // Set cookies before sending the response
-        res.cookie("id", user.id);
-        res.cookie("type", type);
-        res.json(req.session.user); // Send the response
+        res.json(req.session.user); 
       } else if (!match) {
         res.status(403).send("WrongPWD");
         console.log("WrongPWD");
