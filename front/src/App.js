@@ -71,7 +71,7 @@ function ProtectedAuthRoute({ component: Component }) {
     return <div>Loading...</div>; // Replace this with your loading indicator
   }
 
-  const isAuthenticated = user && user.type === "clientsBailleurs" || user.type === "voyageurs" || user.type === "prestaires";
+  const isAuthenticated = user && user.type === "clientsBailleurs";
 
   return isAuthenticated ? (
     <Component />
