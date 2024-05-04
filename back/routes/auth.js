@@ -35,6 +35,7 @@ router.post("/login", async (req, res) => {
           adresseMail: user.adresseMail,
           dateDeNaissance: user.dateDeNaissance,
           admin: user.admin,
+          type: type,
         };
         res.json(req.session.user); 
       } else if (!match) {
