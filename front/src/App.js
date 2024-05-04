@@ -61,6 +61,7 @@ function ProtectedAuthRoute({ component: Component }) {
 
   useEffect(() => {
     getCredentials().then(data => {
+      console.log(data); // Log the data to check if it's being fetched correctly
       setUser(data);
       setLoading(false);
     });
@@ -70,12 +71,12 @@ function ProtectedAuthRoute({ component: Component }) {
     return <div>Loading...</div>; // Replace this with your loading indicator
   }
 
-  const isAuthenticated = user !== null;
+  const isAuthenticated = user && user.type === "clientsBailleurs";
 
   return isAuthenticated ? (
     <Component />
   ) : (
-    <Navigate to="/login" state={{ from: location }} />
+    <Navigate to="/login" replace state={{ from: location }} />
   );
 }
 
