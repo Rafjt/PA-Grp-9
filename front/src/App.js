@@ -27,6 +27,8 @@ import Cookies from "js-cookie";
 import { useEffect } from "react";
 import { getCredentials } from "./services.js";
 import { useState } from "react";
+import ModifyBien from "./pages/modifyBien.js";
+import CalendarBailleurs from "./pages/calendarBailleurs.js";
 // import { use } from "../../back/routes/auth.js";
 
 function ProtectedRoute({ component: Component }) {
@@ -131,6 +133,8 @@ function App() {
           {/* Routes Authent CLientsBailleurs*/}
           <Route path="/espaceBailleur" element={<ProtectedAuthRoute path="/espaceBailleur" component={EspaceBailleur} authType="clientsBailleurs" />} />
           <Route path="/mesBiens" element={<ProtectedAuthRoute path="/mesBiens" component={MesBiens} authType="clientsBailleurs" />} />
+          <Route path="/modifyBien" element={<ProtectedAuthRoute path="/modifyBien" component={ModifyBien} authType="clientsBailleurs" />} />
+          <Route path="/calendarBailleurs" element={<ProtectedAuthRoute path="/calendarBailleurs" component={CalendarBailleurs} authType="clientsBailleurs" />} />
           {/* Routes Authent Prestataires*/}
 
           {/* Routes admin */}
