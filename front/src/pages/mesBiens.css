@@ -1,7 +1,7 @@
 .bienBailleur {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    max-height: 500px;
+    max-height: 700px;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     -ms-overflow-style: -ms-autohiding-scrollbar;
@@ -14,3 +14,25 @@
     border-radius: 20px;
 }
 
+
+.mesBiensModal {
+    width:50%;
+}
+
+
+.table-mesBiens {
+    width: 10%;
+    border-collapse: collapse;
+    margin: 25px 0;
+    font-size: 0.9em;
+    border:solid 1px #cacaca;
+}
+
+.table-mesBiens tr {
+    border-bottom: 1px solid #ddd;
+    padding: 8px;
+}
+
+.table-mesBiens td {
+    padding: 8px;
+}

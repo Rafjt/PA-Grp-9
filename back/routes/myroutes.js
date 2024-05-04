@@ -385,15 +385,23 @@ router.put('/bienImo/:id', upload.single('cheminImg'), async (req, res) => {
   } = req.body;
   newDescription = description.replace(/'/g, "''");
   console.log('prix est :', prix);
+
+  let query = `UPDATE bienImo SET nomBien = '${nomBien}', description = '${newDescription}', id_ClientBailleur = '${id_ClientBailleur}', prix = '${prix}', disponible = '${disponible}', typeDePropriete = '${typeDePropriete}', nombreChambres = '${nombreChambres}', nombreLits = '${nombreLits}', nombreSallesDeBain = '${nombreSallesDeBain}', wifi = '${wifi}', cuisine = '${cuisine}', balcon = '${balcon}', jardin = '${jardin}', parking = '${parking}', piscine = '${piscine}', jaccuzzi = '${jaccuzzi}', salleDeSport = '${salleDeSport}', climatisation = '${climatisation}', ville = '${ville}', adresse = '${adresse}'`;
+
+  if (pictures) {
+    query += `, cheminImg = '${pictures}'`;
+  }
+
+  query += ` WHERE id = ${id}`;
+
   try {
-    await sequelize.query(
-      `UPDATE bienImo SET nomBien = '${nomBien}', description = '${newDescription}', id_ClientBailleur = '${id_ClientBailleur}', prix = '${prix}', disponible = '${disponible}', typeDePropriete = '${typeDePropriete}', nombreChambres = '${nombreChambres}', nombreLits = '${nombreLits}', nombreSallesDeBain = '${nombreSallesDeBain}', wifi = '${wifi}', cuisine = '${cuisine}', balcon = '${balcon}', jardin = '${jardin}', parking = '${parking}', piscine = '${piscine}', jaccuzzi = '${jaccuzzi}', salleDeSport = '${salleDeSport}', climatisation = '${climatisation}', cheminImg = '${pictures}', ville = '${ville}', adresse = '${adresse}' WHERE id = ${id}`
-    );
+    await sequelize.query(query);
   } catch (error) {
     console.error('Error modifying bien:', error);
   }
   res.send('Bien modified');
 });
+
 
 router.post('/bienImo/filter', async (req, res) => {
   let {
@@ -736,6 +744,7 @@ module.exports = router;
 
 router.get('/biens', async (req, res) => {
   const { user } = req.session;
+  console.log(user);
   const [bienImo] = await sequelize.query(`SELECT * FROM bienImo WHERE id_ClientBailleur = ${user.id}`);
   res.send(bienImo);
 });
