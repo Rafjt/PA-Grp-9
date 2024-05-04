@@ -6,6 +6,15 @@ import { fetchReservationByBailleur } from '../services';
 
 const localizer = momentLocalizer(moment);
 
+const EventComponent = ({ event }) => (
+    <div>
+        <strong>{event.title}</strong>
+        <p>{event.statut}</p>
+        <p>{event.prix}</p>
+        {/* Add more information as needed */}
+    </div>
+);
+
 const MyCalendar = () => {
     const [events, setEvents] = useState([]);
 
@@ -17,9 +26,11 @@ const MyCalendar = () => {
                     title: reservation.nomBien,
                     start: new Date(reservation.dateDebut),
                     end: new Date(reservation.dateFin),
+                    statut: reservation.statut,
+                    prix: reservation.prix,
+                    // Add more fields as needed
                 }));
                 setEvents(formattedEvents);
-                console.log(formattedEvents);
             } catch (error) {
                 console.log(error);
             }
@@ -35,6 +46,9 @@ const MyCalendar = () => {
                 events={events}
                 startAccessor="start"
                 endAccessor="end"
+                components={{
+                    event: EventComponent,
+                }}
             />
         </div>
     );
