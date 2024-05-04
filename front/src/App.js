@@ -54,14 +54,13 @@ function ProtectedRoute({ component: Component }) {
   );
 }
 
-function ProtectedAuthRoute({ component: Component }) {
+function ProtectedAuthRoute({ component: Component, authType }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const location = useLocation();
 
   useEffect(() => {
     getCredentials().then(data => {
-      console.log(data); // Log the data to check if it's being fetched correctly
       setUser(data);
       setLoading(false);
     });
@@ -71,7 +70,30 @@ function ProtectedAuthRoute({ component: Component }) {
     return <div>Loading...</div>; // Replace this with your loading indicator
   }
 
-  const isAuthenticated = user && user.type === "clientsBailleurs";
+  let isAuthenticated = false;
+
+  if (user) {
+    switch (authType) {
+      case "admin":
+        isAuthenticated = user.admin === 1;
+        break;
+      case "prestataires":
+        isAuthenticated = user.type === "prestataires";
+        break;
+      case "voyageurs":
+        isAuthenticated = user.type === "voyageurs";
+        break;
+      case "clientsBailleurs":
+        isAuthenticated = user.type === "clientsBailleurs";
+        break;
+      case "all": // New case for "all" authentication type
+        isAuthenticated = true;
+        break;
+      default:
+        isAuthenticated = false;
+    }
+  }
+
 
   return isAuthenticated ? (
     <Component />
@@ -79,7 +101,6 @@ function ProtectedAuthRoute({ component: Component }) {
     <Navigate to="/login" replace state={{ from: location }} />
   );
 }
-
 
 function App() {
 
@@ -104,11 +125,13 @@ function App() {
           <Route path="/Biens" element={<PageBien />} />
           <Route path="/mailConfirm" element={<MailConfirm />} />
 
-          {/* Routes Authent */}
-          <Route path="/espaceBailleur" element={<ProtectedAuthRoute component={EspaceBailleur} />} />
-          <Route path="/userProfile" element={<ProtectedAuthRoute component={UserProfile} />} />
-          <Route path="/mesBiens" element={<ProtectedAuthRoute component={MesBiens} />} />
-          <Route path="/update/:id/bien" element={<ProtectedAuthRoute component={UpdateAnnonce} />} />
+          {/* Routes Authent ALL*/}
+          <Route path="/userProfile" element={ <ProtectedAuthRoute path="/userProfile" component={UserProfile} authType="all"/>} />
+          {/* Routes Authent Voyageur*/}
+          {/* Routes Authent CLientsBailleurs*/}
+          <Route path="/espaceBailleur" element={<ProtectedAuthRoute path="/espaceBailleur" component={EspaceBailleur} authType="clientsBailleurs" />} />
+          <Route path="/mesBiens" element={<ProtectedAuthRoute path="/mesBiens" component={MesBiens} authType="clientsBailleurs" />} />
+          {/* Routes Authent Prestataires*/}
 
           {/* Routes admin */}
           <Route path="/backOffice" element={<ProtectedRoute component={BackOffice} />} />
@@ -119,6 +142,7 @@ function App() {
           <Route path="/gestionAnnonce" element={<ProtectedRoute component={GestionAnnonce} />} />
           <Route path="/statistiques" element={<ProtectedRoute component={Statistiques} />} />
           <Route path="/gestionPaiement" element={<ProtectedRoute component={GestionPaiement} />} />
+          <Route path="/update/:id/bien" element={<ProtectedRoute component={UpdateAnnonce} />} />
         </Routes>
       </div>
       <div className="footer">
