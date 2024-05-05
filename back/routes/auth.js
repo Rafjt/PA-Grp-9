@@ -61,4 +61,28 @@ router.get("/me", (req, res) => {
   res.send(req.session.user);
 });
 
+router.put("/updateCookie", async (req, res) => {
+    const { userId, userType, userData } = req.body;
+    console.log(userData);
+    console.log("updating the cookie");
+  
+    try {
+      // Update the session or cookie data with the new user data
+      req.session.user = {
+        id: userId,
+        nom: userData.nom,
+        prenom: userData.prenom,
+        adresseMail: userData.adresseMail,
+        dateDeNaissance: userData.dateDeNaissance,
+        admin: userData.admin,
+        type: userType,
+      };
+      // Respond with success message
+      res.status(200).json({ message: "Cookie updated successfully" });
+    } catch (error) {
+      console.error("Error updating cookie:", error);
+      res.status(500).json({ message: "Server error" });
+    }
+  });
+
 module.exports = router;
