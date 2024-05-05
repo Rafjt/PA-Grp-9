@@ -1,30 +1,78 @@
 import "./header.css";
-import { Link } from "react-router-dom";
+import { Link, useRoutes } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
+import { getCredentials } from "../services";
 
 const Header = () => {
   // Check if the user is connected
-   // Initialize isConnected state and set it based on the cookie value
-   const [isConnected, setIsConnected] = useState(!!Cookies.get('connect.sid'));
+  // Initialize isConnected state and set it based on the cookie value
+  const [user, setUser] = useState(null);
+  const [userType, setUserType] = useState("");
+  const [isConnected, setIsConnected] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
-   // Check for changes in the cookie value on component mount
-   useEffect(() => {
-     const checkSession = () => {
-       const sessionCookie = Cookies.get('connect.sid');
-       setIsConnected(!!sessionCookie);
-     };
- 
-     // Call checkSession once to set the initial state
-     checkSession();
- 
-     // Set up interval to check for changes in the cookie value periodically
-     const intervalId = setInterval(checkSession, 1000);
- 
-     // Clean up the interval when the component unmounts
-     return () => clearInterval(intervalId);
-   }, []);
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const userData = await getCredentials();
+        if (userData) {
+          setUser(userData);
+          setUserType(userData.type);
+          setIsConnected(true); // Assuming isAdmin is a property indicating admin status
+          if (userData.admin === 1) {
+            setIsAdmin(true);
+          }
+        } else {
+          setIsConnected(false);
+          setIsAdmin(false);
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        setIsConnected(false);
+        setIsAdmin(false);
+      }
+    };
+
+    // Call checkSession once to set the initial state
+    checkSession();
+
+    // Set up interval to check for changes in the user session periodically
+    let executionCount = 0;
+    const intervalId = setInterval(() => {
+      if (executionCount < 1) {
+        // Execute the function
+        checkSession();
+        executionCount++;
+      } else {
+        // Clear the interval after executing the function three times
+        clearInterval(intervalId);
+        // Set up interval to execute the function every 10 minutes
+        const tenMinutesIntervalId = setInterval(checkSession, 10 * 60 * 1000);
+
+        // Clean up the interval when the component unmounts
+        return () => clearInterval(tenMinutesIntervalId);
+      }
+    }, 1000);
+
+    // Clean up the initial interval when the component unmounts
+    return () => clearInterval(intervalId);
+  }, []);
+
+  const getMonEspaceLink = () => {
+    if (userType === "voyageurs") {
+      return "/espaceVoyageur";
+    } else if (userType === "clientsBailleurs") {
+      return "/espaceBailleur";
+    } else if (userType === "prestataires") {
+      return "/acceuil";
+    } else {
+      // Handle default case, e.g., return a generic URL
+      return "/acceuil";
+    }
+  };
+
   return (
     <header className="header sticky-top">
       <div className="upper-section">
@@ -54,33 +102,46 @@ const Header = () => {
                 Acceuil
               </a>
             </li>
-            <li className="locali">
-              <a href="/backOffice" className="text-white ml-3">
-                Mon espace
-              </a>
-            </li>
+            {isAdmin && (
+              <li className="locali">
+                <a href="/backOffice" className="text-white ml-3">
+                  Gestion BackOffice
+                </a>
+              </li>
+            )}
+            {isConnected && (
+              <li className="locali">
+                <a href={getMonEspaceLink()} className="text-white ml-3">
+                  Mon espace
+                </a>
+              </li>
+            )}
             {/* Conditionally render "Connexion" or user logo */}
             {!isConnected ? (
               <li className="locali">
-                <a href="/login" className="text-white ml-3 mr-2"> {/* Add mr-2 for margin right */}
+                <a href="/login" className="text-white ml-3 mr-2">
+                  {" "}
+                  {/* Add mr-2 for margin right */}
                   Connexion
                 </a>
               </li>
             ) : (
               <li className="locali mr-3">
                 <a href="/userProfile">
-                  <img className="user-logo" src="/logouser.png" alt="User Logo" />
+                  <img
+                    className="user-logo"
+                    src="/logouser.png"
+                    alt="User Logo"
+                  />
                 </a>
               </li>
             )}
             <li className="locali mr-3">
-                <span>
-                </span>
-              </li>
-              <li className="locali mr-3">
-                <span>
-                </span>
-              </li>
+              <span></span>
+            </li>
+            <li className="locali mr-3">
+              <span></span>
+            </li>
           </ul>
         </nav>
       </div>

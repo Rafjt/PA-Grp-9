@@ -26,7 +26,7 @@ function Login() {
       const response = await login(adresseMail, motDePasse, type);
       if (response.status === 200) {
         console.log("Logged in");
-        navigate("/");
+        window.location.replace("/");
       }
     } catch (error) {
       console.error(error);
