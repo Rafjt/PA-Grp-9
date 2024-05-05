@@ -5,9 +5,10 @@ import { BACK_URL } from "../services";
 import "./viewBien.css";
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { useNavigate } from "react-router-dom";
 
 const ViewBien = () => {
-
+    const navigate = useNavigate();
     const [arrivee, setArrivee] = useState(new Date());
     const [depart, setDepart] = useState(new Date());
     const [disabledDates, setDisabledDates] = useState([]);
@@ -24,6 +25,11 @@ const ViewBien = () => {
             });
     }, [id]);
 
+
+    const handleReserve = () => {
+        sessionStorage.setItem('price', data.prix);
+        navigate('/reservation', { state: { id, arrivee, depart, prix: data.prix } });
+    };
 
 
     useEffect(() => {
@@ -136,7 +142,7 @@ const ViewBien = () => {
                         {showErrorMessage && <div class="alert alert-danger">
                             <strong>Attention!</strong> Vous ne pouvez pas sélectionner une date déjà réservée.
                         </div>}
-                        <button className="btn btn-dark">Réserver</button>
+                        <button className="btn btn-dark" onClick={handleReserve}>Réserver</button>
                     </form>
                     <hr />
                     <p><strong>{data.prix}€</strong> par nuits</p>
