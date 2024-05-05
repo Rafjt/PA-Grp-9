@@ -66,12 +66,20 @@ router.delete("/users/:id/debannis", async (req, res) => {
 });
 
 router.delete("/users/:userType/:id", async (req, res) => {
-  const { id } = req.params;
-  const { userType } = req.params;
+  const { id, userType } = req.params;
 
   console.log("Deleting user:", id, userType);
 
   try {
+    if (userType === 'voyageurs') {
+      // Delete all reservations of the user
+      await sequelize.query(`DELETE FROM reservation WHERE id_ClientVoyageur = ${id}`);
+    } else if (userType === 'clientsBailleurs') {
+      // Delete all BienImo of the user
+      await sequelize.query(`DELETE FROM bienImo WHERE id_ClientBailleur = ${id}`);
+    }
+
+    // Delete the user
     await sequelize.query(`DELETE FROM ${userType} WHERE id = ${id}`);
     res.send("User deleted");
   } catch (error) {
@@ -371,8 +379,10 @@ router.put('/bienImo/:id', upload.single('cheminImg'), async (req, res) => {
   console.log('Modifying bien:', req.body);
   const { id } = req.params;
   let pictures = req.body.cheminImg; // Use existing image by default
+  let updateImageQuery = '';
   if (req.file) {
     pictures = req.file.filename; // If a new file was uploaded, use it instead
+    updateImageQuery = `, cheminImg = '${pictures}'`;
   }
   console.log('pictures ==', pictures); // Log uploaded file information
   const {
@@ -401,7 +411,7 @@ router.put('/bienImo/:id', upload.single('cheminImg'), async (req, res) => {
   console.log('prix est :', prix);
   try {
     await sequelize.query(
-      `UPDATE bienImo SET nomBien = '${nomBien}', description = '${newDescription}', id_ClientBailleur = '${id_ClientBailleur}', prix = '${prix}', disponible = '${disponible}', typeDePropriete = '${typeDePropriete}', nombreChambres = '${nombreChambres}', nombreLits = '${nombreLits}', nombreSallesDeBain = '${nombreSallesDeBain}', wifi = '${wifi}', cuisine = '${cuisine}', balcon = '${balcon}', jardin = '${jardin}', parking = '${parking}', piscine = '${piscine}', jaccuzzi = '${jaccuzzi}', salleDeSport = '${salleDeSport}', climatisation = '${climatisation}', cheminImg = '${pictures}', ville = '${ville}', adresse = '${adresse}' WHERE id = ${id}`
+      `UPDATE bienImo SET nomBien = '${nomBien}', description = '${newDescription}', id_ClientBailleur = '${id_ClientBailleur}', prix = '${prix}', disponible = '${disponible}', typeDePropriete = '${typeDePropriete}', nombreChambres = '${nombreChambres}', nombreLits = '${nombreLits}', nombreSallesDeBain = '${nombreSallesDeBain}', wifi = '${wifi}', cuisine = '${cuisine}', balcon = '${balcon}', jardin = '${jardin}', parking = '${parking}', piscine = '${piscine}', jaccuzzi = '${jaccuzzi}', salleDeSport = '${salleDeSport}', climatisation = '${climatisation}', ville = '${ville}', adresse = '${adresse}'${updateImageQuery} WHERE id = ${id}`
     );
   } catch (error) {
     console.error('Error modifying bien:', error);
@@ -522,6 +532,26 @@ router.post('/bienImo/filter', async (req, res) => {
 });
 
 // GESTION DES RESERVATIONS
+
+router.get('/MyCalendar', async (req, res) => {
+  const { user } = req.session;
+  try {
+    // Fetch all bienImo associated with the user
+    const [bienImos] = await sequelize.query(`SELECT * FROM bienImo WHERE id_ClientBailleur = ${user.id}`);
+
+    // Extract the ids of the bienImos
+    const bienImoIds = bienImos.map(bienImo => bienImo.id);
+
+    // Fetch all reservations associated with these bienImo
+    const [reservations] = await sequelize.query(`SELECT * FROM reservation WHERE id_BienImmobilier IN (${bienImoIds.join(',')})`);
+
+    res.json(reservations);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred while fetching reservations.' });
+  }
+});
+
 
 router.get('/reservation', async (req, res) => {
   const [reservation] = await sequelize.query('SELECT * FROM reservation');

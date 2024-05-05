@@ -433,6 +433,20 @@ export const updateReservation = async (reservationId, reservationData) => {
   }
 };
 
+export const fetchReservationByBailleur = async () => {
+  console.log("Callin fetchReservationByBailleur");
+  try {
+    const response = await fetch(`${BASE_URL}/MyCalendar`, {
+      credentials: 'include', 
+    });
+    const data = await response.json();
+    return data;
+  }
+  catch (error) {
+    console.log(error);
+  }
+}
+
 export const fetchReservationById = async (reservationId) => {
   try {
     console.log("fetchReservationById", reservationId);
@@ -444,6 +458,7 @@ export const fetchReservationById = async (reservationId) => {
     console.log(error);
   }
 };
+
 
 export const fetchDisabledDates = async (reservationId) => {
   try {
@@ -485,3 +500,4 @@ export const getCredentials = async() => {
     console.log(error);
   }
 }
+

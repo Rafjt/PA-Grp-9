@@ -2,9 +2,7 @@ import React, { useEffect, useState } from "react";
 import { BACK_URL, updateAnnonce } from "../services";
 import { Link } from "react-router-dom";
 import "./mesBiens.css";
-import Modal from 'react-modal';
 
-Modal.setAppElement('#root');
 
 const MesBiens = () => {
     const [annonces, setAnnonces] = useState([]);
@@ -22,31 +20,21 @@ const MesBiens = () => {
 
     }, []);
 
-    const handleEdit = (annonce) => {
-        setEditId(annonce.id);
-        setEditData(annonce);
-        setModalIsOpen(true);
+    // const handleEdit = (annonce) => {
+    //     setEditId(annonce.id);
+    //     setEditData(annonce);
+    //     setModalIsOpen(true);
+    // };
+
+    const handleClick = (annonceId) => {
+        sessionStorage.setItem('elementId', annonceId);
+        window.location.href = '/modifyBien'; // Navigate to the modify page
     };
 
-    const handleInputChange = (event) => {
-        setEditData({
-            ...editData,
-            [event.target.name]: event.target.value,
-        });
-    };
+    const tocalendar = () => {
+        window.location.href = '/calendarBailleurs';
+    }
 
-    const handleModify = () => {
-        setModalIsOpen(false); // Close the modal when modifications are done
-        setEditId(null);
-        setEditData({});
-        console.log(editData);
-        try {
-            updateAnnonce(editId, editData);
-
-        } catch (error) {
-            console.error(error);
-        }
-    };
 
     return (
         <div>
@@ -86,10 +74,6 @@ const MesBiens = () => {
                                             <tr style={{ borderBottom: '1px solid #ddd', padding: '8px' }}>
                                                 <td><strong>Description</strong></td>
                                                 <td>{annonce.description}</td>
-                                            </tr>
-                                            <tr style={{ borderBottom: '1px solid #ddd', padding: '8px' }}>
-                                                <td><strong>Statut validation</strong></td>
-                                                <td>{annonce.statutValidation}</td>
                                             </tr>
                                             <tr style={{ borderBottom: '1px solid #ddd', padding: '8px' }}>
                                                 <td><strong>Disponible</strong></td>
@@ -154,125 +138,14 @@ const MesBiens = () => {
                             <button>
                                 Supprimer
                             </button>
-                            <button onClick={() => handleEdit(annonce)}>Modifier</button>
+                            <button onClick={() => handleClick(annonce.id)}>Modifier</button>
                         </div>
                     ))}
             </div>
             <hr />
-            <Modal
-                isOpen={modalIsOpen}
-                onRequestClose={() => setModalIsOpen(false)} // This allows the modal to be closed when clicking outside of it
-            >
-                <h2 className="mb-3">Modifier l'annonce</h2>
-                <form>
-                <div className="mb-3">
-                <label htmlFor="cheminImg">Modifier l'image :</label>
-                    <input type="file" name="cheminImg" onChange={handleInputChange} />
-                    </div>
-                    <div className="mb-3">
-                        <label className="form-label">Ville</label>
-                        <select className="form-select mesBiensModal" name="ville" value={editData.ville} onChange={handleInputChange}>
-                            <option value="Paris">Paris</option>
-                            <option value="Nice">Nice</option>
-                            <option value="Biarritz">Biarritz</option>
-                        </select>
-                    </div>
-                    <div className="mb-3">
-                        <label className="form-label">Nom du bien</label>
-                        <input type="text" name="nomBien" value={editData.nomBien} onChange={handleInputChange} className="form-control mesBiensModal" />
-                    </div>
-                    <div className="mb-3">
-                        <label className="form-label">Adresse</label>
-                        <input type="text" name="adresse" value={editData.adresse} onChange={handleInputChange} className="form-control mesBiensModal" />
-                    </div>
-                    <div className="mb-3">
-                        <label className="form-label">Prix</label>
-                        <input type="number" name="prix" value={editData.prix} onChange={handleInputChange} className="form-control mesBiensModal" />
-                    </div>
-                    <div className="mb-3">
-                        <label className="form-label">Description</label>
-                        <textarea name="description" value={editData.description} onChange={handleInputChange} className="form-control mesBiensModal"></textarea>
-                    </div>
-                    <div className="mb-3">
-                        <label className="form-label">Type de propriété</label>
-                        <select className="form-select mesBiensModal">
-                            <option value="Maison">Maison</option>
-                            <option value="Appartement">Appartement</option>
-                            <option value="Maison d'hôtes">Maison d'hôtes</option>
-                            <option value="Hôtel">Hôtel</option>
-                        </select>
-                    </div>
-                    <div className="mb-3">
-                        <label className="form-label">Nombre de chambres</label>
-                        <input type="number" name="nombreChambres" value={editData.nombreChambres} onChange={handleInputChange} className="form-control mesBiensModal" />
-                    </div>
-                    <div className="mb-3">
-                        <label className="form-label">Nombre de lits</label>
-                        <input type="number" name="nombreLits" value={editData.nombreLits} onChange={handleInputChange} className="form-control mesBiensModal" />
-                    </div>
-                    <div className="mb-3">
-                        <label className="form-label">Nombre de salles de bain</label>
-                        <input type="number" name="nombreSallesDeBain" value={editData.nombreSallesDeBain} onChange={handleInputChange} className="form-control mesBiensModal" />
-                    </div>
-                    <div>
-                        <label className="form-label">Wifi</label>
-                        <select className="form-select mesBiensModal" name="wifi" value={editData.wifi} onChange={handleInputChange}>
-                            <option value="1">Oui</option>
-                            <option value="0">Non</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label className="form-label">Cuisine</label>
-                        <select className="form-select mesBiensModal" name="cuisine" value={editData.cuisine} onChange={handleInputChange}>
-                            <option value="1">Oui</option>
-                            <option value="0">Non</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label className="form-label">Balcon</label>
-                        <select className="form-select mesBiensModal" name="balcon" value={editData.balcon} onChange={handleInputChange}>
-                            <option value="1">Oui</option>
-                            <option value="0">Non</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label className="form-label">Jardin</label>
-                        <select className="form-select mesBiensModal" name="jardin" value={editData.jardin} onChange={handleInputChange}>
-                            <option value="1">Oui</option>
-                            <option value="0">Non</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label className="form-label">Parking</label>
-                        <select className="form-select mesBiensModal" name="parking" value={editData.parking} onChange={handleInputChange}>
-                            <option value="1">Oui</option>
-                            <option value="0">Non</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label className="form-label">Jaccuzzi</label>
-                        <select className="form-select mesBiensModal" name="jaccuzzi" value={editData.jaccuzzi} onChange={handleInputChange}>
-                            <option value="1">Oui</option>
-                            <option value="0">Non</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label className="form-label">Salle de sport</label>
-                        <select className="form-select mesBiensModal" name="salleDeSport" value={editData.salleDeSport} onChange={handleInputChange}>
-                            <option value="1">Oui</option>
-                            <option value="0">Non</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label className="form-label">Climatisation</label>
-                        <select className="form-select mesBiensModal" name="climatisation" value={editData.climatisation} onChange={handleInputChange}>
-                            <option value="1">Oui</option>
-                            <option value="0">Non</option>
-                        </select>
-                    </div>
-                    <button onClick={handleModify} className="btn btn-primary">Save</button>
-                </form>
-            </Modal>
+            <div>
+                <button className="btn btn-dark" onClick={tocalendar}>Calendrier d'occupation de vos biens</button>
+            </div>
         </div>
     );
 }
