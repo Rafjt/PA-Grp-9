@@ -66,12 +66,20 @@ router.delete("/users/:id/debannis", async (req, res) => {
 });
 
 router.delete("/users/:userType/:id", async (req, res) => {
-  const { id } = req.params;
-  const { userType } = req.params;
+  const { id, userType } = req.params;
 
   console.log("Deleting user:", id, userType);
 
   try {
+    if (userType === 'voyageurs') {
+      // Delete all reservations of the user
+      await sequelize.query(`DELETE FROM reservation WHERE id_ClientVoyageur = ${id}`);
+    } else if (userType === 'clientsBailleurs') {
+      // Delete all BienImo of the user
+      await sequelize.query(`DELETE FROM bienImo WHERE id_ClientBailleur = ${id}`);
+    }
+
+    // Delete the user
     await sequelize.query(`DELETE FROM ${userType} WHERE id = ${id}`);
     res.send("User deleted");
   } catch (error) {
