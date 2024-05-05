@@ -430,6 +430,7 @@ export const updateReservation = async (reservationId, reservationData) => {
     return data;
   } catch (error) {
     console.log(error);
+    console.log(`${URL_RESERVATION}/${reservationId}`);
   }
 };
 

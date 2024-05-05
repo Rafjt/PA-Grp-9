@@ -1,25 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import DatePicker from 'react-datepicker';
 import './gestionReservations.css';
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Link } from 'react-router-dom';
-import { fetchReservation, deleteReservation, updateReservation } from '../services';
+import { fetchReservation, deleteReservation, createReservation, updateReservation, fetchAnnonceById,fetchDisabledDates, fetchReservationById } from '../services';
 //import {UpdateReservation} from './updateReservation'
 
 const BACK_URL = "http://localhost:3001";
 
-/*const Popup = ({ onClose, reservation }) => {
-    return (
-        <div className="popup">
-            <div>
-                <p>Modifier la réservation pour: {reservation.nomBien}</p>
-                <button onClick={onClose}>Fermer</button>
-            </div>
-        </div>
-    );
-};
-*/
-
 const GestionReservations = () => {
+
     const [reservations, setReservations] = useState({
         voyageurs: [],
         clientsbailleurs: [],
@@ -28,7 +18,18 @@ const GestionReservations = () => {
     });  
 
     // recherche/filtrage
-    const [searchTerm, setSearchTerm] = useState('');
+   // const [searchTerm, setSearchTerm] = useState('');
+
+    const [searchId, setSearchId] = useState('');
+
+    const [reservationDetails, setReservationDetails] = useState(null);
+
+    const [message, setMessage] = useState('');
+
+    const [arrivee, setArrivee] = useState(new Date());
+    const [depart, setDepart] = useState(new Date());
+    const [disabledDates, setDisabledDates] = useState([]);
+    
 
     const [form, setForm] = useState({
      id_BienImmobilier: '',
@@ -40,9 +41,18 @@ const GestionReservations = () => {
      prix: '',
      nomBien: '',
      description: '',
-     cheminImg: ''
+     cheminImg: '',
+     wifi: 0,
+     cuisine: 0,
+     balcon: 0,
+     jardin: 0,
+     parking: 0,
+     piscine: 0,
+     jaccuzzi: 0,
+     salleDeSport: 0,
+     climatisation: 0
     });
-
+    
     useEffect(() => {
         fetch('http://localhost:3001/api/reservation')
             .then(response => response.json())
@@ -58,8 +68,9 @@ const GestionReservations = () => {
                     (reservation) => reservation.id !== reservationId
                 ));
             })
-            .catch((error) => console.error('Error deleting annonce:', error));
+            .catch((error) => console.error('Error deleting reservation:', error));
     };
+
 /*
     const handleModify = (e) => {
         const value = e.target.type === 'checkbox' ? (e.target.checked ? 1 : 0) : e.target.value;
@@ -70,9 +81,200 @@ const GestionReservations = () => {
     };
 */
     const handleSearch = (event) => {
-        setSearchTerm(event.target.value);
+        setSearchId(event.target.value);
     };
 
+    const handleCreateReservation = async () => {
+        if (!reservationDetails || !arrivee || !depart) {
+            setMessage("Veuillez compléter tous les champs requis.");
+            return;
+        }
+    
+        const reservationData = {
+            id_BienImmobilier: reservationDetails.id_BienImmobilier,
+            id_Voyageur: 'ID_DU_VOYAGEUR', // À remplacer par l'ID réel du client/voyageur
+            dateDebut: arrivee.toISOString().substring(0, 10), // format YYYY-MM-DD
+            dateFin: depart.toISOString().substring(0, 10), // format YYYY-MM-DD
+            prixTotal: calculateTotalPrice(reservationDetails.prix, arrivee, depart)
+        };
+    
+        try {
+            const response = await createReservation(reservationData);
+            console.log('Réponse de la création de réservation:', response);
+            setMessage("Réservation créée avec succès!");
+            // Ajoutez ici toute logique supplémentaire post-création
+        } catch (error) {
+            console.error("Erreur lors de la création de la réservation:", error);
+            setMessage("Échec de la création de la réservation.");
+        }
+    };
+    
+
+    /*
+    const handleFetchById = async () => {
+        if (searchId.trim() !== '') {
+            try {
+                const data = await fetchReservationById(searchId);
+                // Filtrer les réservations en fonction du statut
+                const filteredReservations = data.filter(reservation => reservation.statut === 'Disponible');
+                if (filteredReservations.length > 0) {
+                    setReservationDetails(filteredReservations[0]);
+                } else {
+                    setReservationDetails(null);
+                    console.log("Aucune réservation disponible trouvée pour cet ID.");
+                }
+            } catch (error) {
+                console.error("Erreur lors de la récupération de la réservation :", error);
+                setReservationDetails(null);
+            }
+        }
+    };
+
+    const handleFetchById = async () => {
+        if (searchId.trim() !== '') {
+            try {
+                const data = await fetchReservationById(searchId);
+                // Assurez-vous que la donnée est présente et est un tableau (si attendu)
+                if (data && Array.isArray(data)) {
+                    const filteredReservations = data.filter(reservation => reservation.statut === 'Disponible');
+                    if (filteredReservations.length > 0) {
+                        setReservationDetails(filteredReservations[0]);
+                    } else {
+                        console.log("Aucune réservation disponible trouvée pour cet ID.");
+                        setReservationDetails(null);
+                    }
+                } else if (data && data.statut === 'Disponible') { // Si c'est un objet et non un tableau
+                    setReservationDetails(data);
+                } else {
+                    console.log("Aucune réservation disponible ou donnée mal formée.");
+                    setReservationDetails(null);
+                }
+            } catch (error) {
+                console.error("Erreur lors de la récupération de la réservation :", error);
+                setReservationDetails(null);
+            }
+        }
+    };
+ 
+
+    const handleFetchById = async () => {
+        if (searchId.trim() !== '') {
+            try {
+                const data = await fetchReservationById(searchId);
+                if (data) {
+                    switch (data.statut) {
+                        case 'Disponible':
+                            setReservationDetails(data);
+                            setMessage('');
+                            break;
+                        case 'Pending':
+                            setReservationDetails(null);
+                            setMessage("Ce bien est déjà réservé.");
+                            break;
+                        default:
+                            setReservationDetails(null);
+                            setMessage("Cette réservation n'est pas disponible pour vos dates.");
+                            break;
+                    }
+                } else {
+                    setReservationDetails(null);
+                    setMessage("Aucun résultat pour cet ID.");
+                }
+            } catch (error) {
+                console.error("Erreur lors de la récupération de la réservation :", error);
+                setReservationDetails(null);
+                setMessage("Erreur lors de la récupération de la réservation.");
+            }
+        } else {
+            setMessage("Veuillez entrer un ID valide.");
+        }
+    };
+    
+
+  
+    const handleFetchById = async () => {
+        if (searchId.trim() !== '') {
+            try {
+                const data = await fetchReservationById(searchId);
+                if (data) {
+                    switch (data.statut) {
+                        case 'Disponible':
+                            setReservationDetails(data);
+                            const dates = await fetchDisabledDates(searchId);
+                            setDisabledDates(dates.map(date => new Date(date)));
+                            setMessage('');
+                            break;
+                        case 'Pending':
+                            setReservationDetails(null);
+                            setMessage("Ce bien est déjà réservé.");
+                            break;
+                        default:
+                            setReservationDetails(null);
+                            setMessage("Cette réservation n'est pas disponible pour vos dates.");
+                            break;
+                    }
+                } else {
+                    setReservationDetails(null);
+                    setMessage("Aucun résultat pour cet ID.");
+                }
+            } catch (error) {
+                console.error("Erreur lors de la récupération de la réservation :", error);
+                setReservationDetails(null);
+                setMessage("Erreur lors de la récupération de la réservation.");
+            }
+        } else {
+            setMessage("Veuillez entrer un ID valide.");
+        }
+    };
+    
+    */
+
+    const handleFetchById = async () => {
+        if (!searchId.trim()) {
+            setMessage("Veuillez entrer un ID valide.");
+            setReservationDetails(null);
+            return;
+        }
+    
+        try {
+            // D'abord, essayez de récupérer les détails du bien non encore réservé
+            const annonceData = await fetchAnnonceById(searchId);
+            if (annonceData) {
+                // Vérifiez si le bien est réservé et les dates ne sont pas disponibles
+                const disabledDatesData = await fetchDisabledDates(searchId);
+                if (disabledDatesData && disabledDatesData.length) {
+                    const isAvailable = !disabledDatesData.some(date =>
+                        new Date(date.dateDebut) <= new Date(depart) && new Date(date.dateFin) >= new Date(arrivee)
+                    );
+                    if (isAvailable) {
+                        setReservationDetails(annonceData);
+                        setMessage('');
+                    } else {
+                        setReservationDetails(null);
+                        setMessage("Ce bien est déjà réservé pour les dates sélectionnées.");
+                    }
+                } else {
+                    setReservationDetails(annonceData);
+                    setMessage('');
+                }
+            } else {
+                // Si aucun bien n'est trouvé, vérifiez s'il est dans les réservations en attente
+                const reservationData = await fetchReservationById(searchId);
+                if (reservationData) {
+                    setReservationDetails(null);
+                    setMessage(reservationData.statut === 'Pending' ? "Ce bien est déjà réservé." : "Cette réservation n'est pas disponible pour vos dates.");
+                } else {
+                    setReservationDetails(null);
+                    setMessage("Aucun résultat pour cet ID.");
+                }
+            }
+        } catch (error) {
+            console.error("Erreur lors de la récupération de la réservation :", error);
+            setReservationDetails(null);
+            setMessage("Erreur lors de la récupération de la réservation.");
+        }
+    };
+    
     const calculateTotalPrice = (price, startDate, endDate) => {
         const start = new Date(startDate);
         const end = new Date(endDate);
@@ -81,13 +283,106 @@ const GestionReservations = () => {
         return price * diffDays;
     };
 
+    const arr = new Date(form.dateDebut);
+    const dep = new Date(form.dateFin);
+
+    const diffTime = Math.abs(dep - arr);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const totalPrice = diffDays * form.prix;
+
     return (
         <div className="gestionReservations">
             <div className="greet">
                 <h1>Gestion des Réservations</h1>
                 <h2>Ici, vous pouvez consulter, créer, mettre à jour ou annuler des réservations</h2>
             </div>
-            <input type="text" placeholder="Rechercher" onChange={handleSearch} />
+
+            <div className='reservationCreate'>
+                <h2>Créer une réservation</h2>
+                <input
+                type="number"
+                placeholder="Saisir l'ID du bien"
+                onChange={handleSearch}
+                className='input'
+                id='searchBar'
+            />
+            <div>
+            <DatePicker
+            selected={arrivee}
+            onChange={date => setArrivee(date)}
+            selectsStart
+            startDate={arrivee}
+            endDate={depart}
+            minDate={new Date()}
+            excludeDates={disabledDates}
+            />
+            <DatePicker
+            selected={depart}
+            onChange={date => setDepart(date)}
+            selectsEnd
+            startDate={arrivee}
+            endDate={depart}
+            minDate={arrivee}
+            excludeDates={disabledDates}
+            />
+            </div>
+            <button type="button" onClick={handleFetchById}>Rechercher</button>
+            </div>
+
+            {reservationDetails ? (
+            <div className="reservationDetails">
+                <h3>Détails de la réservation :</h3>
+                <img className="photoDuBien" src={`${BACK_URL}/uploads/${reservationDetails.cheminImg}`} alt={reservationDetails.nomBien} />
+                <p>Nom du bien: {reservationDetails.nomBien}</p>
+                <p>Prix par nuit: {reservationDetails.prix}€</p>
+                <div className='equipments'>
+                    <h5>Équipements:</h5>
+                    <label>
+                    Wifi :
+                    <input type="checkbox" checked={reservationDetails.wifi === 1} disabled />
+                    </label>
+                    <label>
+                    Cuisine :
+                    <input type="checkbox" checked={reservationDetails.cuisine === 1} disabled />
+                    </label>
+                    <label>
+                    Balcon :
+                    <input type="checkbox" checked={reservationDetails.balcon === 1} disabled />
+                    </label>
+                    <label>
+                    Jardin :
+                    <input type="checkbox" checked={reservationDetails.jardin === 1} disabled />
+                    </label>
+                    <label>
+                    Parking :
+                    <input type="checkbox" checked={reservationDetails.parking === 1} disabled />
+                    </label>
+                    <label>
+                    Piscine :
+                    <input type="checkbox" checked={reservationDetails.piscine === 1} disabled />
+                    </label>
+                    <label>
+                    Jaccuzzi :
+                    <input type="checkbox" checked={reservationDetails.jaccuzzi === 1} disabled />
+                    </label>
+                    <label>
+                    Salle de Sport :
+                    <input type="checkbox" checked={reservationDetails.salleDeSport === 1} disabled />
+                    </label>
+                    <label>
+                    Climatisation :
+                    <input type="checkbox" checked={reservationDetails.climatisation === 1} disabled />
+                    </label>
+                </div>
+                <button className="btn btn-dark" onClick={handleCreateReservation}>Réserver</button>
+            </div>
+        ) : message && (
+            <p className="errorMessage">{message}</p>
+        )}
+
+        <hr></hr>
+        <h1>Réservations effectuées</h1>
+
             <div className="reservationsContainer">
                 {Object.values(reservations)
                     .flat()
@@ -99,88 +394,17 @@ const GestionReservations = () => {
                     
                     .map(reservation => (
                         <div key={reservation.id} className="reservation">
-                        <h3>Votre réservation : </h3>
-                        <img src={`${BACK_URL}/uploads/${reservation.cheminImg}`} alt={reservation.nomBien} className='img' />
-                        <p>ID du Bien Immobilier : {reservation.id_BienImmobilier}, {reservation.nomBien}</p>
+                        <h3>Votre réservation : {reservation.nomBien}</h3>
+                        <img className="photoDuBien" src={`${BACK_URL}/uploads/${reservation.cheminImg}`} alt={reservation.nomBien} />
+                        <p>ID du Bien Immobilier : {reservation.id_BienImmobilier}</p>
                         <p>ID du Client voyageur : {reservation.id_ClientVoyageur}</p>
                         <h3>Prix par nuit: {reservation.prix}€</h3>
                         <p>Statut : {reservation.statut}</p>
                         <input type="date" name="dateDebut" value={reservation.dateDebut}/>
                         <input type="date" name="dateFin" value={reservation.dateFin} />
+                        <p>Total: <strong>{Math.ceil(Math.abs(depart - arrivee) / (1000 * 60 * 60 * 24)) * reservation.prix}€</strong> pour {Math.ceil(Math.abs(depart - arrivee) / (1000 * 60 * 60 * 24))} nuits</p>
                         <div className='equipments'>    
                         <h5>Équipements</h5>
-                        <label>
-                            Wifi:
-                            <input 
-                                type="checkbox" 
-                                checked={reservation.wifi === 1} 
-                                disabled={true}
-                            />
-                        </label>
-                        <label>
-                            Cuisine:
-                            <input 
-                                type="checkbox" 
-                                checked={reservation.cuisine === 1} 
-                                disabled={true}
-                            />
-                        </label>
-                        <label>
-                            Balcon : 
-                            <input 
-                                type="checkbox" 
-                                checked={reservation.balcon === 1} 
-                                disabled={true}
-                            />
-                        </label>
-                        <label>
-                            Jardin :
-                            <input 
-                                type="checkbox" 
-                                checked={reservation.jardin === 1} 
-                                disabled={true}
-                            />
-                        </label>
-                        <label>
-                            Parking :
-                            <input 
-                                type="checkbox" 
-                                checked={reservation.parking === 1} 
-                                disabled={true}
-                            />
-                        </label>
-                        <label>
-                            Piscine :
-                            <input 
-                                type="checkbox" 
-                                checked={reservation.piscine === 1} 
-                                disabled={true}
-                            />
-                        </label>
-                        <label>
-                            Jaccuzzi:
-                            <input 
-                                type="checkbox" 
-                                checked={reservation.jaccuzzi === 1} 
-                                disabled={true}
-                            />
-                        </label>
-                        <label>
-                            Salle de sport :
-                            <input 
-                                type="checkbox" 
-                                checked={reservation.salleDeSport === 1} 
-                                disabled={true}
-                            />
-                        </label>
-                        <label>
-                            Climatisation :
-                            <input 
-                                type="checkbox" 
-                                checked={reservation.climatisation === 1} 
-                                disabled={true}
-                            />
-                        </label>
                     </div>
                     <br />
                         <Link to={{

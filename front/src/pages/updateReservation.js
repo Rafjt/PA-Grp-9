@@ -12,14 +12,12 @@ const UpdateReservation = () => {
 
     const [reservationData, setReservationData] = useState(null);
     const [values, setValues] = useState({
-        formuleDejeuner: false,
-        mobilierSupp: false,
         dateDebut: '',
         dateFin: ''
     });
 
     const [loading, setLoading] = useState(true);
-
+/*
     useEffect(() => {
         fetch(`http://localhost:3001/api/bienimo/${id}`)
             .then((response) => response.json())
@@ -35,7 +33,7 @@ const UpdateReservation = () => {
                 }
             });
     }, [id, loading]);
-
+*/
     const hasFormChanged = () => {
         return JSON.stringify(values) !== JSON.stringify(initialValues);
     }
@@ -62,13 +60,17 @@ const UpdateReservation = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const data = await updateReservation(id, values);
-            console.log('Update successful:', data);
+            const updatedData = await updateReservation(id, {
+                ...values,
+                dateDebut: values.dateDebut,
+                dateFin: values.dateFin,
+            });
+            console.log('Update successful:', updatedData);
         } catch (error) {
             console.error('Error updating reservation:', error);
         }
     };
-
+/*
     const fetchData = async () => {
         try {
             const data = await fetchReservationById(id);
@@ -79,6 +81,28 @@ const UpdateReservation = () => {
         }
     };
 
+*/
+
+const fetchData = async () => {
+    try {
+        const data = await fetchReservationById(id);
+        if (data) {
+            console.log(data);
+            setReservationData(data);
+            setValues({
+                ...values,
+                dateDebut: data.dateDebut,
+                dateFin: data.dateFin
+            });
+            setInitialValues({
+                dateDebut: data.dateDebut,
+                dateFin: data.dateFin
+            });
+        }
+    } catch (error) {
+        console.log(error);
+    }
+};
 
     useEffect(() => {
         fetchData();
@@ -97,7 +121,7 @@ const UpdateReservation = () => {
                                 <input
                                     type="checkbox"
                                     name="mobilierSupp"
-                                    checked={values.mobilierSupp}
+                                    //checked={values.mobilierSupp}
                                     onChange={handleChange}
                                 />
                             </label>
@@ -107,7 +131,7 @@ const UpdateReservation = () => {
                                 <input
                                     type="checkbox"
                                     name="formuleDejeuner"
-                                    checked={values.formuleDejeuner}
+                                    //checked={values.formuleDejeuner}
                                     onChange={handleChange}
                                 />
                             </label>
