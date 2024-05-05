@@ -31,6 +31,7 @@ import ModifyBien from "./pages/modifyBien.js";
 import CalendarBailleurs from "./pages/calendarBailleurs.js";
 import ReserverBien from "./pages/reserverBien.js";
 import PagePaiement from "./pages/pagePaiement.js";
+import EspaceVoyageur from "./pages/espaceVoyageur.js";
 // import { use } from "../../back/routes/auth.js";
 
 function ProtectedRoute({ component: Component }) {
@@ -134,6 +135,7 @@ function App() {
           <Route path="/pagePaiement" element={ <ProtectedAuthRoute path="/pagePaiement" component={PagePaiement} authType="all"/>} />
           {/* Routes Authent Voyageur*/}
           <Route path="/Reservation" element={<ProtectedAuthRoute path="/reserverBien" component={ReserverBien} authType="voyageurs" />} />
+          <Route path="/EspaceVoyageur" element={<ProtectedAuthRoute path="/espaceVoyageur" component={EspaceVoyageur} authType="voyageurs" />} />
           {/* Routes Authent CLientsBailleurs*/}
           <Route path="/espaceBailleur" element={<ProtectedAuthRoute path="/espaceBailleur" component={EspaceBailleur} authType="clientsBailleurs" />} />
           <Route path="/mesBiens" element={<ProtectedAuthRoute path="/mesBiens" component={MesBiens} authType="clientsBailleurs" />} />
