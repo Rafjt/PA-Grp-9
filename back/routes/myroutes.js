@@ -599,7 +599,7 @@ router.delete('/reservation/:id', async (req, res) => {
 
   try {
       await sequelize.query(`DELETE FROM reservation WHERE id = ${id}`);
-      res.send('Rservation deleted');
+      res.send('Reservation deleted');
   } catch (error) {
       console.error('Error deleting reservation:', error);
       res.status(500).send('Failed to delete reservation');
@@ -635,6 +635,52 @@ router.post('/reservation', async (req, res) => {
   res.send('Reservation created');
 });
 
+/*
+router.put("/reservation/:id", async (req, res) => {
+  console.log("Modifying reservation :", req.body);
+  const { id } = req.params;
+  const {
+    dateDebut,
+    dateFin,
+    statut,
+  } = req.body;
+
+  try {
+    await sequelize.query(
+      `UPDATE reservation SET dateDebut = '${dateDebut}', dateFin = '${dateFin}', statut = '${statut}' WHERE id = ${id}`
+    );
+  } catch (error) {
+    console.error("Error modifying reservation :", error);
+  }
+
+  res.send("Reservation successfully updated");
+});
+
+*/
+
+router.put('/reservation/:id', async (req, res) => {
+  const { id } = req.params;
+  const { dateDebut, dateFin } = req.body;
+
+  try {
+      await sequelize.query(`
+          UPDATE reservation SET
+          dateDebut = ${dateDebut},
+          dateFin = ${dateFin}
+          WHERE id = ${id}
+      `, {
+          replacements: {
+              id,
+              dateDebut,
+              dateFin,
+          }
+      });
+      res.json({ success: true, message: 'Reservation updated successfully' });
+  } catch (error) {
+      console.error('Failed to update reservation', error);
+      res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
 
 
 // GESTION DES PAIEMENTS
