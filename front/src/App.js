@@ -29,6 +29,8 @@ import { getCredentials } from "./services.js";
 import { useState } from "react";
 import ModifyBien from "./pages/modifyBien.js";
 import CalendarBailleurs from "./pages/calendarBailleurs.js";
+import ReserverBien from "./pages/reserverBien.js";
+import PagePaiement from "./pages/pagePaiement.js";
 // import { use } from "../../back/routes/auth.js";
 
 function ProtectedRoute({ component: Component }) {
@@ -129,7 +131,9 @@ function App() {
 
           {/* Routes Authent ALL*/}
           <Route path="/userProfile" element={ <ProtectedAuthRoute path="/userProfile" component={UserProfile} authType="all"/>} />
+          <Route path="/pagePaiement" element={ <ProtectedAuthRoute path="/pagePaiement" component={PagePaiement} authType="all"/>} />
           {/* Routes Authent Voyageur*/}
+          <Route path="/Reservation" element={<ProtectedAuthRoute path="/reserverBien" component={ReserverBien} authType="voyageurs" />} />
           {/* Routes Authent CLientsBailleurs*/}
           <Route path="/espaceBailleur" element={<ProtectedAuthRoute path="/espaceBailleur" component={EspaceBailleur} authType="clientsBailleurs" />} />
           <Route path="/mesBiens" element={<ProtectedAuthRoute path="/mesBiens" component={MesBiens} authType="clientsBailleurs" />} />
