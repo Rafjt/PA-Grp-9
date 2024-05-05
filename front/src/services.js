@@ -186,7 +186,25 @@ export const login = async (email, password, type) => {
   } catch (error) {
     throw error;
   }
-}
+};
+
+export const updateCookie = async (userId, userType, userData) => {
+  try {
+    const response = await fetch(`${URL_AUTH}/updateCookie`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ userId, userType, userData }),
+      credentials: 'include',
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error updating cookie:", error);
+    throw error; // Rethrow the error to be handled by the caller
+  }
+};
 
 // GESTION DES ANNONCES
 

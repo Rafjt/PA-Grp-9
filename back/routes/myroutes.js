@@ -182,21 +182,35 @@ router.post("/users/code/:code", async (req, res) => {
   }
 });
 
-
 router.put("/users/:id/:type", async (req, res) => {
   console.log("Modifying user:", req.body);
   const { id, type } = req.params;
-  const { nom, prenom, adresseMail, motDePasse, dateDeNaissance,admin } = req.body;
-  console.log("date de naissance est :", dateDeNaissance);
+  const { nom, prenom, adresseMail, motDePasse, dateDeNaissance, admin } = req.body;
+
+  // Create an array to hold the fields to be updated
+  const fieldsToUpdate = [
+    `nom = '${nom}'`,
+    `prenom = '${prenom}'`,
+    `adresseMail = '${adresseMail}'`,
+    `dateDeNaissance = '${dateDeNaissance}'`,
+    `admin = '${admin}'`
+  ];
+
+  // Conditionally include the password field in the update query
+  if (motDePasse !== undefined) {
+    fieldsToUpdate.push(`motDePasse = '${motDePasse}'`);
+  }
+
   try {
     await sequelize.query(
-      `UPDATE ${type} SET nom = '${nom}', prenom = '${prenom}', adresseMail = '${adresseMail}',dateDeNaissance = '${dateDeNaissance}', motDePasse = '${motDePasse}', admin = '${admin}' WHERE id = ${id}`
+      `UPDATE ${type} SET ${fieldsToUpdate.join(', ')} WHERE id = ${id}`
     );
   } catch (error) {
     console.error("Error modifying user:", error);
   }
   res.send("User modified");
 });
+
 
 router.post("/users/bannir/vatefaireenculer/:id/:type", async (req, res) => {
   console.log("Modifying user:", req.body);

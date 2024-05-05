@@ -26,10 +26,10 @@ const Prompt = ({ message, onConfirm, onCancel }) => {
           <div className="prompt-message">{message}</div>
           <div className="prompt-buttons">
             <button className="prompt-confirm" onClick={handleConfirm}>
-              Confirm
+              Confirmer
             </button>
             <button className="prompt-cancel" onClick={handleCancel}>
-              Cancel
+              Annuler
             </button>
           </div>
         </div>
