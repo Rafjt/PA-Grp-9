@@ -28,7 +28,8 @@ const ViewBien = () => {
 
     const handleReserve = () => {
         sessionStorage.setItem('price', data.prix);
-        navigate('/reservation', { state: { id, arrivee, depart, prix: data.prix } });
+        sessionStorage.setItem('pId', data.productId);
+        navigate('/reservation', { state: { id, arrivee, depart, prix: data.prix,pId: data.productId } });
     };
 
 
