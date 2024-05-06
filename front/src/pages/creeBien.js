@@ -1,10 +1,12 @@
 import React, { useEffect } from "react";
-import { createAnnonce } from "../services";
+import { createAnnonce } from "../services";import { Modal, Button } from 'react-bootstrap';
 
 function CreeBien() {
 
     const [data, setData] = React.useState({});
     const [annonces, setAnnonces] = React.useState([]);
+    const [showModal, setShowModal] = React.useState(false);
+    const [modalMessage, setModalMessage] = React.useState('');
 
     const [form, setForm] = React.useState({
         id_ClientBailleur: null,
@@ -60,22 +62,78 @@ function CreeBien() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // Vérification de base des entrées
+        if (!form.nomBien.trim()) {
+            setModalMessage('Veuillez entrer le nom de la propriété.');
+            setShowModal(true);
+            return;
+        }
+
+        if (!form.description.trim()) {
+            setModalMessage('Veuillez entrer une description.');
+            setShowModal(true);
+            return;
+        }
+
+        if (!form.prix || isNaN(form.prix) || form.prix <= 0) {
+            setModalMessage('Veuillez entrer un prix valide.');
+            setShowModal(true);
+            return;
+        }
+
+        if (!form.adresse.trim()) {
+            setModalMessage('Veuillez entrer une adresse.');
+            setShowModal(true);
+            return;
+        }
+
+        if (!form.nombreChambres || isNaN(form.nombreChambres) || form.nombreChambres <= 0) {
+            setModalMessage('Veuillez entrer un nombre valide de chambres.');
+            setShowModal(true);
+            return;
+        }
+
+        if (!form.nombreLits || isNaN(form.nombreLits) || form.nombreLits <= 0) {
+            setModalMessage('Veuillez entrer un nombre valide de lits.');
+            setShowModal(true);
+            return;
+        }
+
+        if (!form.nombreSallesDeBain || isNaN(form.nombreSallesDeBain) || form.nombreSallesDeBain <= 0) {
+            setModalMessage('Veuillez entrer un nombre valide de salles de bain.');
+            setShowModal(true);
+            return;
+        }
+
+        // Si toutes les vérifications passent, procéder à la soumission du formulaire
         console.log('form:', form);
         try {
             const data = await createAnnonce({
                 ...form,
             });
             setAnnonces([...annonces, data]);
-            console.log('Annonce created:', data);
+            console.log('Annonce créée:', data);
             console.log(data);
         } catch (error) {
-            console.error('Error creating annonce:', error);
+            console.error('Erreur lors de la création de l\'annonce:', error);
         }
     };
 
-    
+
     return (
         <div>
+            <Modal show={showModal} onHide={() => setShowModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Alert</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>{modalMessage}</Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowModal(false)}>
+                        Close
+                    </Button>
+                </Modal.Footer>
+            </Modal>
             <form onSubmit={handleSubmit}>
                 <div className="createAnnonce">
                     <h2>Ajouter une annonce</h2>
