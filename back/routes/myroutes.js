@@ -9,6 +9,22 @@ const { exec } = require("child_process");
 const mailRoute = require("./mailCode");
 const { Console } = require("console");
 router.use("/mail", mailRoute);
+const { STRIPE_PUBLIC_KEY, STRIPE_SECRET_KEY } = require('../credsStripe.js');
+const stripe = require('stripe')(STRIPE_SECRET_KEY);
+const URL = 'http://localhost:3000';
+
+stripe.products.list(
+  { limit: 10 },
+  function(err, products) {
+    // asynchronously called
+    if (err) {
+      console.error('Error fetching products:', err);
+    } else {
+      console.log('Fetched products:', products);
+    }
+  }
+);
+
 
 router.get('/users/mean-age', async (req, res) => {
   try {
@@ -355,9 +371,26 @@ router.post('/bienImo', upload.single('pictures'), async (req, res) => {
   const newDescription = description.replace(/'/g, "''");
 
   try {
+
+    const product = await stripe.products.create({
+      name: nomBien,
+      description: newDescription,
+    });
+
+    // Create a Stripe price
+    const stripePrice = await stripe.prices.create({
+      unit_amount: prix * 100, // The price in cents
+      currency: 'usd', // The currency of the price
+      product: product.id, // The ID of the product this price is associated with
+    });
+
+    console.log('Stripe product created with ID:', product.id);
+    console.log('Stripe price created with ID:', stripePrice.id);
+
     await sequelize.query(
-      `INSERT INTO bienImo (nomBien, description, id_ClientBailleur, statutValidation, prix, disponible, typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation, cheminImg, ville, adresse) VALUES ('${nomBien}', '${newDescription}', '${id_ClientBailleur}', '0', '${prix}', '${disponible}', '${typeDePropriete}', '${nombreChambres}', '${nombreLits}', '${nombreSallesDeBain}', '${wifi}', '${cuisine}', '${balcon}', '${jardin}', '${parking}', '${piscine}', '${jaccuzzi}', '${salleDeSport}', '${climatisation}', '${pictures}', '${ville}', '${adresse}')`
+      `INSERT INTO bienImo (nomBien, description, id_ClientBailleur, statutValidation, prix, disponible, typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation, cheminImg, ville, adresse, productId) VALUES ('${nomBien}', '${newDescription}', '${id_ClientBailleur}', '0', '${prix}', '${disponible}', '${typeDePropriete}', '${nombreChambres}', '${nombreLits}', '${nombreSallesDeBain}', '${wifi}', '${cuisine}', '${balcon}', '${jardin}', '${parking}', '${piscine}', '${jaccuzzi}', '${salleDeSport}', '${climatisation}', '${pictures}', '${ville}', '${adresse}','${stripePrice.id}')`
     );
+
   } catch (error) {
     console.error('Error creating bien:', error);
     return res.status(500).send('Error creating bien');
@@ -782,4 +815,28 @@ router.get('/biens', async (req, res) => {
   const { user } = req.session;
   const [bienImo] = await sequelize.query(`SELECT * FROM bienImo WHERE id_ClientBailleur = ${user.id}`);
   res.send(bienImo);
+});
+
+router.post('/create-checkout-session', async (req, res) => {
+  const { pId, numberOfNights } = req.body;
+  console.log('Creating checkout session with price ID:', pId, 'and quantity:', numberOfNights);
+  
+  try {
+    const session = await stripe.checkout.sessions.create({
+      line_items: [
+        {
+          price: pId,
+          quantity: numberOfNights,
+        },
+      ],
+      mode: 'payment',
+      success_url: `${URL}/pagePaiement?success=true`,
+      cancel_url: `${URL}/pagePaiement?canceled=true`,
+    });
+
+    res.json({ url: session.url });
+  } catch (error) {
+    console.error('Error creating checkout session:', error);
+    res.status(500).send({ error: 'An error occurred while creating the checkout session.' });
+  }
 });

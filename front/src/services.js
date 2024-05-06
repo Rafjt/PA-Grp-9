@@ -500,4 +500,3 @@ export const getCredentials = async() => {
     console.log(error);
   }
 }
-

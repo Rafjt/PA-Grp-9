@@ -1,0 +1,2 @@
+module.exports.STRIPE_PUBLIC_KEY = 'pk_test_51PD6GWRxWnuK618zp8SXz0Hci3LHFWz6gj237bnc7ab4XulaKOUOVfchaVHjX7bVeX0k1KJMhPff5PMQqvyEl1WO00oGdfBcp4';
+module.exports.STRIPE_SECRET_KEY = 'sk_test_51PD6GWRxWnuK618zyi15yTa0vzLWwpF47BYwzG1P9bSYt2VIFtOH6prr1qXmD217QCrqmIyYiZxcinNheL0ynG3V00Myh3Ct0N';
