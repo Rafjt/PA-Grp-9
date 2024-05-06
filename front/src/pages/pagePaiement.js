@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const PagePaiement = () => {
     const [totalCost, setTotalCost] = useState(0);
@@ -10,6 +10,7 @@ const PagePaiement = () => {
     const [price, setPrice] = useState(0);
 
     const location = useLocation();
+    const navigate = useNavigate();
     const params = new URLSearchParams(location.search);
     const success = params.get('success');
     const canceled = params.get('canceled');
@@ -49,7 +50,14 @@ const PagePaiement = () => {
         .catch((error) => {
             console.error('Error:', error);
         });
-    }, []);
+
+        // Redirect to another page after 2 seconds
+        if (success === 'true' || canceled === 'true') {
+            setTimeout(() => {
+                navigate('/another-page'); // Replace '/another-page' with the path of the page you want to redirect to
+            }, 2000);
+        }
+    }, [success, canceled]);
 
     return (
         <div>
