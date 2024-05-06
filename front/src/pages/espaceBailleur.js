@@ -21,6 +21,11 @@ function EspaceBailleur() {
         window.location.href = "/MesBiens";
     }
 
+    const toCreeBien = () => {
+        console.log("CreeBien");
+        window.location.href = "/creeBien";
+    }
+
     return (
         <div>
             <img src="/paris-tour-eiffel.jpg" alt="bailleur" className="banBailleur" />
@@ -33,7 +38,7 @@ function EspaceBailleur() {
                 <button className="grid-button">
                     MES DOCUMENTS ADMINISTRATIF ET PAIEMENTS
                 </button>
-                <button className="grid-button">
+                <button className="grid-button"  onClick={toCreeBien}>
                     METTRE EN LOCATION UN BIEN
                 </button>
                 <button className="grid-button">
