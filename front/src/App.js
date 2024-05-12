@@ -34,6 +34,8 @@ import PagePaiement from "./pages/pagePaiement.js";
 import EspaceVoyageur from "./pages/espaceVoyageur.js";
 import CreeBien from "./pages/creeBien.js";
 import EspaceDiscussion from "./pages/espaceDiscussion.js";
+import EspacePrestataire from "./pages/espacePrestataire.js";
+import Prestations from "./pages/prestations.js";
 // import { use } from "../../back/routes/auth.js";
 
 function ProtectedRoute({ component: Component }) {
@@ -135,6 +137,7 @@ function App() {
           <Route path="/userProfile" element={ <ProtectedAuthRoute path="/userProfile" component={UserProfile} authType="all"/>} />
           <Route path="/pagePaiement" element={ <ProtectedAuthRoute path="/pagePaiement" component={PagePaiement} authType="all"/>} />
           <Route path="/espaceDiscussion" element={ <ProtectedAuthRoute path="/espaceDiscussion" component={EspaceDiscussion} authType="all"/>} />
+          <Route path="/prestations" element={<ProtectedAuthRoute path="/prestations" component={Prestations} authType="all" />} />
           {/* Routes Authent Voyageur*/}
           <Route path="/Reservation" element={<ProtectedAuthRoute path="/reserverBien" component={ReserverBien} authType="voyageurs" />} />
           <Route path="/EspaceVoyageur" element={<ProtectedAuthRoute path="/espaceVoyageur" component={EspaceVoyageur} authType="voyageurs" />} />
@@ -145,7 +148,7 @@ function App() {
           <Route path="/calendarBailleurs" element={<ProtectedAuthRoute path="/calendarBailleurs" component={CalendarBailleurs} authType="clientsBailleurs" />} />
           <Route path="/creeBien" element={<ProtectedAuthRoute path="/creeBien" component={CreeBien} authType="clientsBailleurs" />} />
           {/* Routes Authent Prestataires*/}
-
+          <Route path="/espacePrestataire" element={<ProtectedAuthRoute path="/espacePrestataire" component={EspacePrestataire} authType="prestataires" />} />
           {/* Routes admin */}
           <Route path="/backOffice" element={<ProtectedRoute component={BackOffice} />} />
           <Route path="/update/:id/:type" element={<ProtectedRoute component={Update} />} />

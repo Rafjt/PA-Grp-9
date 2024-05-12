@@ -17,18 +17,19 @@ const EventComponent = ({ event }) => (
 
 const MyCalendar = () => {
     const [events, setEvents] = useState([]);
+    const [selectedEvent, setSelectedEvent] = useState(null); // Add this line
 
     useEffect(() => {
         const fetchEvents = async () => {
             try {
                 const data = await fetchReservationByBailleur();
+                console.log(data);
                 const formattedEvents = data.map((reservation) => ({
                     title: reservation.nomBien,
                     start: new Date(reservation.dateDebut),
                     end: new Date(reservation.dateFin),
                     statut: reservation.statut,
                     prix: reservation.prix,
-                    // Add more fields as needed
                 }));
                 setEvents(formattedEvents);
             } catch (error) {
@@ -46,10 +47,19 @@ const MyCalendar = () => {
                 events={events}
                 startAccessor="start"
                 endAccessor="end"
+                onSelectEvent={event => setSelectedEvent(event)} // Add this line
                 components={{
                     event: EventComponent,
                 }}
             />
+            {selectedEvent && ( // Add this block
+                <div>
+                    <strong>{selectedEvent.title}</strong>
+                    <p>{selectedEvent.statut}</p>
+                    <p>{selectedEvent.prix}</p>
+                    <p>{selectedEvent.description}</p>
+                </div>
+            )}
         </div>
     );
 };

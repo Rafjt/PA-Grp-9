@@ -360,6 +360,13 @@ router.delete('/bienImo/:id', async (req, res) => {
   console.log('trying to delete bien:', id, 'with cheminImg:', cheminImg);
 
   try {
+    await sequelize.query(`DELETE FROM reservation WHERE id_BienImmobilier = ${id}`);
+  } catch (error) {
+    console.error('Error deleting reservations:', error);
+    res.status(500).send('Failed to delete reservations');
+  }
+
+  try {
     await sequelize.query(`DELETE FROM bienImo WHERE id = ${id}`);
     res.send("Bien deleted");
   } catch (error) {
@@ -653,8 +660,17 @@ router.get('/reservation/:id/dates', async (req, res) => {
 router.post('/reservation', async (req, res) => {
   const { id_BienImmobilier, id_Voyageur, dateDebut, dateFin, prixTotal } = req.body;
   console.log('Creating reservation:', req.body);
+  let nomBien;
+  try  {
+    const result = await sequelize.query(`SELECT nomBien FROM bienImo WHERE id = ${id_BienImmobilier}`);
+    nomBien = result[0][0].nomBien; // Extract nomBien from the result set
+  }
+  catch (error) {
+    console.error('Error fetching bien:', error);
+    return res.status(500).send('Failed to fetch bien');
+  }
   try {
-    await sequelize.query(`INSERT INTO reservation (id_BienImmobilier, id_ClientVoyageur, dateDebut, dateFin, prix) VALUES ('${id_BienImmobilier}', '${id_Voyageur}', '${dateDebut}', '${dateFin}', '${prixTotal}')`);
+    await sequelize.query(`INSERT INTO reservation (id_BienImmobilier, id_ClientVoyageur, dateDebut, dateFin, prix, nomBien) VALUES ('${id_BienImmobilier}', '${id_Voyageur}', '${dateDebut}', '${dateFin}', '${prixTotal}','${nomBien}')`);
   }
   catch (error) {
     console.error('Error creating reservation:', error);
@@ -662,7 +678,6 @@ router.post('/reservation', async (req, res) => {
   }
   res.send('Reservation created');
 });
-
 /*
 router.put("/reservation/:id", async (req, res) => {
   console.log("Modifying reservation :", req.body);

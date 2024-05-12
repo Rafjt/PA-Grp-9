@@ -66,7 +66,7 @@ const Header = () => {
     } else if (userType === "clientsBailleurs") {
       return "/espaceBailleur";
     } else if (userType === "prestataires") {
-      return "/acceuil";
+      return "/espacePrestataire";
     } else {
       // Handle default case, e.g., return a generic URL
       return "/acceuil";
