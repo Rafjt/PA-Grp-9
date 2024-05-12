@@ -56,9 +56,8 @@ const PagePaiement = () => {
             if (success === 'true' && data) {
                 const convertDate = (inputFormat) => {
                     let parts = inputFormat.split("/");
-                    return new Date(parts[2], parts[1] - 1, parts[0]).toISOString().split('T')[0];
+                    return new Date(Date.UTC(parts[2], parts[1] - 1, parts[0])).toISOString().split('T')[0];
                 }
-
                 // Call createReservation after the checkout session is successful
                 const reservationData = {
                         id_BienImmobilier: id,
@@ -67,6 +66,8 @@ const PagePaiement = () => {
                         dateFin: convertDate(depart),
                         prixTotal: totalCost
                 };
+                console.log(reservationData.dateDebut);
+                console.log(reservationData.dateFin);
                 createReservation(reservationData)
                     .then(reservationResponse => {
                         console.log('Reservation created:', reservationResponse);

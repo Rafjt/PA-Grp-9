@@ -12,6 +12,10 @@ function EspaceVoyageur() {
     window.location.replace("/Biens");
   };
 
+  const toPrestations = () => {
+    window.location.replace("/prestations");
+  }
+
   return (
     <div>
       <img
@@ -31,7 +35,7 @@ function EspaceVoyageur() {
         <button className="grid-button" onClick={toLouerBien}>
           LOUER UN BIEN
         </button>
-        <button className="grid-button">LOUER OU SUIVRE UN SERVICE</button>
+        <button className="grid-button" onClick={toPrestations}>LOUER OU SUIVRE UN SERVICE</button>
       </div>
     </div>
   );
