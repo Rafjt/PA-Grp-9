@@ -13,17 +13,17 @@ const { STRIPE_PUBLIC_KEY, STRIPE_SECRET_KEY } = require('../credsStripe.js');
 const stripe = require('stripe')(STRIPE_SECRET_KEY);
 const URL = 'http://localhost:3000';
 
-stripe.products.list(
-  { limit: 10 },
-  function(err, products) {
-    // asynchronously called
-    if (err) {
-      console.error('Error fetching products:', err);
-    } else {
-      console.log('Fetched products:', products);
-    }
-  }
-);
+// stripe.products.list(
+//   { limit: 10 },
+//   function(err, products) {
+//     // asynchronously called
+//     if (err) {
+//       console.error('Error fetching products:', err);
+//     } else {
+//       console.log('Fetched products:', products);
+//     }
+//   }
+// );
 
 
 router.get('/users/mean-age', async (req, res) => {
@@ -152,6 +152,21 @@ router.get("/users", async (req, res) => {
   res.send({ voyageurs, clientsBailleurs, prestataires });
 });
 
+router.get('/users/bailleurs', async (req, res) => {
+  const [clientsBailleurs] = await sequelize.query('SELECT * FROM clientsBailleurs');
+  res.send(clientsBailleurs);
+});
+
+router.get('/users/prestataires', async (req, res) => {
+  const [prestataires] = await sequelize.query('SELECT * FROM prestataires');
+  res.send(prestataires);
+});
+
+router.get('/users/voyageurs', async (req, res) => {
+  const [voyageurs] = await sequelize.query('SELECT * FROM voyageurs');
+  res.send(voyageurs);
+});
+
 router.get("/users/:id/:type", async (req, res) => {
   console.log("route /users/:id called");
   const id = req.params.id;
@@ -222,7 +237,8 @@ router.put("/users/:id/:type", async (req, res) => {
 
   // Conditionally include the password field in the update query
   if (motDePasse !== undefined) {
-    fieldsToUpdate.push(`motDePasse = '${motDePasse}'`);
+    const hashedPassword = await bcrypt.hash(motDePasse, 10); // Hash the password
+    fieldsToUpdate.push(`motDePasse = '${hashedPassword}'`);
   }
 
   try {
@@ -262,6 +278,18 @@ router.get("/users/bannis", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch banned users" });
   }
 });
+
+router.get("/users/infos", async (req, res) => {
+  const { user } = req.session;
+  try {
+    const [userInfo] = await sequelize.query(`SELECT * FROM ${user.type} WHERE id = ${user.id}`);
+    res.json(userInfo[0]);
+  } catch (error) {
+    console.error("Error fetching user info:", error);
+    res.status(500).json({ error: "Failed to fetch user info" });
+  }
+});
+
 
 // GESTION DES BIENS/ANNONCES
 
@@ -626,7 +654,7 @@ router.post('/reservation', async (req, res) => {
   const { id_BienImmobilier, id_Voyageur, dateDebut, dateFin, prixTotal } = req.body;
   console.log('Creating reservation:', req.body);
   try {
-    await sequelize.query(`INSERT INTO reservation (id_BienImmobilier, id_Voyageur, dateDebut, dateFin, prixTotal) VALUES ('${id_BienImmobilier}', '${id_Voyageur}', '${dateDebut}', '${dateFin}', '${prixTotal}')`);
+    await sequelize.query(`INSERT INTO reservation (id_BienImmobilier, id_ClientVoyageur, dateDebut, dateFin, prix) VALUES ('${id_BienImmobilier}', '${id_Voyageur}', '${dateDebut}', '${dateFin}', '${prixTotal}')`);
   }
   catch (error) {
     console.error('Error creating reservation:', error);
@@ -863,6 +891,9 @@ router.get('/biens', async (req, res) => {
   res.send(bienImo);
 });
 
+// SERVICES SPECIFIQUES
+
+// - Stripe 
 router.post('/create-checkout-session', async (req, res) => {
   const { pId, numberOfNights } = req.body;
   console.log('Creating checkout session with price ID:', pId, 'and quantity:', numberOfNights);
@@ -884,5 +915,47 @@ router.post('/create-checkout-session', async (req, res) => {
   } catch (error) {
     console.error('Error creating checkout session:', error);
     res.status(500).send({ error: 'An error occurred while creating the checkout session.' });
+  }
+});
+
+// - Socket.io
+
+router.post('/createFirstMessage', async (req, res) => {
+  const {id_sender, id_receiver, type_sender, type_receiver, content ,timestamp } = req.body;
+  console.log('Creating message:', req.body);
+  try {
+    await sequelize.query(`INSERT INTO messages (id_sender, id_receiver, type_sender, type_receiver, content) VALUES ('${id_sender}', '${id_receiver}', '${type_sender}', '${type_receiver}', '${content}')`);
+    await sequelize.query(`INSERT INTO messages (id_sender, id_receiver, type_sender, type_receiver, content) VALUES ('${id_receiver}', '${id_sender}', '${type_receiver}', '${type_sender}', '${content}')`);
+  } catch (error) {
+    console.error('Error creating message:', error);
+    return res.status(500).send('Error creating message');
+  }
+  res.send('Message created');
+});
+
+router.get('/messagesById', async (req, res) => {
+  const { user } = req.session;
+  try {
+    const [messages] = await sequelize.query(`SELECT * FROM messages WHERE id_sender = ${user.id} AND content = 'init'`);
+    res.json(messages);
+  } catch (error) {
+    console.error('Error fetching messages:', error);
+    res.status(500).json({ error: 'Failed to fetch messages' });
+  }
+});
+
+router.get('/discussionsOfUser', async (req, res) => {
+  const { user } = req.session;
+  try {
+    const [contacts] = await sequelize.query(`SELECT DISTINCT id_receiver, type_receiver FROM messages WHERE id_sender = ${user.id}`);
+    const contactsDetailsPromises = contacts.map(async (contact) => {
+      const [details] = await sequelize.query(`SELECT id, nom, prenom FROM ${contact.type_receiver} WHERE id = ${contact.id_receiver}`);
+      return {...details[0], type: contact.type_receiver};
+    });
+    const contactsDetails = await Promise.all(contactsDetailsPromises);
+    res.json(contactsDetails);
+  } catch (error) {
+    console.error('Error fetching discussions for specified user:', error);
+    res.status(500).json({ error: 'Failed to fetch discussions' });
   }
 });

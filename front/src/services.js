@@ -19,6 +19,46 @@ export const fetchUsers = async () => {
   }
 };
 
+export const fetchBailleurs = async () => {
+  try {
+    const response = await fetch(`${URL_USERS}/bailleurs`);
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const fetchVoyageurs = async () => {
+  try {
+    const response = await fetch(`${URL_USERS}/voyageurs`);
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export const fetchPrestataires = async () => {
+  try {
+    const response = await fetch(`${URL_USERS}/prestataires`);
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export const fetchUserById = async (userId, userType) => {
+  try {
+    const response = await fetch(`${URL_USERS}/${userId}/${userType}`);
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 export const createUser = (userData) => {
   return new Promise((resolve, reject) => {
     fetch(`${URL_ENVOI_MAIL}/sendCode`, {
@@ -473,6 +513,7 @@ export const fetchDisabledDates = async (reservationId) => {
 };
 
 export const createReservation = async (reservationData) => {
+  console.log("createReservation avec :", reservationData);
   try {
     const response = await fetch(URL_RESERVATION, {
       method: "POST",
@@ -500,4 +541,63 @@ export const getCredentials = async() => {
   catch (error) {
     console.log(error);
   }
+};
+
+export const createFirstMessage = async (messageData) => {
+  try {
+    const response = await fetch(`${BASE_URL}/createFirstMessage`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(messageData),
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export const fetchMessagesById = async () => {
+  try {
+    const response = await fetch(`${BASE_URL}/messagesById`, {
+      credentials: 'include', // or 'same-origin'
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const fetchDiscussions = async () => {
+  try {
+    const response = await fetch(`${BASE_URL}/discussionsOfUser`, {
+      credentials: 'include', // or 'same-origin'
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const createRoomName = (user1, user2) => {
+  // Initialize all categories to '00'
+  let voyageur = '00';
+  let bailleur = '00';
+  let prestataire = '00';
+
+  // Assign the user IDs to the correct categories
+  if (user1.type === 'voyageurs') voyageur = user1.id;
+  else if (user1.type === 'clientsBailleurs') bailleur = user1.id; // Corrected type
+  else if (user1.type === 'prestataires') prestataire = user1.id;
+
+  if (user2.type === 'voyageurs') voyageur = user2.id;
+  else if (user2.type === 'clientsBailleurs') bailleur = user2.id; // Corrected type
+  else if (user2.type === 'prestataires') prestataire = user2.id;
+
+  // Return the room name
+  return `room n°${voyageur}_${bailleur}_${prestataire}`;
 }

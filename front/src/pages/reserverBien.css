@@ -17,3 +17,9 @@
   border-radius: 5px;
   margin-bottom: 2%;
 }
+
+.errResa {
+  color: red;
+  font-size: 20px;
+  margin-top: 1%;
+}
