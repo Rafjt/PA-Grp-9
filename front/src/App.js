@@ -131,10 +131,10 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/Biens" element={<PageBien />} />
           <Route path="/mailConfirm" element={<MailConfirm />} />
-          <Route path="/espaceDiscussion" element={<EspaceDiscussion />} />
           {/* Routes Authent ALL*/}
           <Route path="/userProfile" element={ <ProtectedAuthRoute path="/userProfile" component={UserProfile} authType="all"/>} />
           <Route path="/pagePaiement" element={ <ProtectedAuthRoute path="/pagePaiement" component={PagePaiement} authType="all"/>} />
+          <Route path="/espaceDiscussion" element={ <ProtectedAuthRoute path="/espaceDiscussion" component={EspaceDiscussion} authType="all"/>} />
           {/* Routes Authent Voyageur*/}
           <Route path="/Reservation" element={<ProtectedAuthRoute path="/reserverBien" component={ReserverBien} authType="voyageurs" />} />
           <Route path="/EspaceVoyageur" element={<ProtectedAuthRoute path="/espaceVoyageur" component={EspaceVoyageur} authType="voyageurs" />} />
