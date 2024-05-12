@@ -33,6 +33,7 @@ import ReserverBien from "./pages/reserverBien.js";
 import PagePaiement from "./pages/pagePaiement.js";
 import EspaceVoyageur from "./pages/espaceVoyageur.js";
 import CreeBien from "./pages/creeBien.js";
+import EspaceDiscussion from "./pages/espaceDiscussion.js";
 // import { use } from "../../back/routes/auth.js";
 
 function ProtectedRoute({ component: Component }) {
@@ -130,7 +131,7 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/Biens" element={<PageBien />} />
           <Route path="/mailConfirm" element={<MailConfirm />} />
-
+          <Route path="/espaceDiscussion" element={<EspaceDiscussion />} />
           {/* Routes Authent ALL*/}
           <Route path="/userProfile" element={ <ProtectedAuthRoute path="/userProfile" component={UserProfile} authType="all"/>} />
           <Route path="/pagePaiement" element={ <ProtectedAuthRoute path="/pagePaiement" component={PagePaiement} authType="all"/>} />

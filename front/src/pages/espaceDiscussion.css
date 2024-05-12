@@ -1,0 +1,83 @@
+body {
+    background-color: #fafafa;
+    font-family: Arial, sans-serif;
+}
+
+.convContainer {
+    width: 80%;
+    height: 500px;
+    border: 1px solid #dbdbdb;
+    overflow-y: auto;
+    padding: 10px;
+    margin: 10px auto;
+    background-color: #fff;
+    border-radius: 10px;
+}
+
+.inputDis{
+    width: 90%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    border: none;
+    border-radius: 50px;
+    background-color: #f0f0f0;
+}
+
+.btnDis {
+    background-color: #0095f6;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    float: right;
+}
+
+.btnDis:hover {
+    background-color: #0077b6;
+}
+
+.sent {
+    display: block;
+    text-align: right;
+    color: #ffffff;
+    margin: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: #0084ff;
+    max-width: 80%; /* limit the width of the message */
+    word-wrap: break-word; /* add this line */
+    width: fit-content;
+    margin-left: auto;
+}
+
+.received {
+    display: block;
+    text-align: left;
+    color: #000000;
+    margin: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: #cbcbcb;
+    max-width: 80%; /* limit the width of the message */
+    word-wrap: break-word; /* add this line */
+    width: fit-content;
+}
+
+.userContainer {
+    padding: 20px;
+}
+
+.userCard {
+    background-color: #f0f0f0;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+.userName {
+    margin: 0;
+    font-size: 16px;
+}

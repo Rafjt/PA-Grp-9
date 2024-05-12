@@ -7,6 +7,7 @@ import { BACK_URL } from "../services.js";
 const ReserverBien = () => {
     const location = useLocation();
     const { id, arrivee, depart, pId } = location.state;
+    const [isErrorVisible, setErrorVisible] = useState(false);
 
     // Retrieve the price from sessionStorage and convert it to a number
     const price = Number(sessionStorage.getItem('price'));
@@ -21,7 +22,7 @@ const ReserverBien = () => {
     const numberOfNights = Math.ceil(Math.abs(departDate - arriveeDate) / (1000 * 60 * 60 * 24));
     const totalCost = numberOfNights * price;
     console.log(numberOfNights);
-    // Define a state variable to store the fetched data
+    const [isChecked, setIsChecked] = useState(false);
     const [fetchedData, setFetchedData] = useState(null);
 
     useEffect(() => {
@@ -33,13 +34,17 @@ const ReserverBien = () => {
     }, [id]);
 
     const handleSubmit = async () => {
+        if (!isChecked) {
+            setErrorVisible(true);
+            return;
+        }
         sessionStorage.setItem('totalCost', totalCost);
         sessionStorage.setItem('numberOfNights', numberOfNights);
         sessionStorage.setItem('id', id);
         sessionStorage.setItem('arrivee', arriveeString);
         sessionStorage.setItem('depart', departString);
         sessionStorage.setItem('price', price);
-        
+
         const createCheckoutSession = async () => {
             const response = await fetch(`${BACK_URL}/api/create-checkout-session`, {
                 method: 'POST',
@@ -48,7 +53,7 @@ const ReserverBien = () => {
                 },
                 body: JSON.stringify({ pId, numberOfNights })
             });
-        
+
             if (response.ok) {
                 const session = await response.json();
                 window.location.href = session.url;
@@ -74,8 +79,11 @@ const ReserverBien = () => {
                         <p>Depart: {departString}</p>
                         <p>Total a payer: {totalCost}€ pour {numberOfNights} nuits</p>
                         <label>
-                            <input className="" type="checkbox" />
+                            <input type="checkbox" onChange={(e) => setIsChecked(e.target.checked)} />
                             J'ai lu et accepte les termes et conditions du bailleurs
+                            <div>
+                                {isErrorVisible && <p className="errResa">Veuillez valider le champ ci-dessus avant de procéder au paiement</p>}
+                            </div>
                         </label>
                     </>
                 )}

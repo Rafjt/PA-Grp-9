@@ -149,3 +149,20 @@ CREATE TABLE facture (
   FOREIGN KEY (id_Reservation) REFERENCES reservation(id),
   FOREIGN KEY (id_ClientBailleur) REFERENCES clientsBailleurs(id)
 );
+
+-- Table messages
+CREATE TABLE messages (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  id_sender INT,
+  id_receiver INT,
+  type_sender ENUM('clientsBailleurs', 'voyageurs', 'prestataires'),
+  type_receiver ENUM('clientsBailleurs', 'voyageurs', 'prestataires'),
+  content TEXT,
+  timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (id_sender) REFERENCES clientsBailleurs(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (id_sender) REFERENCES voyageurs(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (id_sender) REFERENCES prestataires(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (id_receiver) REFERENCES clientsBailleurs(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (id_receiver) REFERENCES voyageurs(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (id_receiver) REFERENCES prestataires(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
