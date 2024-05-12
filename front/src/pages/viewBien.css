@@ -63,3 +63,10 @@ p.assets {
 .resForm button {
     margin-top: 10%;
 }
+
+.btnretour{
+    margin-top: 10px;
+    position: absolute;
+    left: 90px;
+    top: 90px;
+}

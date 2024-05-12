@@ -5,6 +5,11 @@
     display: flex;
     justify-content: center; /* Horizontally centers the text */
     padding: 0%;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    padding: 20px;
+    text-align: center;
 }
 
 .footer-content {

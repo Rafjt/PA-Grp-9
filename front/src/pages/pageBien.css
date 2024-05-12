@@ -70,3 +70,7 @@ hr {
     position: absolute;
     right: 10px;
 }
+
+.paginationBtn {
+    margin-top: 300px;
+}
