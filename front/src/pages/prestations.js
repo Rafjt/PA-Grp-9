@@ -10,6 +10,13 @@ function Prestations() {
     const [biens, setBiens] = useState([]);
     const navigate = useNavigate();
 
+    const today = new Date();
+    const dd = String(today.getDate()).padStart(2, '0');
+    const mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    const yyyy = today.getFullYear();
+
+    const todayFormatted = yyyy + '-' + mm + '-' + dd;
+
     useEffect(() => {
         getCredentials().then(data => {
             setUser(data);
@@ -85,55 +92,55 @@ function Prestations() {
             </div>
             <hr />
             <div className="form-container-presta">
-            <div className="formPresta">
-                <h1>Demander un service</h1>
-                <form ref={formRef} onSubmit={handleSubmit}>
-                    <label for="typeIntervention">Type de service demandé</label>
-                    <select id="typeIntervention" name="typeIntervention" className="form-input">
-                        <option value="Conciergerie">Conciergerie</option>
-                        <option value="Entretien ménager">Entretien ménager</option>
-                        <option value="Maintenance">Maintenance</option>
-                        <option value="Jardinage et entretien extérieur">Jardinage et entretien extérieur</option>
-                        <option value="Livraison">Livraison</option>
-                        <option value="Gestion des déchets">Gestion des déchets</option>
-                        <option value="Soutien administratif">Soutien administratif</option>
-                        <option value="Déménagement">Déménagement</option>
-                        <option value="Chauffeur">Chauffeur</option>
-                        <option value="Sécurité">Sécurité</option>
-                    </select>
-                    <label for="nom">Intitulé de la demande</label>
-                    <input type="text" id="nom" name="nom" className="form-input" />
-                    <label for="date">Date</label>
-                    <input type="date" id="date" name="date" className="form-input" />
-                    <label for="ville">Ville</label>
-                    <select id="ville" name="ville" className="form-input">
-                        <option value="Paris">Paris</option>
-                        <option value="Nice">Nice</option>
-                        <option value="Biarritz">Biarritz</option>
-                    </select>
-                    <label for="lieux">Lieu</label>
-                    <input type="text" id="lieux" name="lieux" className="form-input" />
-                    {/* Render the additional input if the user type is 'clientsBailleurs' */}
-                    {user && user.type === 'clientsBailleurs' && (
-                        <>
-                             <label for="id_BienImmobilier">Bien associé</label>
-                            <select id="id_BienImmobilier" name="id_BienImmobilier" className="form-input">
-                                {biens.map(bien => (
-                                    <option value={bien.id}>{bien.nomBien}</option>
-                                ))}
-                            </select>
-                        </>
-                    )}
-                    <label for="description">Description</label>
-                    <textarea id="description" name="description" className="form-input" />
-                    <br />
-                    <br />
-                    <input type="submit" value="Submit" className="form-submit" />
-                </form>
+                <div className="formPresta">
+                    <h1>Demander un service</h1>
+                    <form ref={formRef} onSubmit={handleSubmit}>
+                        <label for="typeIntervention">Type de service demandé</label>
+                        <select id="typeIntervention" name="typeIntervention" className="form-input">
+                            <option value="Conciergerie">Conciergerie</option>
+                            <option value="Entretien ménager">Entretien ménager</option>
+                            <option value="Maintenance">Maintenance</option>
+                            <option value="Jardinage et entretien extérieur">Jardinage et entretien extérieur</option>
+                            <option value="Livraison">Livraison</option>
+                            <option value="Gestion des déchets">Gestion des déchets</option>
+                            <option value="Soutien administratif">Soutien administratif</option>
+                            <option value="Déménagement">Déménagement</option>
+                            <option value="Chauffeur">Chauffeur</option>
+                            <option value="Sécurité">Sécurité</option>
+                        </select>
+                        <label for="nom">Intitulé de la demande</label>
+                        <input type="text" id="nom" name="nom" className="form-input" />
+                        <label for="date">Date</label>
+                        <input type="date" id="date" name="date" className="form-input" min={todayFormatted} />
+                        <label for="ville">Ville</label>
+                        <select id="ville" name="ville" className="form-input">
+                            <option value="Paris">Paris</option>
+                            <option value="Nice">Nice</option>
+                            <option value="Biarritz">Biarritz</option>
+                        </select>
+                        <label for="lieux">Lieu</label>
+                        <input type="text" id="lieux" name="lieux" className="form-input" />
+                        {/* Render the additional input if the user type is 'clientsBailleurs' */}
+                        {user && user.type === 'clientsBailleurs' && (
+                            <>
+                                <label for="id_BienImmobilier">Bien associé</label>
+                                <select id="id_BienImmobilier" name="id_BienImmobilier" className="form-input">
+                                    {biens.map(bien => (
+                                        <option value={bien.id}>{bien.nomBien}</option>
+                                    ))}
+                                </select>
+                            </>
+                        )}
+                        <label for="description">Description</label>
+                        <textarea id="description" name="description" className="form-input" />
+                        <br />
+                        <br />
+                        <input type="submit" value="Submit" className="form-submit" />
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
-);
+    );
 }
 
 export default Prestations;
