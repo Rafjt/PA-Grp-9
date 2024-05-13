@@ -599,6 +599,12 @@ router.post('/bienImo/filter', async (req, res) => {
   }
 });
 
+router.get('/biens', async (req, res) => {
+  const { user } = req.session;
+  const [bienImo] = await sequelize.query(`SELECT * FROM bienImo WHERE id_ClientBailleur = ${user.id}`);
+  res.send(bienImo);
+});
+
 // GESTION DES RESERVATIONS
 
 router.get('/MyCalendar', async (req, res) => {
@@ -900,10 +906,52 @@ router.post("/bienDispo", async (req, res) => {
 module.exports = router;
 
 
-router.get('/biens', async (req, res) => {
+
+// GESTION DES PRESTATIONS
+
+router.get('/prestationsById', async (req, res) => {
   const { user } = req.session;
-  const [bienImo] = await sequelize.query(`SELECT * FROM bienImo WHERE id_ClientBailleur = ${user.id}`);
-  res.send(bienImo);
+  let query = '';
+
+  switch(user.type) {
+    case 'clientsBailleurs':
+      query = `SELECT prestation.*, bienImo.nomBien FROM prestation 
+               INNER JOIN bienImo ON prestation.id_BienImmobilier = bienImo.id 
+               WHERE prestation.id_clientBailleur = ${user.id} AND prestation.statut != 'TERMINÉE'`;
+      break;
+    case 'voyageurs':
+      query = `SELECT * FROM prestation WHERE id_Voyageur = ${user.id} AND statut != 'TERMINÉE'`;
+      break;
+    default:
+      res.status(400).send({ error: 'Invalid user type' });
+      return;
+  }
+
+  const [prestations] = await sequelize.query(query);
+  res.send(prestations);
+});
+
+router.post('/createPrestation', async (req, res) => {
+  const {user} = req.session;
+  const {id_BienImmobilier, date, lieux, ville, typeIntervention, nom, description} = req.body; // Extract description from req.body
+  console.log('Creating prestation:', req.body);
+
+  let query = '';
+
+  switch(user.type) {
+    case 'clientsBailleurs':
+      query = `INSERT INTO prestation (id_BienImmobilier, id_ClientBailleur, date, statut, lieux, ville, typeIntervention, nom, description) VALUES ('${id_BienImmobilier}', '${user.id}', '${date}', 'EN ATTENTE','${lieux}', '${ville}', '${typeIntervention}', '${nom}', '${description}')`; // Include description in the query
+      break;
+    case 'voyageurs':
+      query = `INSERT INTO prestation (id_Voyageur, date, statut, lieux, ville, typeIntervention, nom, description) VALUES ('${user.id}', '${date}', 'EN ATTENTE','${lieux}', '${ville}', '${typeIntervention}', '${nom}', '${description}')`; // Include description in the query
+      break;
+    default:
+      res.status(400).send({ error: 'Invalid user type' });
+      return;
+  }
+
+  await sequelize.query(query);
+  res.send('Prestation created');
 });
 
 // SERVICES SPECIFIQUES
