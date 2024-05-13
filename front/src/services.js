@@ -357,6 +357,18 @@ export const updateAnnonce = async (annonceId, annonceData, file) => {
   }
 };
 
+export const fetchAnnonceByBailleur = async () => {
+  try {
+    const response = await fetch(`${BASE_URL}/biens`, {
+      credentials: 'include',
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 // GESTION DES PAIEMENTS
 
 export const fetchPaiement = async () => {
@@ -528,6 +540,40 @@ export const createReservation = async (reservationData) => {
     console.log(error);
   }
 };
+
+// GESTION DES PRESTATIONS
+
+export const fetchPrestationsById = async () => {
+  try {
+    const response = await fetch(`${BASE_URL}/prestationsById`, {
+      credentials: 'include', 
+    });
+    const data = await response.json();
+    return data;
+  }
+  catch (error) {
+    console.log(error);
+  }
+}
+
+export const createPrestation = async (prestationData) => {
+  try {
+    const response = await fetch(`${BASE_URL}/createPrestation`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(prestationData),
+      credentials: 'include', // Include credentials in the request
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// GESTION DES SERVICES EXTERNES
 
 export const getCredentials = async() => {
   console.log("getCredentials");
