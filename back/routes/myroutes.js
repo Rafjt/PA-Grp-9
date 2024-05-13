@@ -937,20 +937,23 @@ router.post('/createPrestation', async (req, res) => {
   console.log('Creating prestation:', req.body);
 
   let query = '';
+  let replacements = {};
 
   switch(user.type) {
     case 'clientsBailleurs':
-      query = `INSERT INTO prestation (id_BienImmobilier, id_ClientBailleur, date, statut, lieux, ville, typeIntervention, nom, description) VALUES ('${id_BienImmobilier}', '${user.id}', '${date}', 'EN ATTENTE','${lieux}', '${ville}', '${typeIntervention}', '${nom}', '${description}')`; // Include description in the query
+      query = `INSERT INTO prestation (id_BienImmobilier, id_ClientBailleur, date, statut, lieux, ville, typeIntervention, nom, description) VALUES (:id_BienImmobilier, :id_ClientBailleur, :date, 'EN ATTENTE', :lieux, :ville, :typeIntervention, :nom, :description)`; 
+      replacements = {id_BienImmobilier, id_ClientBailleur: user.id, date, lieux, ville, typeIntervention, nom, description};
       break;
     case 'voyageurs':
-      query = `INSERT INTO prestation (id_Voyageur, date, statut, lieux, ville, typeIntervention, nom, description) VALUES ('${user.id}', '${date}', 'EN ATTENTE','${lieux}', '${ville}', '${typeIntervention}', '${nom}', '${description}')`; // Include description in the query
+      query = `INSERT INTO prestation (id_Voyageur, date, statut, lieux, ville, typeIntervention, nom, description) VALUES (:id_Voyageur, :date, 'EN ATTENTE', :lieux, :ville, :typeIntervention, :nom, :description)`; 
+      replacements = {id_Voyageur: user.id, date, lieux, ville, typeIntervention, nom, description};
       break;
     default:
       res.status(400).send({ error: 'Invalid user type' });
       return;
   }
 
-  await sequelize.query(query);
+  await sequelize.query(query, { replacements });
   res.send('Prestation created');
 });
 

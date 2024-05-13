@@ -34,14 +34,6 @@ function Prestations() {
 
     const formRef = useRef();
 
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-
-        const formData = new FormData(formRef.current);
-        const data = Object.fromEntries(formData);
-
-        await createPrestation(data);
-    };
 
     return (
         <div>
