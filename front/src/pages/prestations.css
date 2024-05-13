@@ -1,0 +1,80 @@
+.form-container {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+}
+
+.formPresta {
+    display: flex;
+    flex-direction: column;
+}
+
+.formPresta h1 {
+
+    text-align: center;
+    color: #484848;
+    margin-bottom: 20px;
+}
+
+.formPresta label {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.form-input {
+    width: 50%; /* Make all inputs take up the full width of their container */
+    margin-bottom: 10px; 
+    padding: 10px;
+    border: 1px solid #000000;
+    border-radius: 20px;
+}
+
+.form-submit {
+    background-color: #252525;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+.form-submit:hover {
+    background-color: #8d8d8d;
+}
+
+.prestaContainer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.prestaContainer {
+    max-width: 1000px; /* Set the maximum width of the table */
+    overflow-x: auto; /* Make the table scrollable horizontally */
+    margin: 0 auto; /* Center the table horizontally */
+}
+
+.prestaTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.prestaTable th, .prestaTable td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.prestaTable th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #575757;
+    color: white;
+}
+
+#description {
+    height: 200px; /* Make the description input taller */
+}
