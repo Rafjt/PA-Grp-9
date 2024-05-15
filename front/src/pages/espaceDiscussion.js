@@ -62,11 +62,12 @@ function EspaceDiscussion() {
             console.log('Joining room:', roomName);
             socket.emit('joinRoom', { roomName });
             setSelectedUser(otherUser); // Set the selected user when clicked
+            console.log('Selected user:', otherUser);
           }}>
             <p><strong>{otherUser.nom}</strong>, {otherUser.prenom} (
-              {user.type === 'clientsBailleurs' ? 'Bailleur' :
-                user.type === 'voyageurs' ? 'Voyageur' :
-                  user.type === 'prestataires' ? 'Prestataire' : user.type})
+              {otherUser.type === 'clientsBailleurs' ? 'Bailleur' :
+                otherUser.type === 'voyageurs' ? 'Voyageur' :
+                  otherUser.type === 'prestataires' ? 'Prestataire' : otherUser.type})
             </p>
           </div>
         ))}

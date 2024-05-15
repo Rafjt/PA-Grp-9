@@ -59,6 +59,22 @@ export const fetchUserById = async (userId, userType) => {
   }
 }
 
+export const validatePrestataire = async (userId) => {
+  try {
+    const response = await fetch(`${URL_USERS}/verifyValidationPresta`, {
+      credentials: 'include',
+    });
+    if (!response.ok) {
+      throw new Error("Failed to validate prestataire");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error validating prestataire:", error);
+    throw error;
+  }
+};
+
 export const createUser = (userData) => {
   return new Promise((resolve, reject) => {
     fetch(`${URL_ENVOI_MAIL}/sendCode`, {
@@ -582,6 +598,47 @@ export const createPrestation = async (prestationData) => {
     const data = await response.json();
     return data;
   } catch (error) {
+    console.log(error);
+  }
+}
+
+export const fetchPrestationsEnAttente = async () => {
+  try {
+    const response = await fetch(`${BASE_URL}/prestationsEnAttente`, {
+      credentials: 'include', 
+    });
+    const data = await response.json();
+    return data;
+  }
+  catch (error) {
+    console.log(error);
+  }
+}
+
+export const acceptPrestation = async (prestationId) => {
+  try {
+    const response = await fetch(`${BASE_URL}/acceptPrestation/${prestationId}`, {
+      method: "PUT",
+      credentials: 'include', 
+    });
+    const data = await response.json();
+    return data;
+  }
+  catch (error) {
+    console.log(error);
+  }
+}
+
+export const deletePrestation = async (prestationId) => {
+  try {
+    const response = await fetch(`${BASE_URL}/prestation/${prestationId}`, {
+      method: "DELETE",
+      credentials: 'include', 
+    });
+    const data = await response.json();
+    return data;
+  }
+  catch (error) {
     console.log(error);
   }
 }
