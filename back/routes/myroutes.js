@@ -731,6 +731,25 @@ router.put('/reservation/:id', async (req, res) => {
   }
 });
 
+router.get("/reservation/:idVoyageur/voyageur", async (req, res) => {
+  console.log("route /reservation/:idVoyageur/voyageur called");
+  const idVoyageur = req.params.idVoyageur;
+  try {
+    const reservations = await sequelize.query(`
+      SELECT r.*, bi.* 
+      FROM reservation r
+      JOIN bienImo bi ON r.id_BienImmobilier = bi.id 
+      WHERE id_ClientVoyageur = ${idVoyageur}
+    `);
+    console.log(reservations);
+    res.send(reservations[0]); // Return the array of reservations
+  } catch (error) {
+    console.error("Error fetching reservations:", error);
+    res.status(500).send("Internal server error");
+  }
+});
+
+
 
 // GESTION DES PAIEMENTS
 

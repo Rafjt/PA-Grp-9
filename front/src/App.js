@@ -36,6 +36,7 @@ import CreeBien from "./pages/creeBien.js";
 import EspaceDiscussion from "./pages/espaceDiscussion.js";
 import EspacePrestataire from "./pages/espacePrestataire.js";
 import Prestations from "./pages/prestations.js";
+import MesReservations from "./pages/mesReservations.js"
 // import { use } from "../../back/routes/auth.js";
 
 function ProtectedRoute({ component: Component }) {
@@ -141,6 +142,7 @@ function App() {
           {/* Routes Authent Voyageur*/}
           <Route path="/Reservation" element={<ProtectedAuthRoute path="/reserverBien" component={ReserverBien} authType="voyageurs" />} />
           <Route path="/EspaceVoyageur" element={<ProtectedAuthRoute path="/espaceVoyageur" component={EspaceVoyageur} authType="voyageurs" />} />
+          <Route path="/MesReservations" element={<ProtectedAuthRoute path="/mesReservations" component={MesReservations} authType="voyageurs" />} />
           {/* Routes Authent CLientsBailleurs*/}
           <Route path="/espaceBailleur" element={<ProtectedAuthRoute path="/espaceBailleur" component={EspaceBailleur} authType="clientsBailleurs" />} />
           <Route path="/mesBiens" element={<ProtectedAuthRoute path="/mesBiens" component={MesBiens} authType="clientsBailleurs" />} />

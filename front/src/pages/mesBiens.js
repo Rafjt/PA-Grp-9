@@ -97,39 +97,39 @@ const MesBiens = () => {
                                             </tr>
                                             <tr style={{ borderBottom: '1px solid #ddd', padding: '8px' }}>
                                                 <td><strong>Wifi</strong></td>
-                                                <td>{annonce.wifi == 1 ? 'Oui' : 'Non'}</td>
+                                                <td>{annonce.wifi === 1 ? 'Oui' : 'Non'}</td>
                                             </tr>
                                             <tr style={{ borderBottom: '1px solid #ddd', padding: '8px' }}>
                                                 <td><strong>Cuisine</strong></td>
-                                                <td>{annonce.cuisine == 1 ? 'Oui' : 'Non'}</td>
+                                                <td>{annonce.cuisine === 1 ? 'Oui' : 'Non'}</td>
                                             </tr>
                                             <tr style={{ borderBottom: '1px solid #ddd', padding: '8px' }}>
                                                 <td><strong>Balcon</strong></td>
-                                                <td>{annonce.balcon == 1 ? 'Oui' : 'Non'}</td>
+                                                <td>{annonce.balcon === 1 ? 'Oui' : 'Non'}</td>
                                             </tr>
                                             <tr style={{ borderBottom: '1px solid #ddd', padding: '8px' }}>
                                                 <td><strong>Jardin</strong></td>
-                                                <td>{annonce.jardin == 1 ? 'Oui' : 'Non'}</td>
+                                                <td>{annonce.jardin === 1 ? 'Oui' : 'Non'}</td>
                                             </tr>
                                             <tr style={{ borderBottom: '1px solid #ddd', padding: '8px' }}>
                                                 <td><strong>Parking</strong></td>
-                                                <td>{annonce.parking == 1 ? 'Oui' : 'Non'}</td>
+                                                <td>{annonce.parking === 1 ? 'Oui' : 'Non'}</td>
                                             </tr>
                                             <tr style={{ borderBottom: '1px solid #ddd', padding: '8px' }}>
                                                 <td><strong>Piscine</strong></td>
-                                                <td>{annonce.piscine == 1 ? 'Oui' : 'Non'}</td>
+                                                <td>{annonce.piscine === 1 ? 'Oui' : 'Non'}</td>
                                             </tr>
                                             <tr style={{ borderBottom: '1px solid #ddd', padding: '8px' }}>
                                                 <td><strong>Jaccuzzi</strong></td>
-                                                <td>{annonce.jaccuzzi == 1 ? 'Oui' : 'Non'}</td>
+                                                <td>{annonce.jaccuzzi === 1 ? 'Oui' : 'Non'}</td>
                                             </tr>
                                             <tr style={{ borderBottom: '1px solid #ddd', padding: '8px' }}>
                                                 <td><strong>Salle de sport</strong></td>
-                                                <td>{annonce.salleDeSport == 1 ? 'Oui' : 'Non'}</td>
+                                                <td>{annonce.salleDeSport === 1 ? 'Oui' : 'Non'}</td>
                                             </tr>
                                             <tr style={{ borderBottom: '1px solid #ddd', padding: '8px' }}>
                                                 <td><strong>Climatisation</strong></td>
-                                                <td>{annonce.climatisation == 1 ? 'Oui' : 'Non'}</td>
+                                                <td>{annonce.climatisation === 1 ? 'Oui' : 'Non'}</td>
                                             </tr>
                                         </tbody>
                                     </table>

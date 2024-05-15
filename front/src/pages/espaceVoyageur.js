@@ -5,7 +5,7 @@ import "./espaceBailleur.css";
 function EspaceVoyageur() {
   console.log(document.cookie);
   const toMesBiens = () => {
-    console.log("j'ai les cramptés");
+    window.location.replace("/mesReservations");
   };
 
   const toLouerBien = () => {
