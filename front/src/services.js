@@ -528,6 +528,19 @@ export const fetchReservationById = async (reservationId) => {
   }
 };
 
+export const fetchReservationByIdVoyageur = async (voyageurId) => {
+  try {
+    console.log("fetchReservationByIdVoyageur", voyageurId);
+    const response = await fetch(`${URL_RESERVATION}/${voyageurId}/voyageur`);
+    const data = await response.json();
+    console.log("result = ", data);
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+
 
 export const fetchDisabledDates = async (reservationId) => {
   try {
