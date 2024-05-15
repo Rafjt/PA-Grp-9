@@ -290,6 +290,24 @@ router.get("/users/infos", async (req, res) => {
   }
 });
 
+router.get("/users/verifyValidationPresta", async (req, res) => {
+  const { user } = req.session;
+  let prestataire;
+
+  try {
+    [prestataire] = await sequelize.query(`SELECT * FROM prestataires WHERE id = ${user.id}`);
+  } catch (error) {
+    console.error("Error fetching prestataire:", error);
+    return res.status(500).json({ error: "Failed to fetch prestataire" });
+  }
+  
+  if (prestataire && prestataire.length > 0) {
+    res.send(prestataire[0]);
+  } else {
+    res.status(404).json({ error: "Prestataire not found" });
+  }
+});
+
 
 // GESTION DES BIENS/ANNONCES
 
@@ -957,6 +975,58 @@ router.post('/createPrestation', async (req, res) => {
   res.send('Prestation created');
 });
 
+router.get('/prestationsEnAttente', async (req, res) => {
+  try {
+    const today = new Date();
+    today.setUTCHours(0, 0, 0, 0); // Set the time to 00:00:00 UTC
+
+    const [prestations] = await sequelize.query(`
+      SELECT * 
+      FROM prestation 
+      WHERE statut = 'EN ATTENTE' 
+      AND date >= '${today.toISOString().split('T')[0]}' 
+    `);
+
+    res.send(prestations);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('An error occurred while fetching the data.');
+  }
+});
+
+router.put('/acceptPrestation/:prestationId', async (req, res) => {
+  const { user } = req.session;
+  const { prestationId } = req.params;
+  console.log('Accepting prestation:', prestationId);
+
+  try {
+    await sequelize.query(`UPDATE prestation SET statut = 'ACCEPTÉE', id_Prestataire = ${user.id} WHERE id = ${prestationId}`);
+    
+    // Fetch the updated prestation record
+    const [results] = await sequelize.query(`SELECT * FROM prestation WHERE id = ${prestationId}`);
+    const updatedPrestation = results[0];
+
+    res.send(updatedPrestation);
+  } catch (error) {
+    console.error('Error accepting prestation:', error);
+    res.status(500).send('Failed to accept prestation');
+  }
+});
+
+router.delete('/prestation/:id', async (req, res) => {
+  const { id } = req.params;
+
+  console.log('Deleting prestation:', id);
+
+  try {
+    await sequelize.query(`DELETE FROM prestation WHERE id = ${id}`);
+    res.send('Prestation deleted');
+  } catch (error) {
+    console.error('Error deleting prestation:', error);
+    res.status(500).send('Failed to delete prestation');
+  }
+});
+
 // SERVICES SPECIFIQUES
 
 // - Stripe 
@@ -987,7 +1057,7 @@ router.post('/create-checkout-session', async (req, res) => {
 // - Socket.io
 
 router.post('/createFirstMessage', async (req, res) => {
-  const {id_sender, id_receiver, type_sender, type_receiver, content ,timestamp } = req.body;
+  const {id_sender, id_receiver, type_sender, type_receiver, content } = req.body;
   console.log('Creating message:', req.body);
   try {
     await sequelize.query(`INSERT INTO messages (id_sender, id_receiver, type_sender, type_receiver, content) VALUES ('${id_sender}', '${id_receiver}', '${type_sender}', '${type_receiver}', '${content}')`);

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import './prestations.css';
-import { getCredentials, fetchPrestationsById, createPrestation, fetchAnnonceByBailleur } from "../services";
+import { getCredentials, fetchPrestationsById, createPrestation, fetchAnnonceByBailleur, deletePrestation, fetchUserById } from "../services";
 import { useNavigate } from "react-router-dom";
 
 function Prestations() {
@@ -8,6 +8,7 @@ function Prestations() {
     const [loading, setLoading] = useState(true);
     const [prestations, setPrestations] = useState([]);
     const [biens, setBiens] = useState([]);
+    const [prestataires, setPrestataires] = useState([]);
     const navigate = useNavigate();
 
     const today = new Date();
@@ -17,12 +18,21 @@ function Prestations() {
 
     const todayFormatted = yyyy + '-' + mm + '-' + dd;
 
+    const handleDelete = async (id) => {
+        await deletePrestation(id);
+        window.location.reload();
+        // console.log('delete',id);
+    };
+
+    const handleContact = () => {
+        window.location.replace('/espaceDiscussion');
+    };
+
     useEffect(() => {
         getCredentials().then(data => {
             setUser(data);
             setLoading(false);
 
-            // If the user type is 'prestataires', redirect to /login
             if (data.type === 'prestataires') {
                 navigate('/login');
             }
@@ -33,11 +43,26 @@ function Prestations() {
             setPrestations(data);
         });
 
-        // Fetch the biens data
         fetchAnnonceByBailleur().then(data => {
             setBiens(data);
         });
     }, []);
+
+
+    useEffect(() => {
+        const fetchPrestataires = async () => {
+            const fetchedPrestataires = await Promise.all(prestations.map(async (prestation) => {
+                if (prestation.id_Prestataire) {
+                    const prestataire = await fetchUserById(prestation.id_Prestataire, 'prestataires');
+                    return { ...prestation, prestataire };
+                } else {
+                    return prestation;
+                }
+            }));
+            setPrestataires(fetchedPrestataires);
+        };
+        fetchPrestataires();
+    }, [prestations]);
 
     const formRef = useRef();
 
@@ -73,18 +98,36 @@ function Prestations() {
                         </tr>
                     </thead>
                     <tbody>
-                        {prestations.map(prestation => (
+                        {prestataires.map(prestation => (
                             <tr key={prestation.id}>
                                 <td>{prestation.typeIntervention}</td>
                                 <td>{prestation.nom}</td>
                                 <td>{prestation.description}</td>
-                                <td>{prestation.statut}</td>
+                                <td>
+                                    {prestation.statut === 'ACCEPTÉE' ?
+                                        `${prestation.statut} par ${prestation.prestataire.prenom} ${prestation.prestataire.nom}` :
+                                        prestation.statut
+                                    }
+                                </td>
                                 <td>{prestation.prix}</td>
-                                <td>{prestation.date}</td>
+                                <td>
+                                    {new Date(prestation.date) < new Date() ?
+                                        <span style={{ color: 'red' }}>date limite passée</span> :
+                                        prestation.date
+                                    }
+                                </td>
                                 <td>{prestation.ville}, {prestation.lieux}</td>
                                 {user && user.type === 'clientsBailleurs' && (
                                     <td>{prestation.nomBien}</td>
                                 )}
+                                <td>
+                                    {new Date(prestation.date) >= new Date() && prestation.statut === 'ACCEPTÉE' ?
+                                        <span style={{ cursor: 'pointer', color: 'green' }} onClick={() => handleContact()}>Contacter le prestataire</span> :
+                                        new Date(prestation.date) < new Date() ?
+                                            <span style={{ cursor: 'pointer', color: 'red' }} onClick={() => handleDelete(prestation.id)}>X</span> :
+                                            <span style={{ cursor: 'pointer', color: 'blue' }} onClick={() => handleDelete(prestation.id)}>Annuler</span>
+                                    }
+                                </td>
                             </tr>
                         ))}
                     </tbody>
