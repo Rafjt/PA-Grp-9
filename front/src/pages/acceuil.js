@@ -8,7 +8,7 @@ const Acceuil = () => {
     const script = document.createElement("script");
     script.innerHTML = `
       window.embeddedChatbotConfig = {
-        chatbotId: "PMzsVHu-Yo1-fWx4fih76",
+        chatbotId: "7LgUyPeesiNhz8OTEf6Y8",
         domain: "www.chatbase.co"
       };
     `;
@@ -16,7 +16,7 @@ const Acceuil = () => {
 
     const script2 = document.createElement("script");
     script2.src = "https://www.chatbase.co/embed.min.js";
-    script2.setAttribute("chatbotId", "PMzsVHu-Yo1-fWx4fih76");
+    script2.setAttribute("chatbotId", "7LgUyPeesiNhz8OTEf6Y8");
     script2.setAttribute("domain", "www.chatbase.co");
     script2.defer = true;
     document.body.appendChild(script2);

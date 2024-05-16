@@ -99,7 +99,7 @@ const Header = () => {
             </li>
             <li className="locali">
               <a href="/" className="text-white ml-3">
-                Acceuil
+                Accueil
               </a>
             </li>
             {isAdmin && (
