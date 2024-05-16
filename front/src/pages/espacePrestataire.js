@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { validatePrestataire } from "../services";
+import MyPrestations from "./myPrestations";
 
 function EspacePrestataire() {
     const [isValid, setIsValid] = useState(null);
@@ -40,6 +41,10 @@ function EspacePrestataire() {
         window.location.href = "/MePlacer";
     }
 
+    const toMyPrestations = () => {
+        window.location.href = "/MyPrestations";
+    }
+
     return (
         <div>
             <img
@@ -54,7 +59,7 @@ function EspacePrestataire() {
                 <button className="grid-button">MES DOCUMENTS ADMINISTRATIF ET PAIEMENTS</button>
                 <button className="grid-button" onClick={toMePlacer}>ME PLACER SUR UNE PRESTATIONS</button>
                 <button className="grid-button">MES SECTEURS D'ACTIVITÉ</button>
-                <button className="grid-button">MES PRESTATIONS</button>
+                <button className="grid-button" onClick={toMyPrestations}>MES PRESTATIONS</button>
             </div>
         </div>
     );
