@@ -959,6 +959,9 @@ router.get('/prestationsById', async (req, res) => {
     case 'voyageurs':
       query = `SELECT * FROM prestation WHERE id_Voyageur = ${user.id} AND statut != 'TERMINÉE'`;
       break;
+    case 'prestataires':
+      query = `SELECT * FROM prestation WHERE id_Prestataire = ${user.id}`;
+      break;
     default:
       res.status(400).send({ error: 'Invalid user type' });
       return;
