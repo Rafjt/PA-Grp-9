@@ -14,21 +14,50 @@ function EspaceDiscussion() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const credentials = await getCredentials();
-        setUser(credentials);
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const credentials = await getCredentials();
+      setUser(credentials);
 
-        const discussions = await fetchDiscussions();
-        setUsers(discussions); // Store the fetched users in state
-      } catch (error) {
-        console.error('Error fetching messages or users:', error);
+      const discussions = await fetchDiscussions();
+      setUsers(discussions); // Store the fetched users in state
+    } catch (error) {
+      console.error('Error fetching messages or users:', error);
+    }
+  };
+
+  fetchData();
+}, []);
+
+useEffect(() => {
+  if (user && users.length > 0) {
+    const selectedClient = JSON.parse(localStorage.getItem('selectedClient'));
+    console.log('Selected client:', selectedClient);
+    if (selectedClient) {
+      // Find the client in the discussions array
+      const client = users.find(discussion => discussion.id === selectedClient.id);
+      console.log('Users:', users); // Log the users array
+      console.log('Found client:', client); // Log the found client
+      setSelectedUser(client);
+
+      if (client) {
+        console.log('Here:', user);
+        const roomName = createRoomName(user, client);
+        console.log('Room name:', roomName); // Log the room name
+        setCurrentRoom(roomName);
+        
+        socket.emit('joinRoom', { roomName }, (error) => {
+          if(error) {
+            console.log('Error joining room:', error); // Log any error from the server
+          }
+        });
       }
-    };
 
-    fetchData();
-  }, []);
+      localStorage.removeItem('selectedClient');
+    }
+  }
+}, [user, users]);
 
   const sendMesssage = () => {
     if (currentRoom) {

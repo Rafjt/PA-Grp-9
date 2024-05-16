@@ -47,7 +47,9 @@ function MyPrestations() {
     const acceptedPrestations = prestations.filter(prestation => prestation.statut === 'ACCEPTÉE');
     const finishedPrestations = prestations.filter(prestation => prestation.statut === 'TERMINÉ');
 
-    const handleContact = () => {
+    const handleContact = (clientId, clientName, userType) => {
+        const client = { id: clientId, name: clientName, type: userType };
+        localStorage.setItem('selectedClient', JSON.stringify(client));
         window.location.replace('/espaceDiscussion');
     };
 
@@ -77,7 +79,7 @@ function MyPrestations() {
                             <td>{prestation.lieux}</td>
                             <td>{prestation.ville}</td>
                             <td>{prestation.typeIntervention}</td>
-                            <td onClick={handleContact}>Contacter le client</td> {/* New cell */}
+                            <td onClick={() => handleContact(prestation.id_Voyageur || prestation.id_ClientBailleur, prestation.clientName, prestation.id_Voyageur ? 'Voyageur' : 'ClientBailleur')}>Contacter le client</td>
                         </tr>
                     ))}
                 </tbody>
@@ -92,7 +94,6 @@ function MyPrestations() {
                         <th>Lieux</th>
                         <th>Ville</th>
                         <th>Type d'intervention</th>
-                        <th>Action</th> {/* New cell */}
                     </tr>
                 </thead>
                 <tbody>
@@ -104,11 +105,6 @@ function MyPrestations() {
                             <td>{prestation.lieux}</td>
                             <td>{prestation.ville}</td>
                             <td>{prestation.typeIntervention}</td>
-                            <td>
-                                <div style={{ cursor: 'pointer'}} onClick={handleContact} className="contactClient">
-                                    Contacter le client
-                                </div>
-                            </td>
                         </tr>
                     ))}
                 </tbody>
