@@ -96,10 +96,10 @@ const PagePaiement = () => {
 
             // Redirect after a delay, regardless of success or cancellation
             setTimeout(() => {
-                navigate('/another-page');  
+                navigate('/mesReservations');  
             }, 2000);
         });
-    }, [success, canceled]);
+    }, [success, canceled, navigate]);
 
     return (
         <div>

@@ -106,7 +106,7 @@ useEffect(() => {
           <h1>Discussion</h1>
           <hr />
           {selectedUser && (
-            <p>vous discuter maintenant avec {selectedUser.prenom} {selectedUser.nom}.</p>
+            <p>vous discutez maintenant avec {selectedUser.prenom} {selectedUser.nom}.</p>
           )}
           {error && <div class="alert alert-danger" role="alert">
             {error}

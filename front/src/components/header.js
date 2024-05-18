@@ -77,11 +77,17 @@ const Header = () => {
     <header className="header sticky-top">
       <div className="upper-section">
         <div className="envs">
-          <span className="env">
-            <a href="/env">Bailleurs</a>
-          </span>
-          <span className="env">Voyageurs</span>
-          <span className="env">Prestataires</span>
+          {isConnected ? (
+            <>
+              <span className="env">
+                {userType === "clientsBailleurs" && "Bailleur"}
+                {userType === "voyageurs" && "Voyageur"}
+                {userType === "prestataires" && "Prestataire"}
+              </span>
+            </>
+          ) : (
+            <span className="env">Bienvenue</span>
+          )}
         </div>
       </div>
       <div className="lower-section text-white sticky-top">
