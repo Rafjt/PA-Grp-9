@@ -39,6 +39,7 @@ import Prestations from "./pages/prestations.js";
 import MesReservations from "./pages/mesReservations.js"
 import TakePrestation from "./pages/takePrestation.js";
 import MyPrestations from "./pages/myPrestations.js";
+import NotFound from "./pages/notFound.js"
 // import { use } from "../../back/routes/auth.js";
 
 function ProtectedRoute({ component: Component }) {
@@ -165,6 +166,8 @@ function App() {
           <Route path="/statistiques" element={<ProtectedRoute component={Statistiques} />} />
           <Route path="/gestionPaiement" element={<ProtectedRoute component={GestionPaiement} />} />
           <Route path="/update/:id/bien" element={<ProtectedRoute component={UpdateAnnonce} />} />
+          {/* Route erreur 404 */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
       <div className="footer">
