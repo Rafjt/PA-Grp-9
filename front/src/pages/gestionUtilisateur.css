@@ -171,3 +171,10 @@ a.modif :hover {
   -webkit-overflow-scrolling: touch;
   -ms-overflow-style: -ms-autohiding-scrollbar;
 }
+
+.sticky-header th {
+  position: sticky;
+  top: 0;
+  background-color: #fff; /* Set the background color for the sticky header */
+  z-index: 1; /* Ensure the sticky header is on top of other elements */
+}
