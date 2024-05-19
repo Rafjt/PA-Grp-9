@@ -9,6 +9,7 @@ import {
   banUser,
   fetchBannedUsers,
   unbanUser,
+  changeUserStatus,
 } from "../services";
 
 const GestionUtilisateur = () => {
@@ -130,6 +131,17 @@ const GestionUtilisateur = () => {
       console.error("Error unbanning user:", error);
     }
   };
+
+  const handleStatusChange = async (userId, userType, status) => {
+    try {
+      await changeUserStatus(userId, userType, status);
+      const updatedUsers = await fetchUsers();
+      setUsers(updatedUsers);
+    } catch (error) {
+      console.error("Error updating user status:", error);
+    }
+  }
+
   if (!users) {
     return <div>Loading...</div>;
   }
@@ -229,13 +241,14 @@ const GestionUtilisateur = () => {
           onChange={(e) => setSearchQuery(e.target.value)}
         />
       </div>
-      <div className="usersContainer rounded shadow mt-3 tableWrapper">
-      <div className="table-responsive">
-        <table className="table table-bordered table-hover custom-table style={{ maxHeight: '500px', overflowY: 'auto' }}">
+
+      <div className="user-board">
+        <h2>Voyageurs</h2>
+        <div className="table-responsive rounded shadow">
+          <table className="table table-bordered table-hover custom-table">
             <thead>
-              <tr>
+              <tr className="sticky-header">
                 <th className="narrow-column">ID</th>
-                <th>Type</th>
                 <th>Nom</th>
                 <th>Prénom</th>
                 <th>Date de Naissance</th>
@@ -246,52 +259,230 @@ const GestionUtilisateur = () => {
               </tr>
             </thead>
             <tbody>
-              {["voyageurs", "clientsBailleurs", "prestataires"].map(
-                (userType) =>
-                  filteredUsers[userType].map((user) => (
-                    <tr key={user[idFields[userType]]}>
-                      <td>{user[idFields[userType]]}</td>
-                      <td>{userType}</td>
-                      <td className="long-column">{user.nom}</td>
-                      <td className="long-column">{user.prenom}</td>
-                      <td>{user.dateDeNaissance}</td>
-                      <td className="long-column">{user.adresseMail}</td>
-                      <td className="long-column">{user.motDePasse}</td>
-                      <td>{user.admin}</td>
-                      <td className="long-column">
-                        <button
-                          onClick={() =>
-                            handleDelete(user[idFields[userType]], userType)
-                          }
-                          className="delete"
-                        >
-                          Supprimer
-                        </button>
-                        <Link
-                          className="modif"
-                          to={`/update/${user[idFields[userType]]}/${userType}`}
-                        >
-                          Modifier
-                        </Link>
-
-                        <button
-                          onClick={() =>
-                            handleBan(
-                              user[idFields[userType]],
-                              userType,
-                              user // Pass user data to the handleBan function
-                            )
-                          }
-                          className="bannir ml-1"
-                        >
-                          Bannir
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-              )}
+              {filteredUsers.voyageurs.map((user) => (
+                <tr key={user[idFields.voyageurs]}>
+                  <td>{user[idFields.voyageurs]}</td>
+                  <td className="long-column">{user.nom}</td>
+                  <td className="long-column">{user.prenom}</td>
+                  <td>{user.dateDeNaissance}</td>
+                  <td className="long-column">{user.adresseMail}</td>
+                  <td className="long-column">{user.motDePasse}</td>
+                  <td>
+                    {user.admin === 1 && (
+                      <span style={{ color: "green" }}>Oui</span>
+                    )}
+                    {user.admin === 0 && (
+                      <span style={{ color: "red" }}>Non</span>
+                    )}
+                  </td>
+                  <td className="long-column">
+                    <button
+                      onClick={() =>
+                        handleDelete(user[idFields.voyageurs], "voyageurs")
+                      }
+                      className="delete"
+                    >
+                      Supprimer
+                    </button>
+                    <Link
+                      className="modif"
+                      to={`/update/${user[idFields.voyageurs]}/voyageurs`}
+                    >
+                      Modifier
+                    </Link>
+                    <button
+                      onClick={() =>
+                        handleBan(user[idFields.voyageurs], "voyageurs", user)
+                      }
+                      className="bannir ml-1"
+                    >
+                      Bannir
+                    </button>
+                  </td>
+                </tr>
+              ))}
             </tbody>
-        </table>
+          </table>
+        </div>
+      </div>
+
+      <div className="user-board mt-3">
+        <h2>Clients Bailleurs</h2>
+        <div className="table-responsive rounded shadow">
+          <table className="table table-bordered table-hover custom-table">
+            <thead>
+              <tr className="sticky-header">
+                <th className="narrow-column">ID</th>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th>Date de Naissance</th>
+                <th>Adresse Email</th>
+                <th>Mot de Passe</th>
+                <th className="narrow-column">Admin</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredUsers.clientsBailleurs.map((user) => (
+                <tr key={user[idFields.clientsBailleurs]}>
+                  <td>{user[idFields.clientsBailleurs]}</td>
+                  <td className="long-column">{user.nom}</td>
+                  <td className="long-column">{user.prenom}</td>
+                  <td>{user.dateDeNaissance}</td>
+                  <td className="long-column">{user.adresseMail}</td>
+                  <td className="long-column">{user.motDePasse}</td>
+                  <td>
+                    {user.admin === 1 && (
+                      <span style={{ color: "green" }}>Oui</span>
+                    )}
+                    {user.admin === 0 && (
+                      <span style={{ color: "red" }}>Non</span>
+                    )}
+                  </td>
+                  <td className="long-column">
+                    <button
+                      onClick={() =>
+                        handleDelete(
+                          user[idFields.clientsBailleurs],
+                          "clientsBailleurs"
+                        )
+                      }
+                      className="delete"
+                    >
+                      Supprimer
+                    </button>
+                    <Link
+                      className="modif"
+                      to={`/update/${
+                        user[idFields.clientsBailleurs]
+                      }/clientsBailleurs`}
+                    >
+                      Modifier
+                    </Link>
+                    <button
+                      onClick={() =>
+                        handleBan(
+                          user[idFields.clientsBailleurs],
+                          "clientsBailleurs",
+                          user
+                        )
+                      }
+                      className="bannir ml-1"
+                    >
+                      Bannir
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div className="user-board mt-3">
+        <h2>Prestataires</h2>
+        <div className="table-responsive rounded shadow">
+          <table className="table table-bordered table-hover custom-table">
+            <thead>
+              <tr className="sticky-header">
+                <th className="narrow-column">ID</th>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th>Date de Naissance</th>
+                <th>Adresse Email</th>
+                <th>Mot de Passe</th>
+                <th className="narrow-column">Admin</th>
+                <th className="narrow-column">Validé</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredUsers.prestataires.map((user) => (
+                <tr key={user[idFields.prestataires]}>
+                  <td>{user[idFields.prestataires]}</td>
+                  <td className="long-column">{user.nom}</td>
+                  <td className="long-column">{user.prenom}</td>
+                  <td>{user.dateDeNaissance}</td>
+                  <td className="long-column">{user.adresseMail}</td>
+                  <td className="long-column">{user.motDePasse}</td>
+                  <td>
+                    {user.admin === 1 && (
+                      <span style={{ color: "green" }}>Oui</span>
+                    )}
+                    {user.admin === 0 && (
+                      <span style={{ color: "red" }}>Non</span>
+                    )}
+                  </td>
+                  <td>
+                    {user.valide === 1 && (
+                      <span style={{ color: "green" }}>Oui</span>
+                    )}
+                    {user.valide === 0 && (
+                      <span style={{ color: "red" }}>Non</span>
+                    )}
+                  </td>
+                  <td className="long-column">
+                    <button
+                      onClick={() =>
+                        handleDelete(
+                          user[idFields.prestataires],
+                          "prestataires"
+                        )
+                      }
+                      className="delete"
+                    >
+                      Supprimer
+                    </button>
+                    <Link
+                      className="modif"
+                      to={`/update/${user[idFields.prestataires]}/prestataires`}
+                    >
+                      Modifier
+                    </Link>
+                    <button
+                      onClick={() =>
+                        handleBan(
+                          user[idFields.prestataires],
+                          "prestataires",
+                          user
+                        )
+                      }
+                      className="bannir ml-1"
+                    >
+                      Bannir
+                    </button>
+                    {user.valide === 1 ? (
+                      <button
+                        onClick={() =>
+                          handleStatusChange(
+                            user[idFields.prestataires],
+                            "prestataires",
+                            0
+                          )
+                        }
+                        className="delete"
+                      >
+                        Invalider
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() =>
+                          handleStatusChange(
+                            user[idFields.prestataires],
+                            "prestataires",
+                            1
+                          )
+                        }
+                        className="delete"
+                      >
+                        Valider
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -300,7 +491,7 @@ const GestionUtilisateur = () => {
       </div>
       <div className="usersBannisContainer rounded shadow mt-3 tableWrapper">
         <div className="table-responsive">
-          <table className="table table-bordered table-hover custom-table style={{ maxHeight: '500px', overflowY: 'auto' }}">
+          <table className="table table-bordered table-hover custom-table">
             <thead>
               <tr>
                 <th className="narrow-column">ID</th>

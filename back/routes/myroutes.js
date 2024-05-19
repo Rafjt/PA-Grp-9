@@ -236,31 +236,41 @@ router.put("/users/:id/:type", async (req, res) => {
   const { id, type } = req.params;
   const { nom, prenom, adresseMail, motDePasse, dateDeNaissance, admin } = req.body;
 
-  // Create an array to hold the fields to be updated
-  const fieldsToUpdate = [
-    `nom = '${nom}'`,
-    `prenom = '${prenom}'`,
-    `adresseMail = '${adresseMail}'`,
-    `dateDeNaissance = '${dateDeNaissance}'`,
-    `admin = '${admin}'`
-  ];
-
-  // Conditionally include the password field in the update query
-  if (motDePasse !== undefined) {
-    const hashedPassword = await bcrypt.hash(motDePasse, 10); // Hash the password
-    fieldsToUpdate.push(`motDePasse = '${hashedPassword}'`);
-  }
-
   try {
+    // Create an array to hold the fields and their corresponding values
+    const fieldsToUpdate = {
+      nom,
+      prenom,
+      adresseMail,
+      dateDeNaissance,
+      admin
+    };
+
+    // Conditionally include the password field in the update query
+    if (motDePasse !== undefined) {
+      const hashedPassword = await bcrypt.hash(motDePasse, 10); // Hash the password
+      fieldsToUpdate.motDePasse = hashedPassword;
+    }
+
+    // Construct the SET clause and the values array for the prepared statement
+    const setClause = Object.keys(fieldsToUpdate)
+      .map(field => `${field} = ?`)
+      .join(', ');
+    const values = Object.values(fieldsToUpdate);
+    values.push(id);
+
+    // Perform the update operation using a parameterized query
     await sequelize.query(
-      `UPDATE ${type} SET ${fieldsToUpdate.join(', ')} WHERE id = ${id}`
+      `UPDATE ${type} SET ${setClause} WHERE id = ?`,
+      { replacements: values }
     );
+
+    res.send("User modified");
   } catch (error) {
     console.error("Error modifying user:", error);
+    res.status(500).send("An error occurred while modifying the user");
   }
-  res.send("User modified");
 });
-
 
 router.post("/users/bannir/vatefaireenculer/:id/:type", async (req, res) => {
   console.log("Modifying user:", req.body);
@@ -318,6 +328,18 @@ router.get("/users/verifyValidationPresta", async (req, res) => {
   }
 });
 
+router.put("/users/:id/:type/:valide", async (req, res) => {
+  const { id, type, valide } = req.params;
+  try {
+    await sequelize.query(
+      `UPDATE ${type} SET valide = ${valide} WHERE id = ${id}`
+    );
+    res.send("User status updated");
+  } catch (error) {
+    console.error("Error updating user status:", error);
+    res.status(500).send("Error updating user status");
+  }
+});
 
 // GESTION DES BIENS/ANNONCES
 
@@ -521,8 +543,6 @@ router.put('/bienImo/:id', upload.single('cheminImg'), async (req, res) => {
   const newNomBien = nomBien.replace(/'/g, "''");
   const newAdresse = adresse.replace(/'/g, "''");
   const newTypeDePropriete = typeDePropriete.replace(/'/g, "''");
-
-  console.log('prix est :', prix);
 
   try {
     await sequelize.query(

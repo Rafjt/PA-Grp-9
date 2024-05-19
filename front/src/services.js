@@ -75,6 +75,21 @@ export const validatePrestataire = async (userId) => {
   }
 };
 
+export const changeUserStatus = async (userId, userType, status) => {
+  try {
+    const response = await fetch(`${URL_USERS}/${userId}/${userType}/${status}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const createUser = (userData) => {
   return new Promise((resolve, reject) => {
     fetch(`${URL_ENVOI_MAIL}/sendCode`, {
@@ -642,6 +657,14 @@ export const deletePrestation = async (prestationId) => {
     console.log(error);
   }
 }
+
+// export const uploadAvis = async(prestataireId, prestationId){
+//   try {
+    
+//   } catch (error) {
+    
+//   }
+// }
 
 // GESTION DES SERVICES EXTERNES
 

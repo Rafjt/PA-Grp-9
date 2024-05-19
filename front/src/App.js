@@ -40,6 +40,7 @@ import MesReservations from "./pages/mesReservations.js"
 import TakePrestation from "./pages/takePrestation.js";
 import MyPrestations from "./pages/myPrestations.js";
 import NotFound from "./pages/notFound.js"
+import AvisPrestation from "./pages/avisPrestation.js";
 // import { use } from "../../back/routes/auth.js";
 
 function ProtectedRoute({ component: Component }) {
@@ -152,6 +153,7 @@ function App() {
           <Route path="/modifyBien" element={<ProtectedAuthRoute path="/modifyBien" component={ModifyBien} authType="clientsBailleurs" />} />
           <Route path="/calendarBailleurs" element={<ProtectedAuthRoute path="/calendarBailleurs" component={CalendarBailleurs} authType="clientsBailleurs" />} />
           <Route path="/creeBien" element={<ProtectedAuthRoute path="/creeBien" component={CreeBien} authType="clientsBailleurs" />} />
+          <Route path="/avisPrestation/:prestationId/:prestataireId" element={<ProtectedAuthRoute path="avisPrestation" component={AvisPrestation} authType="clientsBailleurs" />}/>
           {/* Routes Authent Prestataires*/}
           <Route path="/espacePrestataire" element={<ProtectedAuthRoute path="/espacePrestataire" component={EspacePrestataire} authType="prestataires" />} />
           <Route path="/MePlacer" element={<ProtectedAuthRoute path="/MePlacer" component={TakePrestation} authType="prestataires" />} />

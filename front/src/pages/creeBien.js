@@ -77,7 +77,7 @@ function CreeBien() {
       return;
     }
 
-    if (!form.prix || isNaN(form.prix) || form.prix <= 0) {
+    if (!form.prix || isNaN(form.prix) || form.prix <= 0 || form.prix >= 99999) {
       setModalMessage("Veuillez entrer un prix valide.");
       setShowModal(true);
       return;
