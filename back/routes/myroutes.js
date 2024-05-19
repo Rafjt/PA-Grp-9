@@ -202,11 +202,21 @@ router.post("/users/code/:code", async (req, res) => {
         return res.status(404).send("La table temporaire est vide");
       }
 
-      // Insert data into the permanent table
+      // Insert data into the permanent table using parameterized queries
       for (const row of tempTableData) {
         await sequelize.query(
           `INSERT INTO ${row.type} (nom, prenom, adresseMail, motDePasse, admin, dateDeNaissance) 
-        VALUES ('${row.nom}', '${row.prenom}', '${row.adresseMail}', '${row.motDePasse}', ${row.admin}, '${row.dateDeNaissance}')`
+          VALUES (?, ?, ?, ?, ?, ?)`,
+          {
+            replacements: [
+              row.nom,
+              row.prenom,
+              row.adresseMail,
+              row.motDePasse,
+              row.admin,
+              row.dateDeNaissance,
+            ],
+          }
         );
       }
 
@@ -417,17 +427,15 @@ router.post('/bienImo', upload.single('pictures'), async (req, res) => {
     climatisation,
     ville,
     adresse,
-  } = req.body; // Get the filename of the uploaded image
+  } = req.body;
+  
   const pictures = req.file.filename; // Get the filename of the uploaded image
   console.log('pictures ==', pictures); // Log uploaded file information
-  // Handle description escaping single quotes
-  const newDescription = description.replace(/'/g, "''");
 
   try {
-
     const product = await stripe.products.create({
       name: nomBien,
-      description: newDescription,
+      description: description,
     });
 
     // Create a Stripe price
@@ -440,16 +448,30 @@ router.post('/bienImo', upload.single('pictures'), async (req, res) => {
     console.log('Stripe product created with ID:', product.id);
     console.log('Stripe price created with ID:', stripePrice.id);
 
+    // Use a parameterized query to avoid SQL injection and handle special characters
     await sequelize.query(
-      `INSERT INTO bienImo (nomBien, description, id_ClientBailleur, statutValidation, prix, disponible, typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation, cheminImg, ville, adresse, productId) VALUES ('${nomBien}', '${newDescription}', '${id_ClientBailleur}', '0', '${prix}', '${disponible}', '${typeDePropriete}', '${nombreChambres}', '${nombreLits}', '${nombreSallesDeBain}', '${wifi}', '${cuisine}', '${balcon}', '${jardin}', '${parking}', '${piscine}', '${jaccuzzi}', '${salleDeSport}', '${climatisation}', '${pictures}', '${ville}', '${adresse}','${stripePrice.id}')`
+      `INSERT INTO bienImo (
+        nomBien, description, id_ClientBailleur, statutValidation, prix, disponible, typeDePropriete,
+        nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking,
+        piscine, jaccuzzi, salleDeSport, climatisation, cheminImg, ville, adresse, productId
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      {
+        replacements: [
+          nomBien, description, id_ClientBailleur, 0, prix, disponible, typeDePropriete,
+          nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking,
+          piscine, jaccuzzi, salleDeSport, climatisation, pictures, ville, adresse, stripePrice.id
+        ],
+        type: sequelize.QueryTypes.INSERT
+      }
     );
 
+    res.send('Bien created');
   } catch (error) {
     console.error('Error creating bien:', error);
     return res.status(500).send('Error creating bien');
   }
-  res.send('Bien created');
 });
+
 
 router.get("/bienImo/:id", async (req, res) => {
   console.log("route /bienImo/:id called");
@@ -493,18 +515,47 @@ router.put('/bienImo/:id', upload.single('cheminImg'), async (req, res) => {
     ville,
     adresse,
   } = req.body;
-  newDescription = description.replace(/'/g, "''");
+
+  // Escape single quotes in text fields to prevent SQL injection
+  const newDescription = description.replace(/'/g, "''");
+  const newNomBien = nomBien.replace(/'/g, "''");
+  const newAdresse = adresse.replace(/'/g, "''");
+  const newTypeDePropriete = typeDePropriete.replace(/'/g, "''");
+
   console.log('prix est :', prix);
+
   try {
     await sequelize.query(
-      `UPDATE bienImo SET nomBien = '${nomBien}', description = '${newDescription}', id_ClientBailleur = '${id_ClientBailleur}', prix = '${prix}', disponible = '${disponible}', typeDePropriete = '${typeDePropriete}', nombreChambres = '${nombreChambres}', nombreLits = '${nombreLits}', nombreSallesDeBain = '${nombreSallesDeBain}', wifi = '${wifi}', cuisine = '${cuisine}', balcon = '${balcon}', jardin = '${jardin}', parking = '${parking}', piscine = '${piscine}', jaccuzzi = '${jaccuzzi}', salleDeSport = '${salleDeSport}', climatisation = '${climatisation}', ville = '${ville}', adresse = '${adresse}'${updateImageQuery} WHERE id = ${id}`
+      `UPDATE bienImo SET 
+        nomBien = '${newNomBien}', 
+        description = '${newDescription}', 
+        id_ClientBailleur = '${id_ClientBailleur}', 
+        prix = '${prix}', 
+        disponible = '${disponible}', 
+        typeDePropriete = '${newTypeDePropriete}', 
+        nombreChambres = '${nombreChambres}', 
+        nombreLits = '${nombreLits}', 
+        nombreSallesDeBain = '${nombreSallesDeBain}', 
+        wifi = '${wifi}', 
+        cuisine = '${cuisine}', 
+        balcon = '${balcon}', 
+        jardin = '${jardin}', 
+        parking = '${parking}', 
+        piscine = '${piscine}', 
+        jaccuzzi = '${jaccuzzi}', 
+        salleDeSport = '${salleDeSport}', 
+        climatisation = '${climatisation}', 
+        ville = '${ville}', 
+        adresse = '${newAdresse}'
+        ${updateImageQuery} 
+      WHERE id = ${id}`
     );
+    res.send('Bien modified');
   } catch (error) {
     console.error('Error modifying bien:', error);
+    res.status(500).send('Error modifying bien');
   }
-  res.send('Bien modified');
 });
-
 router.post('/bienImo/filter', async (req, res) => {
   let {
     typeDePropriete,
@@ -684,24 +735,41 @@ router.get('/reservation/:id/dates', async (req, res) => {
 router.post('/reservation', async (req, res) => {
   const { id_BienImmobilier, id_Voyageur, dateDebut, dateFin, prixTotal } = req.body;
   console.log('Creating reservation:', req.body);
+
   let nomBien;
-  try  {
-    const result = await sequelize.query(`SELECT nomBien FROM bienImo WHERE id = ${id_BienImmobilier}`);
-    nomBien = result[0][0].nomBien; // Extract nomBien from the result set
-  }
-  catch (error) {
+  try {
+    const result = await sequelize.query(
+      'SELECT nomBien FROM bienImo WHERE id = ?',
+      {
+        replacements: [id_BienImmobilier],
+        type: sequelize.QueryTypes.SELECT
+      }
+    );
+    if (result.length === 0) {
+      return res.status(404).send('Bien not found');
+    }
+    nomBien = result[0].nomBien; // Extract nomBien from the result set
+  } catch (error) {
     console.error('Error fetching bien:', error);
     return res.status(500).send('Failed to fetch bien');
   }
+
   try {
-    await sequelize.query(`INSERT INTO reservation (id_BienImmobilier, id_ClientVoyageur, dateDebut, dateFin, prix, nomBien) VALUES ('${id_BienImmobilier}', '${id_Voyageur}', '${dateDebut}', '${dateFin}', '${prixTotal}','${nomBien}')`);
-  }
-  catch (error) {
+    await sequelize.query(
+      'INSERT INTO reservation (id_BienImmobilier, id_ClientVoyageur, dateDebut, dateFin, prix, nomBien) VALUES (?, ?, ?, ?, ?, ?)',
+      {
+        replacements: [id_BienImmobilier, id_Voyageur, dateDebut, dateFin, prixTotal, nomBien],
+        type: sequelize.QueryTypes.INSERT
+      }
+    );
+  } catch (error) {
     console.error('Error creating reservation:', error);
     return res.status(500).send('Error creating reservation');
   }
+
   res.send('Reservation created');
 });
+
 /*
 router.put("/reservation/:id", async (req, res) => {
   console.log("Modifying reservation :", req.body);
@@ -754,9 +822,10 @@ router.get("/reservation/:idVoyageur/voyageur", async (req, res) => {
   const idVoyageur = req.params.idVoyageur;
   try {
     const reservations = await sequelize.query(`
-      SELECT r.*, bi.* 
+      SELECT r.*, bi.*, cb.nom as bailleurNom, cb.prenom as bailleurPrenom, cb.adresseMail as bailleurMail
       FROM reservation r
       JOIN bienImo bi ON r.id_BienImmobilier = bi.id 
+      JOIN clientsBailleurs cb on bi.id_ClientBailleur = cb.id
       WHERE id_ClientVoyageur = ${idVoyageur}
     `);
     console.log(reservations);

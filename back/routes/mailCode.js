@@ -51,20 +51,19 @@ async function sendEmail(email, randomNumber) {
 
 router.post("/sendCode", async (req, res) => {
   console.log("Creating user and sending code:", req.body);
-  const { nom, prenom, adresseMail, motDePasse, admin, dateDeNaissance, type } =
-    req.body;
+  const { nom, prenom, adresseMail, motDePasse, admin, dateDeNaissance, type } = req.body;
 
   try {
     const existingUser = await sequelize.query(
-      `SELECT * FROM ${type} WHERE adresseMail = '${adresseMail}'`,
-      { type: QueryTypes.SELECT }
+      `SELECT * FROM ${type} WHERE adresseMail = ?`,
+      { replacements: [adresseMail], type: QueryTypes.SELECT }
     );
     if (existingUser.length > 0) {
       return res.status(409).send("Email already exists");
     }
     const bannedUser = await sequelize.query(
-      `SELECT * FROM userBannis WHERE adresseMail = '${adresseMail}'`,
-      { type: QueryTypes.SELECT }
+      "SELECT * FROM userBannis WHERE adresseMail = ?",
+      { replacements: [adresseMail], type: QueryTypes.SELECT }
     );
     if (bannedUser.length > 0) {
       return res.status(403).send("User is banned");
@@ -91,9 +90,12 @@ router.post("/sendCode", async (req, res) => {
     );`
     );
 
-    // Insert the user data into the temporary table
+    // Insert the user data into the temporary table using parameterized query
     await sequelize.query(
-      `INSERT INTO \`${randomNumber}\` (nom, prenom, adresseMail, motDePasse, admin, dateDeNaissance, type, code) VALUES ('${nom}', '${prenom}', '${adresseMail}', '${hashedPassword}', ${admin}, '${dateDeNaissance}', '${type}', '${randomNumber}')`
+      `INSERT INTO \`${randomNumber}\` (nom, prenom, adresseMail, motDePasse, admin, dateDeNaissance, type, code) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      {
+        replacements: [nom, prenom, adresseMail, hashedPassword, admin, dateDeNaissance, type, randomNumber],
+      }
     );
 
     // Send email with the confirmation code
@@ -111,5 +113,6 @@ router.post("/sendCode", async (req, res) => {
 
   res.send();
 });
+
 
 module.exports = router;
