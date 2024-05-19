@@ -488,14 +488,10 @@ router.put('/bienImo/:id', upload.single('cheminImg'), async (req, res) => {
   const { id } = req.params;
   let pictures = req.body.cheminImg; // Use existing image by default
   let updateImageQuery = '';
-  const replacements = [];
-  
   if (req.file) {
     pictures = req.file.filename; // If a new file was uploaded, use it instead
-    updateImageQuery = ', cheminImg = ?';
-    replacements.push(pictures); // Add the image filename to the replacements array
+    updateImageQuery = `, cheminImg = '${pictures}'`;
   }
-  
   console.log('pictures ==', pictures); // Log uploaded file information
   const {
     nomBien,
@@ -519,74 +515,47 @@ router.put('/bienImo/:id', upload.single('cheminImg'), async (req, res) => {
     ville,
     adresse,
   } = req.body;
-  
+
+  // Escape single quotes in text fields to prevent SQL injection
   const newDescription = description.replace(/'/g, "''");
+  const newNomBien = nomBien.replace(/'/g, "''");
+  const newAdresse = adresse.replace(/'/g, "''");
+  const newTypeDePropriete = typeDePropriete.replace(/'/g, "''");
+
   console.log('prix est :', prix);
-  
+
   try {
-    const query = `
-      UPDATE bienImo 
-      SET 
-        nomBien = ?, 
-        description = ?, 
-        id_ClientBailleur = ?, 
-        prix = ?, 
-        disponible = ?, 
-        typeDePropriete = ?, 
-        nombreChambres = ?, 
-        nombreLits = ?, 
-        nombreSallesDeBain = ?, 
-        wifi = ?, 
-        cuisine = ?, 
-        balcon = ?, 
-        jardin = ?, 
-        parking = ?, 
-        piscine = ?, 
-        jaccuzzi = ?, 
-        salleDeSport = ?, 
-        climatisation = ?, 
-        ville = ?, 
-        adresse = ? ${updateImageQuery}
-      WHERE id = ?
-    `;
-    
-    replacements.push(
-      nomBien, 
-      newDescription, 
-      id_ClientBailleur, 
-      prix, 
-      disponible, 
-      typeDePropriete, 
-      nombreChambres, 
-      nombreLits, 
-      nombreSallesDeBain, 
-      wifi, 
-      cuisine, 
-      balcon, 
-      jardin, 
-      parking, 
-      piscine, 
-      jaccuzzi, 
-      salleDeSport, 
-      climatisation, 
-      ville, 
-      adresse, 
-      id
+    await sequelize.query(
+      `UPDATE bienImo SET 
+        nomBien = '${newNomBien}', 
+        description = '${newDescription}', 
+        id_ClientBailleur = '${id_ClientBailleur}', 
+        prix = '${prix}', 
+        disponible = '${disponible}', 
+        typeDePropriete = '${newTypeDePropriete}', 
+        nombreChambres = '${nombreChambres}', 
+        nombreLits = '${nombreLits}', 
+        nombreSallesDeBain = '${nombreSallesDeBain}', 
+        wifi = '${wifi}', 
+        cuisine = '${cuisine}', 
+        balcon = '${balcon}', 
+        jardin = '${jardin}', 
+        parking = '${parking}', 
+        piscine = '${piscine}', 
+        jaccuzzi = '${jaccuzzi}', 
+        salleDeSport = '${salleDeSport}', 
+        climatisation = '${climatisation}', 
+        ville = '${ville}', 
+        adresse = '${newAdresse}'
+        ${updateImageQuery} 
+      WHERE id = ${id}`
     );
-    
-    await sequelize.query(query, {
-      replacements,
-      type: sequelize.QueryTypes.UPDATE
-    });
-    
     res.send('Bien modified');
   } catch (error) {
     console.error('Error modifying bien:', error);
     res.status(500).send('Error modifying bien');
   }
 });
-
-
 router.post('/bienImo/filter', async (req, res) => {
   let {
     typeDePropriete,
