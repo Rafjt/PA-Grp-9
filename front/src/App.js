@@ -41,6 +41,7 @@ import TakePrestation from "./pages/takePrestation.js";
 import MyPrestations from "./pages/myPrestations.js";
 import NotFound from "./pages/notFound.js"
 import AvisPrestation from "./pages/avisPrestation.js";
+import ViewAvis from "./pages/viewAvis.js";
 // import { use } from "../../back/routes/auth.js";
 
 function ProtectedRoute({ component: Component }) {
@@ -100,6 +101,9 @@ function ProtectedAuthRoute({ component: Component, authType }) {
       case "clientsBailleurs":
         isAuthenticated = user.type === "clientsBailleurs";
         break;
+      case "bailleurEtVoyageurs":
+        isAuthenticated = user.type === "voyageurs" || user.type === "clientsBailleurs";
+        break;
       case "all": // New case for "all" authentication type
         isAuthenticated = true;
         break;
@@ -153,7 +157,9 @@ function App() {
           <Route path="/modifyBien" element={<ProtectedAuthRoute path="/modifyBien" component={ModifyBien} authType="clientsBailleurs" />} />
           <Route path="/calendarBailleurs" element={<ProtectedAuthRoute path="/calendarBailleurs" component={CalendarBailleurs} authType="clientsBailleurs" />} />
           <Route path="/creeBien" element={<ProtectedAuthRoute path="/creeBien" component={CreeBien} authType="clientsBailleurs" />} />
-          <Route path="/avisPrestation/:prestationId/:prestataireId" element={<ProtectedAuthRoute path="avisPrestation" component={AvisPrestation} authType="clientsBailleurs" />}/>
+          {/* Routes Authent ClientsBailleurs et Voyageurs*/}
+          <Route path="/avisPrestation/:prestationId/:prestataireId" element={<ProtectedAuthRoute path="avisPrestation" component={AvisPrestation} authType="bailleurEtVoyageurs" />}/>
+          <Route path="/viewAvis/:prestationId/:prestataireId" element={<ProtectedAuthRoute path="viewAvis" component={ViewAvis} authType="bailleurEtVoyageurs" />}/>
           {/* Routes Authent Prestataires*/}
           <Route path="/espacePrestataire" element={<ProtectedAuthRoute path="/espacePrestataire" component={EspacePrestataire} authType="prestataires" />} />
           <Route path="/MePlacer" element={<ProtectedAuthRoute path="/MePlacer" component={TakePrestation} authType="prestataires" />} />
