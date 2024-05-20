@@ -44,13 +44,13 @@ function AvisPrestation() {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  console.log(prestation.id_Prestataire);
+  console.log(prestation);
 
   return (
     <div className="form-container-presta mt-5">
       <h2>
-        Donnez votre avis sur {prestation.prenom} {prestation.nom} au sujet de
-        la prestation suivante: {prestation.nomPrestation}
+        Donnez votre avis sur {prestation.prestatairePrenom} {prestation.prestataireNom} au sujet de
+        la prestation suivante: {prestation.nom}
       </h2>
       <button onClick={toggleMenu} className="toggle-button">
         {isMenuOpen ? "Cacher les détails" : "Afficher les détails"}

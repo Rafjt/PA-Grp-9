@@ -1098,17 +1098,46 @@ router.get('/prestationsByIdPrestation', async (req, res) => {
   const { idPrestation } = req.query; // Use req.query to get query parameters
 
   try {
-    const query = `SELECT *, pst.nom as nomPrestation FROM prestation pst
-    JOIN clientsBailleurs cb on pst.id_ClientBailleur = cb.id
-    JOIN prestataires prst on pst.id_Prestataire = prst.id
-    WHERE pst.id=:idPrestation`;
+    // Fetch the prestation to determine the type of user
+    const [prestation] = await sequelize.query(
+      'SELECT * FROM prestation WHERE id = :idPrestation',
+      {
+        replacements: { idPrestation },
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
 
-    const [prestations] = await sequelize.query(query, {
-      replacements: { idPrestation },
+    if (!prestation) {
+      return res.status(404).send('Prestation not found');
+    }
+
+    // Determine the type of user and construct the appropriate query
+    let query = '';
+    let replacements = { idPrestation };
+
+    if (prestation.id_ClientBailleur) {
+      query = `SELECT pst.*, cb.nom as demandeurNom, cb.prenom as demandeurPrenom, prst.nom as prestataireNom, prst.prenom as prestatairePrenom
+               FROM prestation pst
+               JOIN clientsBailleurs cb on pst.id_ClientBailleur = cb.id
+               JOIN prestataires prst on pst.id_Prestataire = prst.id
+               WHERE pst.id = :idPrestation`;
+    } else if (prestation.id_Voyageur) {
+      query = `SELECT pst.*, v.nom as demandeurNom, v.prenom as demandeurPrenom, prst.nom as prestataireNom, prst.prenom as prestatairePrenom
+               FROM prestation pst
+               JOIN voyageurs v on pst.id_Voyageur = v.id
+               JOIN prestataires prst on pst.id_Prestataire = prst.id
+               WHERE pst.id = :idPrestation`;
+    } else {
+      return res.status(400).send('Prestation does not have a valid user type');
+    }
+
+    // Execute the query
+    const [result] = await sequelize.query(query, {
+      replacements,
       type: sequelize.QueryTypes.SELECT,
     });
 
-    res.send(prestations);
+    res.send(result);
   } catch (error) {
     console.error('Error fetching prestation:', error);
     res.status(500).send('Error fetching prestation');
@@ -1221,22 +1250,30 @@ router.post('/upload/avis/:prestationId/:prestataireId', async (req, res) => {
   try {
     const { id_BienImmobilier, id_Prestataire, typeIntervention, note, commentaire, id_Prestation } = req.body;
 
-    // Check if all required fields are provided
-    if (!id_BienImmobilier || !id_Prestataire || !typeIntervention || !note || !commentaire || !id_Prestation) {
-      return res.status(400).json({ error: 'All fields are required' });
+    // Check if all required fields are provided, except id_BienImmobilier which is optional
+    if (!id_Prestataire || !typeIntervention || !note || !commentaire || !id_Prestation) {
+      return res.status(400).json({ error: 'All fields except id_BienImmobilier are required' });
+    }
+
+    let query, replacements;
+
+    // Construct query and replacements based on the presence of id_BienImmobilier
+    if (id_BienImmobilier) {
+      query = 'INSERT INTO evaluationPrestation (id_BienImmobilier, id_Prestataire, typeIntervention, note, commentaire, id_Prestation) VALUES (?, ?, ?, ?, ?, ?)';
+      replacements = [id_BienImmobilier, id_Prestataire, typeIntervention, note, commentaire, id_Prestation];
+    } else {
+      query = 'INSERT INTO evaluationPrestation (id_Prestataire, typeIntervention, note, commentaire, id_Prestation) VALUES (?, ?, ?, ?, ?)';
+      replacements = [id_Prestataire, typeIntervention, note, commentaire, id_Prestation];
     }
 
     // Insert into database
-    const result = await sequelize.query(
-      'INSERT INTO evaluationPrestation (id_BienImmobilier, id_Prestataire, typeIntervention, note, commentaire, id_Prestation) VALUES (?, ?, ?, ?, ?, ?)', 
-      {
-        replacements: [id_BienImmobilier, id_Prestataire, typeIntervention, note, commentaire, id_Prestation],
-        type: QueryTypes.INSERT
-      }
-    );
+    const result = await sequelize.query(query, {
+      replacements: replacements,
+      type: QueryTypes.INSERT
+    });
 
     // Send success response
-    res.status(201).json({ message: 'Evaluation inserted successfully', evaluationId: result.insertId });
+    res.status(201).json({ message: 'Evaluation inserted successfully', evaluationId: result[0] }); // result[0] contains the inserted id
   } catch (error) {
     console.error('Error inserting evaluation:', error);
     res.status(500).json({ error: 'Internal server error' });
