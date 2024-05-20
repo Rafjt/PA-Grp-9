@@ -122,6 +122,7 @@ function Prestations() {
               {user && user.type === "clientsBailleurs" && (
                 <th>Bien associé</th>
               )}
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -168,16 +169,29 @@ function Prestations() {
                           >
                             X
                           </span>
-                          <Link
-                            to={`/avisPrestation/${prestation.id}/${prestation.id_Prestataire}`}
-                            style={{
-                              cursor: "pointer",
-                              color: "blue",
-                              marginLeft: "10px",
-                            }}
-                          >
-                            Laisser un avis
-                          </Link>
+                          {prestation.evalExists ? (
+                            <Link
+                              to={`/viewAvis/${prestation.id}/${prestation.id_Prestataire}`}
+                              style={{
+                                cursor: "pointer",
+                                color: "blue",
+                                marginLeft: "10px",
+                              }}
+                            >
+                              Visualiser l'avis
+                            </Link>
+                          ) : (
+                            <Link
+                              to={`/avisPrestation/${prestation.id}/${prestation.id_Prestataire}`}
+                              style={{
+                                cursor: "pointer",
+                                color: "blue",
+                                marginLeft: "10px",
+                              }}
+                            >
+                              Laisser un avis
+                            </Link>
+                          )}
                         </>
                       ) : (
                         <span
@@ -189,14 +203,12 @@ function Prestations() {
                       )}
                     </>
                   ) : (
-                    <>
-                      <span
-                        style={{ cursor: "pointer", color: "red" }}
-                        onClick={() => handleDelete(prestation.id)}
-                      >
-                        X
-                      </span>
-                    </>
+                    <span
+                      style={{ cursor: "pointer", color: "red" }}
+                      onClick={() => handleDelete(prestation.id)}
+                    >
+                      X
+                    </span>
                   )}
                 </td>
               </tr>

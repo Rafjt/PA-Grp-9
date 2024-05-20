@@ -1041,16 +1041,50 @@ router.get('/prestationsById', async (req, res) => {
 
   switch(user.type) {
     case 'clientsBailleurs':
-      query = `SELECT prestation.*, bienImo.nomBien FROM prestation 
-               INNER JOIN bienImo ON prestation.id_BienImmobilier = bienImo.id 
-               WHERE prestation.id_clientBailleur = ${user.id} AND prestation.statut != 'TERMINÉE'`;
+      query = `
+        SELECT prestation.*, bienImo.nomBien,
+               CASE 
+                   WHEN EXISTS (SELECT 1 
+                                FROM evaluationPrestation ep 
+                                WHERE ep.id_Prestation = prestation.id) 
+                   THEN 1 
+                   ELSE 0 
+               END as evalExists
+        FROM prestation 
+        INNER JOIN bienImo ON prestation.id_BienImmobilier = bienImo.id 
+        WHERE prestation.id_clientBailleur = ${user.id} 
+          AND prestation.statut != 'TERMINÉE'`;
       break;
+  
     case 'voyageurs':
-      query = `SELECT * FROM prestation WHERE id_Voyageur = ${user.id} AND statut != 'TERMINÉE'`;
+      query = `
+        SELECT prestation.*,
+               CASE 
+                   WHEN EXISTS (SELECT 1 
+                                FROM evaluationPrestation ep 
+                                WHERE ep.id_Prestation = prestation.id) 
+                   THEN 1 
+                   ELSE 0 
+               END as evalExists
+        FROM prestation 
+        WHERE id_Voyageur = ${user.id} 
+          AND statut != 'TERMINÉE'`;
       break;
+  
     case 'prestataires':
-      query = `SELECT * FROM prestation WHERE id_Prestataire = ${user.id}`;
+      query = `
+        SELECT prestation.*,
+               CASE 
+                   WHEN EXISTS (SELECT 1 
+                                FROM evaluationPrestation ep 
+                                WHERE ep.id_Prestation = prestation.id) 
+                   THEN 1 
+                   ELSE 0 
+               END as evalExists
+        FROM prestation 
+        WHERE id_Prestataire = ${user.id}`;
       break;
+  
     default:
       res.status(400).send({ error: 'Invalid user type' });
       return;
@@ -1058,6 +1092,51 @@ router.get('/prestationsById', async (req, res) => {
 
   const [prestations] = await sequelize.query(query);
   res.send(prestations);
+});
+
+router.get('/prestationsByIdPrestation', async (req, res) => {
+  const { idPrestation } = req.query; // Use req.query to get query parameters
+
+  try {
+    const query = `SELECT *, pst.nom as nomPrestation FROM prestation pst
+    JOIN clientsBailleurs cb on pst.id_ClientBailleur = cb.id
+    JOIN prestataires prst on pst.id_Prestataire = prst.id
+    WHERE pst.id=:idPrestation`;
+
+    const [prestations] = await sequelize.query(query, {
+      replacements: { idPrestation },
+      type: sequelize.QueryTypes.SELECT,
+    });
+
+    res.send(prestations);
+  } catch (error) {
+    console.error('Error fetching prestation:', error);
+    res.status(500).send('Error fetching prestation');
+  }
+});
+
+router.get('/avis/:prestationId/:prestataireId', async (req, res) => {
+  const { prestationId, prestataireId } = req.params;
+
+  try {
+    const [results] = await sequelize.query(
+      'SELECT * FROM evaluationPrestation WHERE id_Prestation = :prestationId AND id_Prestataire = :prestataireId',
+      {
+        replacements: { prestationId, prestataireId },
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    if (results.length === 0) {
+      return res.status(404).json({ error: 'Avis not found' });
+    }
+
+    console.log(results);
+    res.send(results);
+  } catch (error) {
+    console.error('Error fetching avis:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 router.post('/createPrestation', async (req, res) => {
@@ -1138,6 +1217,33 @@ router.delete('/prestation/:id', async (req, res) => {
   }
 });
 
+router.post('/upload/avis/:prestationId/:prestataireId', async (req, res) => {
+  try {
+    const { id_BienImmobilier, id_Prestataire, typeIntervention, note, commentaire, id_Prestation } = req.body;
+
+    // Check if all required fields are provided
+    if (!id_BienImmobilier || !id_Prestataire || !typeIntervention || !note || !commentaire || !id_Prestation) {
+      return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    // Insert into database
+    const result = await sequelize.query(
+      'INSERT INTO evaluationPrestation (id_BienImmobilier, id_Prestataire, typeIntervention, note, commentaire, id_Prestation) VALUES (?, ?, ?, ?, ?, ?)', 
+      {
+        replacements: [id_BienImmobilier, id_Prestataire, typeIntervention, note, commentaire, id_Prestation],
+        type: QueryTypes.INSERT
+      }
+    );
+
+    // Send success response
+    res.status(201).json({ message: 'Evaluation inserted successfully', evaluationId: result.insertId });
+  } catch (error) {
+    console.error('Error inserting evaluation:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
 // SERVICES SPECIFIQUES
 
 // - Stripe 
@@ -1167,12 +1273,16 @@ router.post('/create-checkout-session', async (req, res) => {
 
 // - Socket.io
 
+
 router.post('/createFirstMessage', async (req, res) => {
   const {id_sender, id_receiver, type_sender, type_receiver, content } = req.body;
   console.log('Creating message:', req.body);
   try {
-    await sequelize.query(`INSERT INTO messages (id_sender, id_receiver, type_sender, type_receiver, content) VALUES ('${id_sender}', '${id_receiver}', '${type_sender}', '${type_receiver}', '${content}')`);
-    await sequelize.query(`INSERT INTO messages (id_sender, id_receiver, type_sender, type_receiver, content) VALUES ('${id_receiver}', '${id_sender}', '${type_receiver}', '${type_sender}', '${content}')`);
+    const [results] = await sequelize.query(`SELECT * FROM messages WHERE id_sender='${id_sender}' AND id_receiver='${id_receiver}' AND content='${content}'`);
+    if (results.length === 0) {
+      await sequelize.query(`INSERT INTO messages (id_sender, id_receiver, type_sender, type_receiver, content) VALUES ('${id_sender}', '${id_receiver}', '${type_sender}', '${type_receiver}', '${content}')`);
+      await sequelize.query(`INSERT INTO messages (id_sender, id_receiver, type_sender, type_receiver, content) VALUES ('${id_receiver}', '${id_sender}', '${type_receiver}', '${type_sender}', '${content}')`);
+    }
   } catch (error) {
     console.error('Error creating message:', error);
     return res.status(500).send('Error creating message');
@@ -1205,4 +1315,62 @@ router.get('/discussionsOfUser', async (req, res) => {
     console.error('Error fetching discussions for specified user:', error);
     res.status(500).json({ error: 'Failed to fetch discussions' });
   }
+});
+
+router.post('/messagesOfDiscussionById', async (req, res) => {
+  console.log('Route /messagesOfDiscussionById called');
+  const { user } = req.session;
+  const { id_receiver, type_receiver } = req.body; // Get parameters from request body for POST
+  try {
+    const [messages] = await sequelize.query(`
+      SELECT * FROM messages 
+      WHERE ((id_sender = :userId AND type_sender = :userType AND id_receiver = :idReceiver AND type_receiver = :typeReceiver)
+      OR (id_sender = :idReceiver AND type_sender = :typeReceiver AND id_receiver = :userId AND type_receiver = :userType))
+      AND content != 'init'
+    `, {
+      replacements: { 
+        userId: user.id, 
+        userType: user.type, 
+        idReceiver: id_receiver, 
+        typeReceiver: type_receiver 
+      }
+    });
+    res.json(messages);
+  } catch (error) {
+    console.error('Error fetching messages of discussion:', error);
+    res.status(500).json({ error: 'Failed to fetch messages' });
+  }
+});
+
+
+router.post('/storeMessage', async (req, res) => {
+  const { user } = req.session;
+  const { id_receiver, type_receiver, content } = req.body;
+  console.log('Creating message:', req.body);
+
+  let query = '';
+  let replacements = {};
+
+  switch(user.type) {
+    case 'clientsBailleurs':
+      query = `INSERT INTO messages (id_sender, id_receiver, type_sender, type_receiver, content) VALUES (:id_sender, :id_receiver, :type_sender, :type_receiver, :content)`;
+      replacements = {id_sender: user.id, id_receiver, type_sender: user.type, type_receiver, content};
+      break;
+    case 'voyageurs':
+      query = `INSERT INTO messages (id_sender, id_receiver, type_sender, type_receiver, content) VALUES (:id_sender, :id_receiver, :type_sender, :type_receiver, :content)`;
+      replacements = {id_sender: user.id, id_receiver, type_sender: user.type, type_receiver, content};
+      break;
+    default:
+      res.status(400).send({ error: 'Invalid user type' });
+      return;
+  }
+
+  try {
+    await sequelize.query(query, { replacements });
+  } catch (error) {
+    console.error('Error creating message:', error);
+    return res.status(500).send('Error creating message');
+  }
+
+  res.send('Message created');
 });

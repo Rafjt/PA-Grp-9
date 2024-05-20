@@ -37,7 +37,7 @@ export const fetchVoyageurs = async () => {
   } catch (error) {
     console.log(error);
   }
-}
+};
 
 export const fetchPrestataires = async () => {
   try {
@@ -47,7 +47,7 @@ export const fetchPrestataires = async () => {
   } catch (error) {
     console.log(error);
   }
-}
+};
 
 export const fetchUserById = async (userId, userType) => {
   try {
@@ -57,12 +57,12 @@ export const fetchUserById = async (userId, userType) => {
   } catch (error) {
     console.log(error);
   }
-}
+};
 
 export const validatePrestataire = async (userId) => {
   try {
     const response = await fetch(`${URL_USERS}/verifyValidationPresta`, {
-      credentials: 'include',
+      credentials: "include",
     });
     if (!response.ok) {
       throw new Error("Failed to validate prestataire");
@@ -77,12 +77,15 @@ export const validatePrestataire = async (userId) => {
 
 export const changeUserStatus = async (userId, userType, status) => {
   try {
-    const response = await fetch(`${URL_USERS}/${userId}/${userType}/${status}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await fetch(
+      `${URL_USERS}/${userId}/${userType}/${status}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
     const data = await response.json();
     return data;
   } catch (error) {
@@ -224,7 +227,6 @@ export const verifConfCode = async (code) => {
   }
 };
 
-
 export const login = async (email, password, type) => {
   console.log("login", email, password, type);
   try {
@@ -234,7 +236,7 @@ export const login = async (email, password, type) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ email, password, type }),
-      credentials: 'include', // Include cookies in the request
+      credentials: "include", // Include cookies in the request
     });
 
     if (response.status === 401) {
@@ -267,7 +269,7 @@ export const updateCookie = async (userId, userType, userData) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ userId, userType, userData }),
-      credentials: 'include',
+      credentials: "include",
     });
     const data = await response.json();
     return data;
@@ -391,14 +393,14 @@ export const updateAnnonce = async (annonceId, annonceData, file) => {
 export const fetchAnnonceByBailleur = async () => {
   try {
     const response = await fetch(`${BASE_URL}/biens`, {
-      credentials: 'include',
+      credentials: "include",
     });
     const data = await response.json();
     return data;
   } catch (error) {
     console.log(error);
   }
-}
+};
 
 // GESTION DES PAIEMENTS
 
@@ -483,22 +485,19 @@ export const fetchReservation = async () => {
 };
 
 export const deleteReservation = async (reservationId) => {
-  console.log("func :",reservationId);
-  console.log("URL :",`${URL_RESERVATION}/${reservationId}`);
+  console.log("func :", reservationId);
+  console.log("URL :", `${URL_RESERVATION}/${reservationId}`);
   try {
-    const response = await fetch(
-      `${URL_RESERVATION}/${reservationId}`,
-      {
-        method: "DELETE",
-      }
-    );
+    const response = await fetch(`${URL_RESERVATION}/${reservationId}`, {
+      method: "DELETE",
+    });
     if (!response.ok) {
       throw new Error("Failed to delete reservation");
     }
   } catch (error) {
     console.error("Error deleting reservation:", error);
   }
-}
+};
 
 export const updateReservation = async (reservationId, reservationData) => {
   try {
@@ -521,15 +520,14 @@ export const fetchReservationByBailleur = async () => {
   console.log("Callin fetchReservationByBailleur");
   try {
     const response = await fetch(`${BASE_URL}/MyCalendar`, {
-      credentials: 'include', 
+      credentials: "include",
     });
     const data = await response.json();
     return data;
-  }
-  catch (error) {
+  } catch (error) {
     console.log(error);
   }
-}
+};
 
 export const fetchReservationById = async (reservationId) => {
   try {
@@ -554,8 +552,6 @@ export const fetchReservationByIdVoyageur = async (voyageurId) => {
     console.log(error);
   }
 };
-
-
 
 export const fetchDisabledDates = async (reservationId) => {
   try {
@@ -590,15 +586,14 @@ export const createReservation = async (reservationData) => {
 export const fetchPrestationsById = async () => {
   try {
     const response = await fetch(`${BASE_URL}/prestationsById`, {
-      credentials: 'include', 
+      credentials: "include",
     });
     const data = await response.json();
     return data;
-  }
-  catch (error) {
+  } catch (error) {
     console.log(error);
   }
-}
+};
 
 export const createPrestation = async (prestationData) => {
   try {
@@ -608,76 +603,134 @@ export const createPrestation = async (prestationData) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(prestationData),
-      credentials: 'include', // Include credentials in the request
+      credentials: "include", // Include credentials in the request
     });
     const data = await response.json();
     return data;
   } catch (error) {
     console.log(error);
   }
-}
+};
 
 export const fetchPrestationsEnAttente = async () => {
   try {
     const response = await fetch(`${BASE_URL}/prestationsEnAttente`, {
-      credentials: 'include', 
+      credentials: "include",
     });
     const data = await response.json();
     return data;
-  }
-  catch (error) {
+  } catch (error) {
     console.log(error);
   }
-}
+};
 
 export const acceptPrestation = async (prestationId) => {
   try {
-    const response = await fetch(`${BASE_URL}/acceptPrestation/${prestationId}`, {
-      method: "PUT",
-      credentials: 'include', 
-    });
+    const response = await fetch(
+      `${BASE_URL}/acceptPrestation/${prestationId}`,
+      {
+        method: "PUT",
+        credentials: "include",
+      }
+    );
     const data = await response.json();
     return data;
-  }
-  catch (error) {
+  } catch (error) {
     console.log(error);
   }
-}
+};
 
 export const deletePrestation = async (prestationId) => {
   try {
     const response = await fetch(`${BASE_URL}/prestation/${prestationId}`, {
       method: "DELETE",
-      credentials: 'include', 
+      credentials: "include",
     });
     const data = await response.json();
     return data;
-  }
-  catch (error) {
+  } catch (error) {
     console.log(error);
+  }
+};
+
+export const fetchPrestationByPrestationId = async (prestationId) => {
+  try {
+    const response = await fetch(`${BASE_URL}/prestationsByIdPrestation?idPrestation=${prestationId}`, {
+      method: "GET",
+    });
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching prestation:', error);
+    throw error;
+  }
+};
+
+export const uploadAvis = async (id_BienImmobilier, id_Prestataire, typeIntervention, note, commentaire, id_Prestation) => {
+  try {
+    const response = await fetch(`${BASE_URL}/upload/avis/${id_Prestation}/${id_Prestataire}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({id_BienImmobilier, id_Prestataire, typeIntervention, note, commentaire, id_Prestation }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error uploading avis:', error);
+    throw error;
   }
 }
 
-// export const uploadAvis = async(prestataireId, prestationId){
-//   try {
-    
-//   } catch (error) {
-    
-//   }
-// }
+export const fetchAvis = async (prestationId, prestataireId) => {
+  try {
+    const response = await fetch(`${BASE_URL}/avis/${prestationId}/${prestataireId}`, {
+      method: "GET",
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch avis");
+    }
+
+    // Check if the response body is not empty
+    const text = await response.text();
+    if (!text) {
+      throw new Error("Empty response body");
+    }
+
+    // Parse the JSON response
+    const data = JSON.parse(text);
+    console.log(data);
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching avis:", error);
+    throw error;
+  }
+}
 
 // GESTION DES SERVICES EXTERNES
 
-export const getCredentials = async() => {
+export const getCredentials = async () => {
   console.log("getCredentials");
   try {
     const response = await fetch(`${URL_AUTH}/me`, {
-      credentials: 'include', 
+      credentials: "include",
     });
     const data = await response.json();
     return data;
-  }
-  catch (error) {
+  } catch (error) {
     console.log(error);
   }
 };
@@ -696,12 +749,12 @@ export const createFirstMessage = async (messageData) => {
   } catch (error) {
     console.log(error);
   }
-}
+};
 
 export const fetchMessagesById = async () => {
   try {
     const response = await fetch(`${BASE_URL}/messagesById`, {
-      credentials: 'include', // or 'same-origin'
+      credentials: "include", // or 'same-origin'
     });
     const data = await response.json();
     return data;
@@ -713,7 +766,7 @@ export const fetchMessagesById = async () => {
 export const fetchDiscussions = async () => {
   try {
     const response = await fetch(`${BASE_URL}/discussionsOfUser`, {
-      credentials: 'include', // or 'same-origin'
+      credentials: "include", // or 'same-origin'
     });
     const data = await response.json();
     return data;
@@ -722,21 +775,60 @@ export const fetchDiscussions = async () => {
   }
 };
 
+export const fetchMessagesOfDiscussionById = async ({ id_receiver, type_receiver }) => { // Accept object as parameter
+  try {
+    const response = await fetch(`${BASE_URL}/messagesOfDiscussionById`, {
+      method: 'POST', 
+      credentials: 'include', 
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id_receiver, type_receiver }), 
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+
 export const createRoomName = (user1, user2) => {
   // Initialize all categories to '00'
-  let voyageur = '00';
-  let bailleur = '00';
-  let prestataire = '00';
+  let voyageur = "00";
+  let bailleur = "00";
+  let prestataire = "00";
 
   // Assign the user IDs to the correct categories
-  if (user1.type === 'voyageurs') voyageur = user1.id;
-  else if (user1.type === 'clientsBailleurs') bailleur = user1.id; // Corrected type
-  else if (user1.type === 'prestataires') prestataire = user1.id;
+  if (user1.type === "voyageurs") voyageur = user1.id;
+  else if (user1.type === "clientsBailleurs")
+    bailleur = user1.id; // Corrected type
+  else if (user1.type === "prestataires") prestataire = user1.id;
 
-  if (user2.type === 'voyageurs') voyageur = user2.id;
-  else if (user2.type === 'clientsBailleurs') bailleur = user2.id; // Corrected type
-  else if (user2.type === 'prestataires') prestataire = user2.id;
+  if (user2.type === "voyageurs") voyageur = user2.id;
+  else if (user2.type === "clientsBailleurs")
+    bailleur = user2.id; // Corrected type
+  else if (user2.type === "prestataires") prestataire = user2.id;
 
   // Return the room name
   return `room n°${voyageur}_${bailleur}_${prestataire}`;
+
+};
+
+export const storeMessage = async (messageData) => {
+  try {
+    const response = await fetch(`${BASE_URL}/storeMessage`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(messageData),
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
 }
+
