@@ -775,6 +775,24 @@ export const fetchDiscussions = async () => {
   }
 };
 
+export const fetchMessagesOfDiscussionById = async ({ id_receiver, type_receiver }) => { // Accept object as parameter
+  try {
+    const response = await fetch(`${BASE_URL}/messagesOfDiscussionById`, {
+      method: 'POST', 
+      credentials: 'include', 
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id_receiver, type_receiver }), 
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+
 export const createRoomName = (user1, user2) => {
   // Initialize all categories to '00'
   let voyageur = "00";
@@ -794,4 +812,23 @@ export const createRoomName = (user1, user2) => {
 
   // Return the room name
   return `room n°${voyageur}_${bailleur}_${prestataire}`;
+
 };
+
+export const storeMessage = async (messageData) => {
+  try {
+    const response = await fetch(`${BASE_URL}/storeMessage`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(messageData),
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
