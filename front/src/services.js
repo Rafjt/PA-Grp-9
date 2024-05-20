@@ -693,20 +693,26 @@ export const uploadAvis = async (id_BienImmobilier, id_Prestataire, typeInterven
   }
 }
 
-export async function fetchAvis(prestationId, prestataireId) {
+export const fetchAvis = async (prestationId, prestataireId) => {
   try {
-    const response = await fetch(
-      `${BASE_URL}/avis/${prestationId}/${prestataireId}`, {
-        method: "GET",
-      }
-    );
+    const response = await fetch(`${BASE_URL}/avis/${prestationId}/${prestataireId}`, {
+      method: "GET",
+    });
+
     if (!response.ok) {
       throw new Error("Failed to fetch avis");
     }
-    console.log(response);
-    const data = await response.json();
+
+    // Check if the response body is not empty
+    const text = await response.text();
+    if (!text) {
+      throw new Error("Empty response body");
+    }
+
+    // Parse the JSON response
+    const data = JSON.parse(text);
     console.log(data);
-    console.log(response);
+
     return data;
   } catch (error) {
     console.error("Error fetching avis:", error);

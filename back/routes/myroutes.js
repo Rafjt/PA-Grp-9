@@ -1126,13 +1126,13 @@ router.get('/avis/:prestationId/:prestataireId', async (req, res) => {
         type: sequelize.QueryTypes.SELECT,
       }
     );
-    
+
     if (results.length === 0) {
       return res.status(404).json({ error: 'Avis not found' });
     }
 
-    res.json(results[0]);
     console.log(results);
+    res.send(results);
   } catch (error) {
     console.error('Error fetching avis:', error);
     res.status(500).json({ error: 'Internal server error' });

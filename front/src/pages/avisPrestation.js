@@ -16,6 +16,7 @@ function AvisPrestation() {
     const fetchData = async () => {
       try {
         const data = await fetchPrestationByPrestationId(prestationId);
+        console.log(data);
         setPrestation(data);
       } catch (error) {
         setError(error.message);
