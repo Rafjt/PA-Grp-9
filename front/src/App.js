@@ -42,6 +42,7 @@ import MyPrestations from "./pages/myPrestations.js";
 import NotFound from "./pages/notFound.js"
 import AvisPrestation from "./pages/avisPrestation.js";
 import ViewAvis from "./pages/viewAvis.js";
+import PerfPresta from "./pages/perfPresta.js";
 // import { use } from "../../back/routes/auth.js";
 
 function ProtectedRoute({ component: Component }) {
@@ -164,6 +165,7 @@ function App() {
           <Route path="/espacePrestataire" element={<ProtectedAuthRoute path="/espacePrestataire" component={EspacePrestataire} authType="prestataires" />} />
           <Route path="/MePlacer" element={<ProtectedAuthRoute path="/MePlacer" component={TakePrestation} authType="prestataires" />} />
           <Route path="/myPrestations" element={<ProtectedAuthRoute path="/myPrestations" component={MyPrestations} authType="prestataires" />} />
+          <Route path="/perfPresta" element={<ProtectedAuthRoute path="/perfPresta" component={PerfPresta} authType="prestataires" />} />
           {/* Routes admin */}
           <Route path="/backOffice" element={<ProtectedRoute component={BackOffice} />} />
           <Route path="/update/:id/:type" element={<ProtectedRoute component={Update} />} />
