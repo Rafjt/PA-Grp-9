@@ -1307,6 +1307,7 @@ router.get('/evaluations/avis/:prestataireId', async (req, res) => {
         pon.*, 
         eval.typeIntervention, 
         eval.note,
+        eval.commentaire,
         cb.prenom as demandeurPrenom,
         cb.nom as demandeurNom
       FROM 
@@ -1329,6 +1330,7 @@ router.get('/evaluations/avis/:prestataireId', async (req, res) => {
         pon.*, 
         eval.typeIntervention, 
         eval.note,
+        eval.commentaire,
         cb.prenom as demandeurPrenom,
         cb.nom as demandeurNom
       FROM 

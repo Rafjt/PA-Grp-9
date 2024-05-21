@@ -116,10 +116,10 @@ const PerfPresta = () => {
                     <tr className="sticky-header">
                       <th>Demandeur</th>
                       <th>Nom</th>
-                      <th className="long-column">Description</th>
-                      <th className="narrow-column">Note</th>
                       <th>Type d'intervention</th>
                       <th className="narrow-column">Ville</th>
+                      <th className="narrow-column">Note</th>
+                      <th className="long-column">Commentaire</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -129,12 +129,12 @@ const PerfPresta = () => {
                           {evaluation.demandeurPrenom} {evaluation.demandeurNom}
                         </td>
                         <td>{evaluation.nom}</td>
-                        <td className="long-column">
-                          {evaluation.description}
-                        </td>
-                        <td>{evaluation.note}⭐</td>
                         <td>{evaluation.typeIntervention}</td>
                         <td>{evaluation.ville}</td>
+                        <td>{evaluation.note}⭐</td>
+                        <td className="long-column">
+                          {evaluation.commentaire}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
