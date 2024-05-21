@@ -294,6 +294,12 @@ const GestionReservations = () => {
         <div className="gestionReservations">
             <div className="greet">
                 <h1>Gestion des Réservations</h1>
+                <button
+            onClick={() => (window.location.href = "/backOffice")}
+            className="back-button"
+            >
+            Retour
+            </button>
                 <h2>Ici, vous pouvez consulter, créer, mettre à jour ou annuler des réservations</h2>
             </div>
 

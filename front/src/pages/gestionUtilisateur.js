@@ -150,6 +150,12 @@ const GestionUtilisateur = () => {
     <div className="gestionUtilisateur2">
       <div className="greet">
         <h1>Gestion des Utilisateurs</h1>
+        <button
+          onClick={() => (window.location.href = "/backOffice")}
+          className="back-button"
+        >
+          Retour
+        </button>
         <h2>
           Ici, vous pouvez rechercher, ajouter, modifier ou supprimer des
           utilisateurs
