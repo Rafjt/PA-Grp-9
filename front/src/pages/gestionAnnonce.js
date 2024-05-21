@@ -160,6 +160,12 @@ const GestionAnnonce = () => {
     return (
         <div className="gestionAnnonce">
             <h1>Gestion des Annonces</h1>
+            <button
+            onClick={() => (window.location.href = "/backOffice")}
+            className="back-button"
+            >
+            Retour
+            </button>
             <form onSubmit={handleSubmit}>
                 <div className="createAnnonce">
                     <h2>Ajouter une annonce</h2>

@@ -671,6 +671,8 @@ export const fetchPrestationByPrestationId = async (prestationId) => {
   }
 };
 
+// GESTION DES AVIS
+
 export const uploadAvis = async (id_BienImmobilier, id_Prestataire, typeIntervention, note, commentaire, id_Prestation) => {
   try {
     const response = await fetch(`${BASE_URL}/upload/avis/${id_Prestation}/${id_Prestataire}`, {
@@ -718,7 +720,34 @@ export const fetchAvis = async (prestationId, prestataireId) => {
     console.error("Error fetching avis:", error);
     throw error;
   }
-}
+};
+
+
+export const fetchEvaluationsByPrestataire = async (prestataireId) => {
+  console.log("Calling fetchEvaluationsByPrestataire");
+  try {
+    const response = await fetch(`${BASE_URL}/evaluations/avis/${prestataireId}`, {
+      credentials: "include",
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const fetchGeneralInfoByPrestataire = async (prestataireId) => {
+  console.log("Calling fetchGeneralInfoByPrestataire");
+  try {
+    const response = await fetch(`${BASE_URL}/avis/general/${prestataireId}`, {
+      credentials: "include",
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 // GESTION DES SERVICES EXTERNES
 

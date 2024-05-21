@@ -87,6 +87,12 @@ const GestionPaiement = () => {
   return (
     <div>
       <h1>Gestion des paiements</h1>
+      <button
+            onClick={() => (window.location.href = "/backOffice")}
+            className="back-button"
+            >
+            Retour
+            </button>
       <div className="creation rounded shadow">
         <h2>Créer un paiement</h2>
         <form onSubmit={handleSubmit}>

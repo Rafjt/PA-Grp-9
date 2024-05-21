@@ -83,6 +83,12 @@ const Statistiques = () => {
       </div>
       <div className="container mt-5">
         <h1 className="mb-4">Statistiques et Rapports du Site</h1>
+        <button
+          onClick={() => (window.location.href = "/backOffice")}
+          className="back-button"
+        >
+          Retour
+        </button>
         <div className="row">
           {/* Left column (1/3 of the screen) */}
           <div className="col-md-4">

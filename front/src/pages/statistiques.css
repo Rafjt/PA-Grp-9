@@ -18,3 +18,18 @@
     padding-right: 0; /* Override padding */
     padding-bottom: 0; /* Override padding */
   }
+
+  .back-button {
+    position: absolute;
+  top: 120px;
+  left: 30px;
+  background-color: #007bff;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 5px;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+.back-button:hover {
+  background-color: #0056b3;
+}

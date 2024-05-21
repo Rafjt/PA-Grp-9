@@ -42,3 +42,18 @@
 .place-button:hover {
     background-color: #636363;
 }
+
+.back-button {
+    position: absolute;
+  top: 120px;
+  left: 30px;
+  background-color: #007bff;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 5px;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+.back-button:hover {
+  background-color: #0056b3;
+}

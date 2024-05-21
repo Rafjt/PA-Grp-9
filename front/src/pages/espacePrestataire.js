@@ -45,6 +45,10 @@ function EspacePrestataire() {
         window.location.href = "/MyPrestations";
     }
 
+    const toMesPerformances = () => {
+        window.location.href = "/perfPresta";
+    }
+
     return (
         <div>
             <img
@@ -55,7 +59,7 @@ function EspacePrestataire() {
             <h1>Espace Prestataire</h1>
             <hr />
             <div className="button-grid">
-                <button className="grid-button">MES PERFORMANCE</button>
+                <button className="grid-button" onClick={toMesPerformances}>MES PERFORMANCES</button>
                 <button className="grid-button">MES DOCUMENTS ADMINISTRATIF ET PAIEMENTS</button>
                 <button className="grid-button" onClick={toMePlacer}>ME PLACER SUR UNE PRESTATIONS</button>
                 <button className="grid-button">MES SECTEURS D'ACTIVITÉ</button>

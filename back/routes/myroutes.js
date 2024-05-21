@@ -1143,31 +1143,6 @@ router.get('/prestationsByIdPrestation', async (req, res) => {
     res.status(500).send('Error fetching prestation');
   }
 });
-
-router.get('/avis/:prestationId/:prestataireId', async (req, res) => {
-  const { prestationId, prestataireId } = req.params;
-
-  try {
-    const [results] = await sequelize.query(
-      'SELECT * FROM evaluationPrestation WHERE id_Prestation = :prestationId AND id_Prestataire = :prestataireId',
-      {
-        replacements: { prestationId, prestataireId },
-        type: sequelize.QueryTypes.SELECT,
-      }
-    );
-
-    if (results.length === 0) {
-      return res.status(404).json({ error: 'Avis not found' });
-    }
-
-    console.log(results);
-    res.send(results);
-  } catch (error) {
-    console.error('Error fetching avis:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
 router.post('/createPrestation', async (req, res) => {
   const {user} = req.session;
   const {id_BienImmobilier, date, lieux, ville, typeIntervention, nom, description} = req.body; // Extract description from req.body
@@ -1246,6 +1221,8 @@ router.delete('/prestation/:id', async (req, res) => {
   }
 });
 
+// GESTION DES AVIS
+
 router.post('/upload/avis/:prestationId/:prestataireId', async (req, res) => {
   try {
     const { id_BienImmobilier, id_Prestataire, typeIntervention, note, commentaire, id_Prestation } = req.body;
@@ -1276,6 +1253,129 @@ router.post('/upload/avis/:prestationId/:prestataireId', async (req, res) => {
     res.status(201).json({ message: 'Evaluation inserted successfully', evaluationId: result[0] }); // result[0] contains the inserted id
   } catch (error) {
     console.error('Error inserting evaluation:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+router.get('/avis/general/:prestataireId', async (req, res) => {
+  console.log('Route /avis/general/:prestataireId called');
+  const { prestataireId } = req.params;
+
+  try {
+    const [generalInfo] = await sequelize.query(`
+      SELECT 
+        p.nom as prestaNom, 
+        p.prenom as prestaPrenom, 
+        p.dateDeNaissance, 
+        p.adresseMail,
+        AVG(eval.note) as noteMoy,
+        COUNT(*) as nombrePresta
+      FROM 
+        prestataires p
+      JOIN 
+        prestation pon ON p.id = pon.id_Prestataire
+      JOIN 
+        evaluationPrestation eval ON pon.id = eval.id_Prestation
+      WHERE 
+        p.id = :prestataireId
+      GROUP BY 
+        p.nom, 
+        p.prenom, 
+        p.dateDeNaissance, 
+        p.adresseMail
+    `, 
+    {
+      replacements: { prestataireId },
+      type: sequelize.QueryTypes.SELECT,
+    });
+
+    res.json(generalInfo);
+  } catch (error) {
+    console.error('Error fetching general information by prestataireId:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Evaluations Route
+router.get('/evaluations/avis/:prestataireId', async (req, res) => {
+  console.log('Route /avis/evaluations/:prestataireId called');
+  const { prestataireId } = req.params;
+
+  try {
+    // Query for evaluations with id_ClientBailleur
+    const clientBailleurEvaluations = await sequelize.query(`
+      SELECT 
+        pon.*, 
+        eval.typeIntervention, 
+        eval.note,
+        eval.commentaire,
+        cb.prenom as demandeurPrenom,
+        cb.nom as demandeurNom
+      FROM 
+        prestation pon 
+      JOIN 
+        evaluationPrestation eval ON pon.id = eval.id_Prestation
+      JOIN
+        clientsBailleurs cb on pon.id_ClientBailleur = cb.id
+      WHERE 
+        pon.id_Prestataire = :prestataireId
+    `, 
+    {
+      replacements: { prestataireId },
+      type: sequelize.QueryTypes.SELECT,
+    });
+
+    // Query for evaluations with id_Voyageur
+    const voyageurEvaluations = await sequelize.query(`
+      SELECT 
+        pon.*, 
+        eval.typeIntervention, 
+        eval.note,
+        eval.commentaire,
+        cb.prenom as demandeurPrenom,
+        cb.nom as demandeurNom
+      FROM 
+        prestation pon 
+      JOIN 
+        evaluationPrestation eval ON pon.id = eval.id_Prestation
+      JOIN
+        voyageurs cb on pon.id_Voyageur = cb.id
+      WHERE 
+        pon.id_Prestataire = :prestataireId
+    `, 
+    {
+      replacements: { prestataireId },
+      type: sequelize.QueryTypes.SELECT,
+    });
+
+    // Combine the results from both queries
+    const evaluations = clientBailleurEvaluations.concat(voyageurEvaluations);
+
+    res.json(evaluations);
+  } catch (error) {
+    console.error('Error fetching evaluations by prestataireId:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+router.get('/avis/:prestationId/:prestataireId', async (req, res) => {
+  const { prestationId, prestataireId } = req.params;
+
+  try {
+    const [results] = await sequelize.query(
+      'SELECT * FROM evaluationPrestation WHERE id_Prestation = :prestationId AND id_Prestataire = :prestataireId',
+      {
+        replacements: { prestationId, prestataireId },
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    if (results.length === 0) {
+      return res.status(404).json({ error: 'Avis not found' });
+    }
+
+    console.log(results);
+    res.send(results);
+  } catch (error) {
+    console.error('Error fetching avis:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
