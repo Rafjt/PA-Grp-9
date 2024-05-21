@@ -1,6 +1,7 @@
 const express = require("express");
 const sequelize = require("../database");
 // const {fs} = require('fs');
+// const path = require('path');
 const { QueryTypes } = require("sequelize");
 const bcrypt = require("bcrypt");
 const multer = require('multer');
@@ -1510,4 +1511,57 @@ router.post('/storeMessage', async (req, res) => {
   }
 
   res.send('Message created');
+});
+
+
+const path = require('path');
+const fs = require('fs');
+
+router.post('/save-pdf', (req, res) => {
+  const pdfData = req.body; // Assuming pdfData is already in the correct format
+  const timestamp = Date.now();
+  const filePath = path.join(__dirname, '../uploads/facture_' + timestamp + '.pdf');
+
+  // Convert pdfData to string if it's an object
+  const dataToWrite = typeof pdfData === 'object' ? JSON.stringify(pdfData) : pdfData;
+
+  fs.writeFile(filePath, dataToWrite, (err) => {
+      if (err) {
+          console.error(err);
+          res.status(500).send('Error saving PDF');
+      } else {
+          res.status(200).send('PDF saved');
+      }
+  });
+});
+
+router.post('/createFinance', async (req, res) => {
+  const { id_ClientBailleur, id_Prestataire, id_Voyageur, type, montant, dateTransaction, nomDocument } = req.body;
+  console.log('Creating finance:', req.body);
+
+  let query = '';
+  let replacements = {};
+
+  if (id_ClientBailleur) {
+    query = 'INSERT INTO finances (id_ClientBailleur, montant, dateTransaction, type, nomDocument) VALUES (:id_ClientBailleur, :montant, :dateTransaction, :type, :nomDocument)';
+    replacements = {id_ClientBailleur, montant, dateTransaction, type, nomDocument};
+  } else if (id_Prestataire) {
+    query = 'INSERT INTO finances (id_Prestataire, montant, dateTransaction, type, nomDocument) VALUES (:id_Prestataire, :montant, :dateTransaction, :type, :nomDocument)';
+    replacements = {id_Prestataire, montant, dateTransaction, type, nomDocument};
+  } else if (id_Voyageur) {
+    query = 'INSERT INTO finances (id_Voyageur, montant, dateTransaction, type, nomDocument) VALUES (:id_Voyageur, :montant, :dateTransaction, :type, :nomDocument)';
+    replacements = {id_Voyageur, montant, dateTransaction, type, nomDocument};
+  } else {
+    res.status(400).send({ error: 'Invalid user type' });
+    return;
+  }
+
+  try {
+    await sequelize.query(query, { replacements });
+  } catch (error) {
+    console.error('Error creating finance:', error);
+    return res.status(500).send('Error creating finance');
+  }
+
+  res.send('Finance created');
 });
