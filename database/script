@@ -67,11 +67,13 @@ CREATE TABLE finances (
   id INT PRIMARY KEY AUTO_INCREMENT,
   id_ClientBailleur INT,
   id_Prestataire INT,
+  id_Voyageur INT, -- New column
   montant DECIMAL(10, 2),
   type VARCHAR(50),
   dateTransaction DATE,
   FOREIGN KEY (id_ClientBailleur) REFERENCES clientsBailleurs(id),
-  FOREIGN KEY (id_Prestataire) REFERENCES prestataires(id)
+  FOREIGN KEY (id_Prestataire) REFERENCES prestataires(id),
+  FOREIGN KEY (id_Voyageur) REFERENCES voyageurs(id) -- New foreign key constraint
 );
 
 -- Table abonnement

@@ -861,3 +861,20 @@ export const storeMessage = async (messageData) => {
   }
 }
 
+
+export const createFinance = async (financeData) => {
+  try {
+    const response = await fetch(`${BASE_URL}/createFinance`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(financeData),
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+}
