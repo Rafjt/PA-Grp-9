@@ -671,6 +671,19 @@ export const fetchPrestationByPrestationId = async (prestationId) => {
   }
 };
 
+export const archiverPresta = async (prestationId) => {
+  try {
+    const response = await fetch(`${BASE_URL}/archiverPrestation/${prestationId}`, {
+      method: "PUT",
+      credentials: "include",
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 // GESTION DES AVIS
 
 export const uploadAvis = async (id_BienImmobilier, id_Prestataire, typeIntervention, note, commentaire, id_Prestation) => {

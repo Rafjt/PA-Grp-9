@@ -55,10 +55,10 @@ function MyPrestations() {
   }
 
   const acceptedPrestations = prestations.filter(
-    (prestation) => prestation.statut === "ACCEPTÉE"
+    (prestation) => prestation.statut === "ACCEPTEE"
   );
   const finishedPrestations = prestations.filter(
-    (prestation) => prestation.statut === "TERMINÉ"
+    (prestation) => prestation.statut === "TERMINEE"
   );
 
   const handleContact = (clientId, clientName, userType) => {

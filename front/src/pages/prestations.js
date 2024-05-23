@@ -7,10 +7,12 @@ import {
   fetchAnnonceByBailleur,
   deletePrestation,
   fetchUserById,
+  archiverPresta,
 } from "../services";
 import { useNavigate, Link } from "react-router-dom";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import Prompt from "../components/prompt.js";
 
 function Prestations() {
   const [user, setUser] = useState(null);
@@ -18,18 +20,38 @@ function Prestations() {
   const [prestations, setPrestations] = useState([]);
   const [biens, setBiens] = useState([]);
   const [prestataires, setPrestataires] = useState([]);
+  const [showPrompt, setShowPrompt] = useState(false);
+  const [selectedPrestationId, setSelectedPrestationId] = useState(null);
+  const [actionType, setActionType] = useState(null);
   const navigate = useNavigate();
 
   const today = new Date();
   const dd = String(today.getDate()).padStart(2, "0");
-  const mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
+  const mm = String(today.getMonth() + 1).padStart(2, "0"); // January is 0!
   const yyyy = today.getFullYear();
 
   const todayFormatted = yyyy + "-" + mm + "-" + dd;
 
-  const handleDelete = async (id) => {
-    await deletePrestation(id);
-    window.location.reload();
+  const handleDelete = (id, action) => {
+    setSelectedPrestationId(id);
+    setActionType(action);
+    setShowPrompt(true);
+  };
+
+  const confirmDelete = async () => {
+    if (actionType === "delete") {
+      await deletePrestation(selectedPrestationId);
+    } else if (actionType === "archive") {
+      await archiverPresta(selectedPrestationId);
+    }
+    setShowPrompt(false);
+    fetchData(); // Call fetchData to refresh the data
+  };
+
+  const cancelDelete = () => {
+    setShowPrompt(false);
+    setSelectedPrestationId(null);
+    setActionType(null);
   };
 
   const handleContact = () => {
@@ -38,53 +60,46 @@ function Prestations() {
 
   function formatDate(dateString) {
     const date = new Date(dateString);
-
     const day = String(date.getDate()).padStart(2, "0");
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const year = date.getFullYear();
-
     return `${day}/${month}/${year}`;
   }
 
+  const fetchData = async () => {
+    const userData = await getCredentials();
+    setUser(userData);
+    setLoading(false);
+
+    if (userData.type === "prestataires") {
+      navigate("/login");
+    }
+
+    const prestationsData = await fetchPrestationsById();
+    setPrestations(prestationsData);
+
+    const biensData = await fetchAnnonceByBailleur();
+    setBiens(biensData);
+
+    const fetchedPrestataires = await Promise.all(
+      prestationsData.map(async (prestation) => {
+        if (prestation.id_Prestataire) {
+          const prestataire = await fetchUserById(
+            prestation.id_Prestataire,
+            "prestataires"
+          );
+          return { ...prestation, prestataire };
+        } else {
+          return prestation;
+        }
+      })
+    );
+    setPrestataires(fetchedPrestataires);
+  };
+
   useEffect(() => {
-    getCredentials().then((data) => {
-      setUser(data);
-      setLoading(false);
-
-      if (data.type === "prestataires") {
-        navigate("/login");
-      }
-    });
-
-    fetchPrestationsById().then((data) => {
-      console.log(data);
-      setPrestations(data);
-    });
-
-    fetchAnnonceByBailleur().then((data) => {
-      setBiens(data);
-    });
+    fetchData();
   }, []);
-
-  useEffect(() => {
-    const fetchPrestataires = async () => {
-      const fetchedPrestataires = await Promise.all(
-        prestations.map(async (prestation) => {
-          if (prestation.id_Prestataire) {
-            const prestataire = await fetchUserById(
-              prestation.id_Prestataire,
-              "prestataires"
-            );
-            return { ...prestation, prestataire };
-          } else {
-            return prestation;
-          }
-        })
-      );
-      setPrestataires(fetchedPrestataires);
-    };
-    fetchPrestataires();
-  }, [prestations]);
 
   const validationSchema = Yup.object({
     typeIntervention: Yup.string().required(
@@ -108,8 +123,16 @@ function Prestations() {
 
   return (
     <div>
+      <h1 className="mt-5">Prestations demandées</h1>
+      <button
+        onClick={() => (window.location.href = "/espaceVoyageur")}
+        className="back-button"
+      >
+        Retour
+      </button>
+      <hr />
       <div>
-        <table className="prestaTable">
+        <table className="prestaTable table-responsive shadow">
           <thead>
             <tr>
               <th>Type</th>
@@ -132,7 +155,7 @@ function Prestations() {
                 <td>{prestation.nom}</td>
                 <td>{prestation.description}</td>
                 <td>
-                  {prestation.statut === "ACCEPTÉE"
+                  {prestation.statut === "ACCEPTEE"
                     ? `${prestation.statut} par ${prestation.prestataire.prenom} ${prestation.prestataire.nom}`
                     : prestation.statut}
                 </td>
@@ -154,61 +177,71 @@ function Prestations() {
                   {prestation.id && prestation.id_Prestataire ? (
                     <>
                       {new Date(prestation.date) >= new Date() &&
-                      prestation.statut === "ACCEPTÉE" ? (
-                        <span
-                          style={{ cursor: "pointer", color: "green" }}
+                      prestation.statut === "ACCEPTEE" ? (
+                        <button
+                          className="contact-button"
                           onClick={handleContact}
                         >
                           Contacter le prestataire
-                        </span>
+                        </button>
                       ) : new Date(prestation.date) < new Date() ? (
                         <>
-                          <span
-                            style={{ cursor: "pointer", color: "red" }}
-                            onClick={() => handleDelete(prestation.id)}
-                          >
-                            X
-                          </span>
+                          {prestation.evalExists !== 0 && (
+                            <button
+                              style={{ cursor: "pointer" }}
+                              onClick={() =>
+                                handleDelete(prestation.id, "archive")
+                              }
+                            >
+                              Archiver
+                            </button>
+                          )}
                           {prestation.evalExists ? (
-                            <Link
-                              to={`/viewAvis/${prestation.id}/${prestation.id_Prestataire}`}
-                              style={{
-                                cursor: "pointer",
-                                color: "blue",
-                                marginLeft: "10px",
-                              }}
-                            >
-                              Visualiser l'avis
-                            </Link>
+                            <button>
+                              <Link
+                                to={`/viewAvis/${prestation.id}/${prestation.id_Prestataire}`}
+                                style={{
+                                  cursor: "pointer",
+                                  color: "inherit",
+                                  textDecoration: "none",
+                                }}
+                              >
+                                Visualiser l'avis
+                              </Link>
+                            </button>
                           ) : (
-                            <Link
-                              to={`/avisPrestation/${prestation.id}/${prestation.id_Prestataire}`}
-                              style={{
-                                cursor: "pointer",
-                                color: "blue",
-                                marginLeft: "10px",
-                              }}
-                            >
-                              Laisser un avis
-                            </Link>
+                            <button className="btn-avis">
+                              <Link
+                                to={`/avisPrestation/${prestation.id}/${prestation.id_Prestataire}`}
+                                style={{
+                                  cursor: "pointer",
+                                  color: "inherit",
+                                  textDecoration: "none",
+                                }}
+                              >
+                                Laisser un avis
+                              </Link>
+                            </button>
                           )}
                         </>
                       ) : (
-                        <span
-                          style={{ cursor: "pointer", color: "blue" }}
-                          onClick={() => handleDelete(prestation.id)}
+                        <button
+                          className="delete-button"
+                          onClick={() =>
+                            handleDelete(prestation.id, "delete")
+                          }
                         >
                           Annuler
-                        </span>
+                        </button>
                       )}
                     </>
                   ) : (
-                    <span
-                      style={{ cursor: "pointer", color: "red" }}
-                      onClick={() => handleDelete(prestation.id)}
+                    <button
+                      className="delete-button"
+                      onClick={() => handleDelete(prestation.id, "delete")}
                     >
-                      X
-                    </span>
+                      Supprimer
+                    </button>
                   )}
                 </td>
               </tr>
@@ -232,9 +265,11 @@ function Prestations() {
                 user && user.type === "clientsBailleurs" ? "" : undefined,
             }}
             validationSchema={validationSchema}
-            onSubmit={async (values, { setSubmitting }) => {
+            onSubmit={async (values, { setSubmitting, resetForm }) => {
               await createPrestation(values);
-              window.location.reload();
+              fetchData(); // Call fetchData to refresh the data
+              resetForm(); // Reset the form fields
+              setSubmitting(false);
             }}
           >
             {({ isSubmitting }) => (
@@ -273,7 +308,12 @@ function Prestations() {
                 />
 
                 <label htmlFor="nom">Intitulé de la demande</label>
-                <Field type="text" id="nom" name="nom" className="form-input" />
+                <Field
+                  type="text"
+                  id="nom"
+                  name="nom"
+                  className="form-input"
+                />
                 <ErrorMessage
                   name="nom"
                   component="div"
@@ -376,6 +416,17 @@ function Prestations() {
           </Formik>
         </div>
       </div>
+      {showPrompt && (
+        <Prompt
+          message={
+            actionType === "delete"
+              ? "Êtes-vous sûr de vouloir supprimer cette prestation ?<br>Cette action est irréversible"
+              : "Êtes-vous sûr de vouloir archiver cette prestation ?"
+          }
+          onConfirm={confirmDelete}
+          onCancel={cancelDelete}
+        />
+      )}
     </div>
   );
 }
