@@ -63,6 +63,12 @@ const MesReservations = () => {
   return (
     <div className="reservationBoard">
       <h1 className="mt-1">Mes Réservations</h1>
+      <button
+        onClick={() => (window.location.href = "/espaceVoyageur")}
+        className="back-button"
+      >
+        Retour
+      </button>
       <hr />
       <div className="mesResa rounded p-3 shadow">
         {reservations.length > 0 ? (

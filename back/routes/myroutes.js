@@ -1054,7 +1054,7 @@ router.get('/prestationsById', async (req, res) => {
         FROM prestation 
         INNER JOIN bienImo ON prestation.id_BienImmobilier = bienImo.id 
         WHERE prestation.id_clientBailleur = ${user.id} 
-          AND prestation.statut != 'TERMINÉE'`;
+          AND prestation.statut != 'TERMINEE'`;
       break;
   
     case 'voyageurs':
@@ -1069,7 +1069,7 @@ router.get('/prestationsById', async (req, res) => {
                END as evalExists
         FROM prestation 
         WHERE id_Voyageur = ${user.id} 
-          AND statut != 'TERMINÉE'`;
+          AND statut != 'TERMINEE'`;
       break;
   
     case 'prestataires':
@@ -1195,7 +1195,7 @@ router.put('/acceptPrestation/:prestationId', async (req, res) => {
   console.log('Accepting prestation:', prestationId);
 
   try {
-    await sequelize.query(`UPDATE prestation SET statut = 'ACCEPTÉE', id_Prestataire = ${user.id} WHERE id = ${prestationId}`);
+    await sequelize.query(`UPDATE prestation SET statut = 'ACCEPTEE', id_Prestataire = ${user.id} WHERE id = ${prestationId}`);
     
     // Fetch the updated prestation record
     const [results] = await sequelize.query(`SELECT * FROM prestation WHERE id = ${prestationId}`);
@@ -1219,6 +1219,25 @@ router.delete('/prestation/:id', async (req, res) => {
   } catch (error) {
     console.error('Error deleting prestation:', error);
     res.status(500).send('Failed to delete prestation');
+  }
+});
+
+router.put('/archiverPrestation/:prestationId', async (req, res) => {
+  const { user } = req.session;
+  const { prestationId } = req.params;
+  console.log('Accepting prestation:', prestationId);
+
+  try {
+    await sequelize.query(`UPDATE prestation SET statut = 'TERMINEE' WHERE id = ${prestationId}`);
+    
+    // Fetch the updated prestation record
+    const [results] = await sequelize.query(`SELECT * FROM prestation WHERE id = ${prestationId}`);
+    const updatedPrestation = results[0];
+
+    res.send(updatedPrestation);
+  } catch (error) {
+    console.error('Error accepting prestation:', error);
+    res.status(500).send('Failed to accept prestation');
   }
 });
 

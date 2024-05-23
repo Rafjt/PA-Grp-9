@@ -8,9 +8,9 @@
     justify-content: center;
     align-items: center;
     z-index: 9999; /* Adjust z-index to ensure the prompt is displayed above other content */
-  }
+}
   
-  .prompt-overlay {
+.prompt-overlay {
     position: absolute;
     top: 0;
     left: 0;
@@ -18,27 +18,34 @@
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
     z-index: -1; /* Ensure the overlay is behind the prompt box */
-  }
+}
   
-  .prompt-box {
+.prompt-box {
     background-color: white;
     padding: 20px;
     border-radius: 5px;
     z-index: 99999; /* Adjust z-index to ensure the prompt box is displayed above other content */
-  }
+}
   
-  .prompt-message {
+.prompt-message {
     margin-bottom: 10px;
-  }
+}
   
-  .prompt-buttons {
+.prompt-buttons {
     display: flex;
     justify-content: flex-end;
-  }
+}
   
-  .prompt-confirm,
-  .prompt-cancel {
+.prompt-confirm,
+.prompt-cancel {
     cursor: pointer;
     margin-left: 10px;
-  }
+}
   
+.btn-cancel{
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.btn-cancel:hover{  
+  background-color: red;
+}

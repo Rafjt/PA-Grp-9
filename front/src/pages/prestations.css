@@ -78,3 +78,35 @@
 #description {
     height: 200px; /* Make the description input taller */
 }
+
+.delete-button {
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+  
+.delete-button:hover {
+    background-color: red;
+}
+
+.btn-avis {
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-avis:hover {
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.contact-button {
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+  
+.contact-button:hover {
+    background-color: green;
+
+}
+
+.table-responsive {
+    overflow-x: auto;
+  }
