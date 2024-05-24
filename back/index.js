@@ -8,6 +8,7 @@ const session = require('express-session');
 const sequelize = require('./database');
 const router = require('./routes/myroutes');
 const auth = require('./routes/auth');
+const abonnement = require('./routes/abonnementRoute')
 const port = 3001;
 
 const server = http.createServer(app);
@@ -51,6 +52,9 @@ app.use(session({
 app.use('/api', router);
 
 app.use('/auth', auth);
+
+
+app.use('/abonnementRoute', abonnement);
 
 app.use('/uploads', express.static('uploads'));
 

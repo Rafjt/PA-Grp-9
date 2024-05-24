@@ -50,6 +50,7 @@ router.get('/users/mean-age', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
 // Multer configuration
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -67,6 +68,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 //
+
 
 router.delete("/users/:id/debannis", async (req, res) => {
   const { id } = req.params;
@@ -1536,21 +1538,22 @@ router.post('/storeMessage', async (req, res) => {
 const path = require('path');
 const fs = require('fs');
 
-router.post('/save-pdf', (req, res) => {
-  const pdfData = req.body; // Assuming pdfData is already in the correct format
-  const timestamp = Date.now();
-  const filePath = path.join(__dirname, '../uploads/facture_' + timestamp + '.pdf');
+router.post('/save-pdf', upload.single('file'), (req, res) => {
+  const pdfFile = req.file;
 
-  // Convert pdfData to string if it's an object
-  const dataToWrite = typeof pdfData === 'object' ? JSON.stringify(pdfData) : pdfData;
+  // Ensure the file is a PDF
+  if (pdfFile.mimetype !== 'application/pdf') {
+    return res.status(400).send('Invalid file type');
+  }
 
-  fs.writeFile(filePath, dataToWrite, (err) => {
-      if (err) {
-          console.error(err);
-          res.status(500).send('Error saving PDF');
-      } else {
-          res.status(200).send('PDF saved');
-      }
+  const filePath = path.join(__dirname, '../uploads/', pdfFile.originalname);
+
+  fs.rename(pdfFile.path, filePath, (err) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send('Error saving file');
+    }
+    res.status(200).send('File saved successfully');
   });
 });
 
@@ -1583,4 +1586,46 @@ router.post('/createFinance', async (req, res) => {
   }
 
   res.send('Finance created');
+});
+
+router.get('/financesByUserId', async (req, res) => {
+  const { user } = req.session;
+  let query = '';
+
+  switch(user.type) {
+    case 'clientsBailleurs':
+      query = `SELECT * FROM finances WHERE id_ClientBailleur = ${user.id}`;
+      break;
+  
+    case 'voyageurs':
+      query = `SELECT * FROM finances WHERE id_Voyageur = ${user.id}`;
+      break;
+  
+    case 'prestataires':
+      query = `SELECT * FROM finances WHERE id_Prestataire = ${user.id}`;
+      break;
+  
+    default:
+      res.status(400).send({ error: 'Invalid user type' });
+      return;
+  }
+
+  try {
+    const [finances] = await sequelize.query(query);
+    res.send(finances);
+  } catch (error) {
+    console.error('Error fetching finances:', error);
+    res.status(500).send('Error fetching finances');
+  }
+});
+
+router.get('/download/:file', (req, res) => {
+  // Adjust the path to point to the correct location of the uploads directory
+  const filePath = path.resolve(__dirname, '..', 'uploads', req.params.file);
+  res.download(filePath, req.params.file, (err) => {
+    if (err) {
+      console.error(`Error downloading file: ${err.message}`);
+      res.status(404).send('File not found');
+    }
+  });
 });

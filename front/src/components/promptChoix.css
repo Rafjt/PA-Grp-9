@@ -1,0 +1,31 @@
+/* PromptChoix.css */
+.modal-body p {
+    text-align: center;
+    font-size: 1.2em;
+    margin-bottom: 20px;
+  }
+  
+  .button-group {
+    display: flex;
+    justify-content: center;
+  }
+  
+  .button-group .btn {
+    min-width: 100px;
+    margin: 0 10px;
+  }
+  
+  .modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+  }
+  
+  .modal-title {
+    color: #495057;
+  }
+  
+  .modal-content {
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  

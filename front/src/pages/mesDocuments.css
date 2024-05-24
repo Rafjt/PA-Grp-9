@@ -1,0 +1,25 @@
+.titleDoc {
+    margin-top: 5%;
+}
+
+.financeTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.financeTable th, .financeTable td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.financeTable tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.financeTable th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #636363;
+    color: white;
+}

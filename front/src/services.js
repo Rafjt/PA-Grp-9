@@ -1,6 +1,6 @@
 // Define functions for backend calls
 const URL = "http://localhost:3001";
-const BASE_URL = "http://localhost:3001/api";
+export const BASE_URL = "http://localhost:3001/api";
 const URL_USERS = `${BASE_URL}/users`;
 export const BACK_URL = "http://localhost:3001";
 const URL_ANNONCE = `${BASE_URL}/bienImo`;
@@ -884,6 +884,18 @@ export const createFinance = async (financeData) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(financeData),
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export const fetchFinanceByUserId = async () => {
+  try {
+    const response = await fetch(`${BASE_URL}/financesByUserId`, {
+      credentials: "include",
     });
     const data = await response.json();
     return data;

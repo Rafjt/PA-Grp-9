@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import Cookies from "js-cookie";
 import "./espaceBailleur.css";
 
 function EspaceVoyageur() {
@@ -16,6 +15,10 @@ function EspaceVoyageur() {
     window.location.replace("/prestations");
   }
 
+  const toMesDoc = () => {
+    window.location.replace("/mesDocuments");
+  }
+
   return (
     <div>
       <img
@@ -29,7 +32,7 @@ function EspaceVoyageur() {
         <button className="grid-button" onClick={toMesBiens}>
           MES RESERVATIONS
         </button>
-        <button className="grid-button">
+        <button className="grid-button" onClick={toMesDoc}>
           MES DOCUMENTS ADMINISTRATIF ET PAIEMENTS
         </button>
         <button className="grid-button" onClick={toLouerBien}>
