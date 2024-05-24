@@ -273,7 +273,7 @@ router.put("/users/:id/:type", async (req, res) => {
   }
 });
 
-router.post("/users/bannir/vatefaireenculer/:id/:type", async (req, res) => {
+router.post("/users/bannir/ausecours/:id/:type", async (req, res) => {
   console.log("Modifying user:", req.body);
   console.log(req);
   const { id, type } = req.params;
@@ -464,7 +464,7 @@ router.post('/bienImo', upload.single('pictures'), async (req, res) => {
     // Create a Stripe price
     const stripePrice = await stripe.prices.create({
       unit_amount: prix * 100, // The price in cents
-      currency: 'usd', // The currency of the price
+      currency: 'eur', // The currency of the price
       product: product.id, // The ID of the product this price is associated with
     });
 

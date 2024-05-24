@@ -154,7 +154,7 @@ export const updateUser = async (userId, userType, userData) => {
 export const banUser = async (userId, userType, userData) => {
   try {
     const response = await fetch(
-      `${URL_USERS}/bannir/vatefaireenculer/${userId}/${userType}`,
+      `${URL_USERS}/bannir/ausecours/${userId}/${userType}`,
       {
         method: "POST",
         headers: {
