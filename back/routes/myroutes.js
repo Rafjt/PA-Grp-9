@@ -1561,19 +1561,36 @@ router.post('/createFinance', async (req, res) => {
   const { id_ClientBailleur, id_Prestataire, id_Voyageur, type, montant, dateTransaction, nomDocument } = req.body;
   console.log('Creating finance:', req.body);
 
-  let query = '';
+  let query = 'INSERT INTO finances (';
+  let values = 'VALUES (';
   let replacements = {};
 
   if (id_ClientBailleur) {
-    query = 'INSERT INTO finances (id_ClientBailleur, montant, dateTransaction, type, nomDocument) VALUES (:id_ClientBailleur, :montant, :dateTransaction, :type, :nomDocument)';
-    replacements = {id_ClientBailleur, montant, dateTransaction, type, nomDocument};
-  } else if (id_Prestataire) {
-    query = 'INSERT INTO finances (id_Prestataire, montant, dateTransaction, type, nomDocument) VALUES (:id_Prestataire, :montant, :dateTransaction, :type, :nomDocument)';
-    replacements = {id_Prestataire, montant, dateTransaction, type, nomDocument};
-  } else if (id_Voyageur) {
-    query = 'INSERT INTO finances (id_Voyageur, montant, dateTransaction, type, nomDocument) VALUES (:id_Voyageur, :montant, :dateTransaction, :type, :nomDocument)';
-    replacements = {id_Voyageur, montant, dateTransaction, type, nomDocument};
-  } else {
+    query += 'id_ClientBailleur, ';
+    values += ':id_ClientBailleur, ';
+    replacements.id_ClientBailleur = id_ClientBailleur;
+  }
+  if (id_Prestataire) {
+    query += 'id_Prestataire, ';
+    values += ':id_Prestataire, ';
+    replacements.id_Prestataire = id_Prestataire;
+  }
+  if (id_Voyageur) {
+    query += 'id_Voyageur, ';
+    values += ':id_Voyageur, ';
+    replacements.id_Voyageur = id_Voyageur;
+  }
+
+  query += 'montant, dateTransaction, type, nomDocument) ';
+  values += ':montant, :dateTransaction, :type, :nomDocument)';
+  replacements.montant = montant;
+  replacements.dateTransaction = dateTransaction;
+  replacements.type = type;
+  replacements.nomDocument = nomDocument;
+
+  query += values;
+
+  if (!id_ClientBailleur && !id_Prestataire && !id_Voyageur) {
     res.status(400).send({ error: 'Invalid user type' });
     return;
   }

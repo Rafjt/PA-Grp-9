@@ -146,7 +146,7 @@ const PagePaiement = () => {
                                     .then(() => {
                                         // Create financeData object
                                         const financeData = {
-                                            id_ClientBailleur: null,
+                                            id_ClientBailleur: dataF.id_ClientBailleur,
                                             id_Prestataire: null,
                                             id_Voyageur: data.id,
                                             type: 'facture',
