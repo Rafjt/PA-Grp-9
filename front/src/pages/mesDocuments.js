@@ -55,7 +55,7 @@ function MesDocuments() {
             <tbody>
                 {financeArray.map((finance, index) => (
                     <tr key={index}>
-                        <td>{finance.montant}</td>
+                        <td>{finance.montant} €</td>
                         <td>{finance.type}</td>
                         <td>{finance.dateTransaction}</td>
                         <td>{finance.nomDocument}</td>
