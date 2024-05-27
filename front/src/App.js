@@ -45,6 +45,7 @@ import ViewAvis from "./pages/viewAvis.js";
 import PerfPresta from "./pages/perfPresta.js";
 import Abonnement from "./pages/abonnement.js"
 import MesDocuments from "./pages/mesDocuments.js";
+import PaiementAbonnement from "./pages/paiementAbonnement.js";
 // import { use } from "../../back/routes/auth.js";
 
 function ProtectedRoute({ component: Component }) {
@@ -156,6 +157,7 @@ function App() {
           <Route path="/EspaceVoyageur" element={<ProtectedAuthRoute path="/espaceVoyageur" component={EspaceVoyageur} authType="voyageurs" />} />
           <Route path="/MesReservations" element={<ProtectedAuthRoute path="/mesReservations" component={MesReservations} authType="voyageurs" />} />
           <Route path="/abonnement" element={<ProtectedAuthRoute path="/abonnement" component={Abonnement} authType="voyageurs" />} />
+          <Route path="/paiementAbonnement" element={ <ProtectedAuthRoute path="/paiementAbonnement" component={PaiementAbonnement} authType="voyageurs"/>} />
           {/* Routes Authent CLientsBailleurs*/}
           <Route path="/espaceBailleur" element={<ProtectedAuthRoute path="/espaceBailleur" component={EspaceBailleur} authType="clientsBailleurs" />} />
           <Route path="/mesBiens" element={<ProtectedAuthRoute path="/mesBiens" component={MesBiens} authType="clientsBailleurs" />} />
