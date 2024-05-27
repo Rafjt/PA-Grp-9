@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const http = require('http')
+const http = require('http');
 const { Server } = require('socket.io');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -8,7 +8,8 @@ const session = require('express-session');
 const sequelize = require('./database');
 const router = require('./routes/myroutes');
 const auth = require('./routes/auth');
-const abonnement = require('./routes/abonnementRoute')
+const abonnement = require('./routes/abonnementRoute');
+
 const port = 3001;
 
 const server = http.createServer(app);
@@ -27,17 +28,10 @@ sequelize.authenticate().then(() => {
   console.error('Unable to connect to the database: ', error);
 });
 
-// const verifySession = (req, res, next) => {
-//   if (!req.session.user) {
-//     return res.status(401).send("Unauthorized");
-//   }
-//   next();
-// };
-
 app.use(bodyParser.json());
 
 app.use(cors({
-  origin: 'http://localhost:3000', 
+  origin: 'http://localhost:3000',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
@@ -46,43 +40,36 @@ app.use(session({
   secret: 'your-secret-key',
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false , sameSite: 'lax', httpOnly: false, maxAge: 60*60000}, // Set secure to true if you're using HTTPS
+  cookie: { secure: false, sameSite: 'lax', httpOnly: false, maxAge: 60*60000 }
 }));
 
 app.use('/api', router);
-
 app.use('/auth', auth);
-
-
-app.use('/abonnementRoute', abonnement);
+app.use('/abonnement', abonnement);
 
 app.use('/uploads', express.static('uploads'));
 
 io.on('connection', (socket) => {
-  // console.log(`a user connected with id ${socket.id}`);
-
   socket.on('createRoom', (data) => {
     const roomName = data.roomName;
     socket.join(roomName);
     console.log(`Socket ${socket.id} joined room ${roomName}`);
   });
 
-  socket.on('envoieMsg' , (msg) => {
+  socket.on('envoieMsg', (msg) => {
     socket.broadcast.emit('msgRecu', msg);
     console.log(`Message: ${msg.message}`);
-});
+  });
 
   socket.on('disconnect', () => {
     console.log(`user ${socket.id} disconnected`);
   });
-
 });
 
 app.get('/index', async (req, res) => {
   const users = await sequelize.query('SELECT * FROM VOYAGEURS');
   console.log(users);
   res.send('Hello from Node.js!');
-  // res.send(`Server is running on port ${port}`);
 });
 
 const PORT = process.env.PORT || port;

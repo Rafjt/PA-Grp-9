@@ -3,7 +3,8 @@ import "./userProfile.css";
 import { getCredentials, deleteUser } from "../services";
 import Prompt from "../components/prompt.js";
 import * as Yup from "yup";
-import { updateUser, updateCookie } from "../services";
+import { updateUser, updateCookie, checkAbonnement } from "../services";
+import { Link } from "react-router-dom";
 
 const UserProfile = () => {
   const nomRegex =
@@ -22,18 +23,28 @@ const UserProfile = () => {
   const [editMode, setEditMode] = useState(false);
   const [user, setUser] = useState(null);
   const [userType, setUserType] = useState(null);
+  const [abonnements, setAbonnements] = useState([]);
 
   useEffect(() => {
-    getCredentials()
-      .then((userData) => {
+    const fetchUserData = async () => {
+      try {
+        const userData = await getCredentials();
         if (userData) {
           setUser(userData);
           setUserType(userData.type); // Assuming `type` is available in user data
+
+          if (userData.type === "voyageurs") {
+            const { abonnements } = await checkAbonnement(userData.id);
+            setAbonnements(abonnements);
+            console.log(abonnements);
+          }
         }
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error("Error fetching user data:", error);
-      });
+      }
+    };
+
+    fetchUserData();
   }, []);
 
   const formatUserType = (type) => {
@@ -141,13 +152,13 @@ const UserProfile = () => {
           dateDeNaissance: "",
           adresseMail: "",
         });
-  
+
         // Call the updateUser service
         updateUser(user.id, user.type, inputValues)
           .then((userData) => {
             console.log("User updated:", userData);
             document.cookie =
-            "connect.sid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+              "connect.sid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
             // After updating the user, call the updateCookie service
             updateCookie(user.id, user.type, inputValues)
               .then((cookieData) => {
@@ -171,14 +182,22 @@ const UserProfile = () => {
       });
   };
 
-
   // Function to handle canceling edit mode
   const handleCancelEditMode = () => {
     setEditMode(false);
     // Reset input values to current user state
     setInputValues(user);
   };
-  
+
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+
+    return `${day}/${month}/${year}`;
+  }
 
   const renderInputField = (label, value, id, onChange, error) => {
     return (
@@ -211,10 +230,36 @@ const UserProfile = () => {
     );
   };
 
+  const renderAbonnement = (abonnement) => {
+    if (
+      abonnement.type === "Bag_Packer_annual" ||
+      abonnement.type === "Bag_Packer_monthly"
+    ) {
+      abonnement.type = "Bag Packer";
+    } else if (
+      abonnement.type === "Explorator_annual" ||
+      abonnement.type === "Explorator_monthly"
+    ) {
+      abonnement.type = "Explorator";
+    }
+
+    return (
+      <div key={abonnement.id} className="abonnement-item">
+        <h6>Type: {abonnement.type}</h6>
+        <p>Type d'échéance: {abonnement.typeEcheance}</p>
+        <p>Date de début: {formatDate(abonnement.dateDebut)}</p>
+        <p>
+          Date de renouvellement: {formatDate(abonnement.dateRenouvellement)}
+        </p>
+        {/* Render other abonnement fields as needed */}
+      </div>
+    );
+  };
+
   return (
     <div className="container mt-5">
       <div className="row gutters">
-        <div className="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12">
+        <div className="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12 mr-1">
           <div className="card h-100 shadow">
             <div className="card-body shadow">
               <div className="account-settings">
@@ -237,6 +282,20 @@ const UserProfile = () => {
                     <i>{userType ? formatUserType(userType) : ""} </i>
                   </h5>
                 </div>
+                {userType === "voyageurs" ? (
+                  <div className="abonnement-info mt-4">
+                    <h5>Abonnement en cours:</h5>
+                    {abonnements.length > 0 ? (
+                      abonnements.map((abonnement) =>
+                        renderAbonnement(abonnement)
+                      )
+                    ) : (
+                      <span>pas d'abonnement</span>
+                    )}
+                  </div>
+                ) : (
+                  <span></span>
+                )}
               </div>
             </div>
           </div>
@@ -324,6 +383,32 @@ const UserProfile = () => {
                     )}
                   </div>
                 </div>
+                {userType === "voyageurs" ? (
+                  <div>
+                    {abonnements ? (
+                      <button type="button" className="btn btn-primary">
+                        {abonnements.length < 1 ? (
+                          <Link to="/abonnement" className="custom-link">
+                            <span>Consulter les offres d'abonnement</span>
+                          </Link>
+                        ) : (
+                          <a
+                            href="https://billing.stripe.com/p/login/test_dR65ljg3K4y22Ag144"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="custom-link"
+                          >
+                            <span>Gérer mon abonnement</span>
+                          </a>
+                        )}
+                      </button>
+                    ) : (
+                      <span>Loading...</span>
+                    )}
+                  </div>
+                ) : (
+                  <span></span>
+                )}
               </div>
             </div>
           </div>
