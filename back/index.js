@@ -40,7 +40,7 @@ app.use(session({
   secret: 'your-secret-key',
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false, sameSite: 'lax', httpOnly: false, maxAge: 60*60000 }
+  cookie: { secure: false, sameSite: 'lax', httpOnly: false, maxAge: 60*60000 } // Set secure to true if you're using HTTPS
 }));
 
 app.use('/api', router);
