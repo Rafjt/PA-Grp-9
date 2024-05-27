@@ -54,19 +54,16 @@ router.get('/users/mean-age', async (req, res) => {
 // Multer configuration
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/'); // Save uploaded files to the 'uploads' directory
+    cb(null, 'uploads/'); // Directory to store uploaded files
   },
   filename: function (req, file, cb) {
-    // Extracting file extension
-    const fileExtension = file.originalname.split('.').pop();
-    // Getting the current timestamp
-    const timestamp = Date.now();
-    // Constructing the new filename
-    const newFilename = `image.${timestamp}.${fileExtension}`;
-    cb(null, newFilename); // Rename file with desired format
-  },
+    cb(null, Date.now() + path.extname(file.originalname)); // Appends current timestamp to original file name
+  }
 });
+
 const upload = multer({ storage: storage });
+
+
 //
 
 
@@ -374,9 +371,52 @@ router.get('/bienImo/prixMoy', async (req, res) => {
 
 
 router.get("/bienImo", async (req, res) => {
-  const [bienImo] = await sequelize.query("SELECT * FROM bienImo");
-  console.log(bienImo);
-  res.send(bienImo);
+  const results = await sequelize.query(`
+    SELECT b.*, i.imagePath
+    FROM bienImo b
+    LEFT JOIN bienImoImages i ON b.id = i.bienImoId
+  `);
+
+  const biens = [];
+  let currentBien = null;
+
+  for (const result of results[0]) {
+    if (!currentBien || currentBien.id !== result.id) {
+      currentBien = {
+        id: result.id,
+        ville: result.ville,
+        adresse: result.adresse,
+        id_ClientBailleur: result.id_ClientBailleur,
+        prix: result.prix,
+        nomBien: result.nomBien,
+        description: result.description,
+        statutValidation: result.statutValidation,
+        disponible: result.disponible,
+        typeDePropriete: result.typeDePropriete,
+        nombreChambres: result.nombreChambres,
+        nombreLits: result.nombreLits,
+        nombreSallesDeBain: result.nombreSallesDeBain,
+        wifi: result.wifi,
+        cuisine: result.cuisine,
+        balcon: result.balcon,
+        jardin: result.jardin,
+        parking: result.parking,
+        piscine: result.piscine,
+        jaccuzzi: result.jaccuzzi,
+        salleDeSport: result.salleDeSport,
+        climatisation: result.climatisation,
+        productId: result.productId,
+        images: []
+      };
+      biens.push(currentBien);
+    }
+
+    if (result.imagePath) {
+      currentBien.images.push(result.imagePath);
+    }
+  }
+
+  res.send(biens);
 });
 
 router.delete('/bienImo/:id', async (req, res) => {
@@ -428,9 +468,22 @@ router.delete('/bienImo/:id', async (req, res) => {
   }
 });
 
-router.post('/bienImo', upload.single('pictures'), async (req, res) => {
-  console.log('Creating bien:', req.body);
-  console.log('Uploaded file:', req.file); // Log uploaded file information
+router.post('/bienImo', upload.array('pictures', 10), async (req, res) => {
+  console.log('req.body:', req.body);
+  console.log('req.files:', req.files);
+
+  const formData = req.body;
+
+  // Function to log the FormData contents
+  const logFormData = (formData) => {
+    for (let [key, value] of Object.entries(formData)) {
+      console.log(`${key}: ${value}`);
+    }
+  };
+
+  logFormData(formData);
+
+  // Extracting values from the request body
   const {
     nomBien,
     description,
@@ -451,62 +504,127 @@ router.post('/bienImo', upload.single('pictures'), async (req, res) => {
     salleDeSport,
     climatisation,
     ville,
-    adresse,
+    adresse
   } = req.body;
-  
-  const pictures = req.file.filename; // Get the filename of the uploaded image
-  console.log('pictures ==', pictures); // Log uploaded file information
 
   try {
+    if (!nomBien || !description) {
+      throw new Error('Missing required fields: nomBien or description');
+    }
+
     const product = await stripe.products.create({
       name: nomBien,
       description: description,
     });
 
-    // Create a Stripe price
     const stripePrice = await stripe.prices.create({
+
       unit_amount: prix * 100, // The price in cents
       currency: 'eur', // The currency of the price
       product: product.id, // The ID of the product this price is associated with
+
     });
 
-    console.log('Stripe product created with ID:', product.id);
-    console.log('Stripe price created with ID:', stripePrice.id);
-
-    // Use a parameterized query to avoid SQL injection and handle special characters
-    await sequelize.query(
+    const [result] = await sequelize.query(
       `INSERT INTO bienImo (
         nomBien, description, id_ClientBailleur, statutValidation, prix, disponible, typeDePropriete,
         nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking,
-        piscine, jaccuzzi, salleDeSport, climatisation, cheminImg, ville, adresse, productId
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        piscine, jaccuzzi, salleDeSport, climatisation, ville, adresse, productId
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       {
         replacements: [
           nomBien, description, id_ClientBailleur, 0, prix, disponible, typeDePropriete,
           nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking,
-          piscine, jaccuzzi, salleDeSport, climatisation, pictures, ville, adresse, stripePrice.id
+          piscine, jaccuzzi, salleDeSport, climatisation, ville, adresse, stripePrice.id
         ],
         type: sequelize.QueryTypes.INSERT
       }
     );
 
-    res.send('Bien created');
+    const bienImoId = result;
+
+    if (req.files && req.files.length > 0) {
+      const imagePromises = req.files.map(file => {
+        return sequelize.query(
+          `INSERT INTO bienImoImages (bienImoId, imagePath) VALUES (?, ?)`,
+          {
+            replacements: [bienImoId, file.path],
+            type: sequelize.QueryTypes.INSERT
+          }
+        );
+      });
+      await Promise.all(imagePromises);
+    }
+
+    res.status(200).json({ message: 'Bien created successfully', bienImoId });
   } catch (error) {
-    console.error('Error creating bien:', error);
-    return res.status(500).send('Error creating bien');
+    console.error('Error creating bien:', error.message);
+    res.status(500).json({ message: 'Error creating bien', error: error.message });
   }
 });
+
 
 
 router.get("/bienImo/:id", async (req, res) => {
   console.log("route /bienImo/:id called");
   const id = req.params.id;
-  const [bien] = await sequelize.query(
-    `SELECT * FROM bienImo WHERE id = ${id}`
-  );
-  console.log(bien);
-  res.send(bien[0]);
+  
+  try {
+    const [results] = await sequelize.query(
+      `SELECT b.*, i.imagePath
+       FROM bienImo b
+       LEFT JOIN bienImoImages i ON b.id = i.bienImoId
+       WHERE b.id = ${id}`
+    );
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'Bien not found' });
+    }
+
+    // Extract the main details from the first result
+    const bienImo = {
+      id: results[0].id,
+      ville: results[0].ville,
+      adresse: results[0].adresse,
+      id_ClientBailleur: results[0].id_ClientBailleur,
+      prix: results[0].prix,
+      nomBien: results[0].nomBien,
+      description: results[0].description,
+      statutValidation: results[0].statutValidation,
+      disponible: results[0].disponible,
+      typeDePropriete: results[0].typeDePropriete,
+      nombreChambres: results[0].nombreChambres,
+      nombreLits: results[0].nombreLits,
+      nombreSallesDeBain: results[0].nombreSallesDeBain,
+      wifi: results[0].wifi,
+      cuisine: results[0].cuisine,
+      balcon: results[0].balcon,
+      jardin: results[0].jardin,
+      parking: results[0].parking,
+      piscine: results[0].piscine,
+      jaccuzzi: results[0].jaccuzzi,
+      salleDeSport: results[0].salleDeSport,
+      climatisation: results[0].climatisation,
+      productId: results[0].productId,
+      images: []
+    };
+
+    // Add image paths to the images array
+    for (const result of results) {
+      if (result.imagePath) {
+        bienImo.images.push(result.imagePath);
+      }
+    }
+
+    console.log(bienImo);
+    res.send(bienImo);
+
+  } catch (error) {
+    console.error('Error fetching bien:', error);
+    res.status(500).json({ message: 'Error fetching bien', error: error.message });
+  }
 });
+
 
 router.put('/bienImo/:id', upload.single('cheminImg'), async (req, res) => {
   console.log('Modifying bien:', req.body);
@@ -579,24 +697,26 @@ router.put('/bienImo/:id', upload.single('cheminImg'), async (req, res) => {
     res.status(500).send('Error modifying bien');
   }
 });
+
+
 router.post('/bienImo/filter', async (req, res) => {
   let {
-    typeDePropriete,
-    nombreChambres,
-    nombreLits,
-    nombreSallesDeBain,
-    wifi,
-    cuisine,
-    balcon,
-    jardin,
-    parking,
-    piscine,
-    jaccuzzi,
-    salleDeSport,
-    climatisation,
-    prixMin,
-    prixMax,
-    ville,
+      typeDePropriete,
+      nombreChambres,
+      nombreLits,
+      nombreSallesDeBain,
+      wifi,
+      cuisine,
+      balcon,
+      jardin,
+      parking,
+      piscine,
+      jaccuzzi,
+      salleDeSport,
+      climatisation,
+      prixMin,
+      prixMax,
+      ville,
   } = req.body;
 
   wifi = wifi ? 1 : 0;
@@ -609,92 +729,176 @@ router.post('/bienImo/filter', async (req, res) => {
   salleDeSport = salleDeSport ? 1 : 0;
   climatisation = climatisation ? 1 : 0;
 
-  nombreChambres =
-    nombreChambres !== 'Tout' ? parseInt(nombreChambres) : nombreChambres;
+  nombreChambres = nombreChambres !== 'Tout' ? parseInt(nombreChambres) : nombreChambres;
   nombreLits = nombreLits !== 'Tout' ? parseInt(nombreLits) : nombreLits;
-  nombreSallesDeBain =
-    nombreSallesDeBain !== 'Tout'
-      ? parseInt(nombreSallesDeBain)
-      : nombreSallesDeBain;
+  nombreSallesDeBain = nombreSallesDeBain !== 'Tout' ? parseInt(nombreSallesDeBain) : nombreSallesDeBain;
   ville = ville !== 'Tout' ? ville : ville;
 
-  let query = 'SELECT * FROM bienImo';
+  let query = `
+      SELECT b.*, i.imagePath
+      FROM bienImo b
+      LEFT JOIN bienImoImages i ON b.id = i.bienImoId
+  `;
   const params = [];
 
   const properties = {
-    typeDePropriete,
-    nombreChambres,
-    nombreLits,
-    nombreSallesDeBain,
-    wifi,
-    cuisine,
-    balcon,
-    jardin,
-    parking,
-    piscine,
-    jaccuzzi,
-    salleDeSport,
-    climatisation,
-    ville,
+      typeDePropriete,
+      nombreChambres,
+      nombreLits,
+      nombreSallesDeBain,
+      wifi,
+      cuisine,
+      balcon,
+      jardin,
+      parking,
+      piscine,
+      jaccuzzi,
+      salleDeSport,
+      climatisation,
+      ville,
   };
-  console.log(properties);
-  for (const property in properties) {
-    if (
-      properties[property] !== undefined &&
-      properties[property] !== 'Tout' &&
-      properties[property] !== 0
-    ) {
-      if (params.length === 0) {
-        query += ' WHERE';
-      } else {
-        query += ' AND';
-      }
 
-      query += ` ${property} = ?`;
-      params.push(properties[property]);
-    }
+  let whereClause = '';
+
+  for (const property in properties) {
+      if (properties[property] !== undefined && properties[property] !== 'Tout' && properties[property] !== 0) {
+          if (whereClause === '') {
+              whereClause = ' WHERE';
+          } else {
+              whereClause += ' AND';
+          }
+
+          whereClause += ` ${property} = ?`;
+          params.push(properties[property]);
+      }
   }
 
   // Add price range filter
   if (prixMin) {
-    if (params.length === 0) {
-      query += ' WHERE';
-    } else {
-      query += ' AND';
-    }
+      if (whereClause === '') {
+          whereClause = ' WHERE';
+      } else {
+          whereClause += ' AND';
+      }
 
-    query += ' prix >= ?';
-    params.push(prixMin);
+      whereClause += ' prix >= ?';
+      params.push(prixMin);
   }
 
   if (prixMax) {
-    if (params.length === 0) {
-      query += ' WHERE';
-    } else {
-      query += ' AND';
-    }
+      if (whereClause === '') {
+          whereClause = ' WHERE';
+      } else {
+          whereClause += ' AND';
+      }
 
-    query += ' prix <= ?';
-    params.push(prixMax);
+      whereClause += ' prix <= ?';
+      params.push(prixMax);
   }
 
+  query += whereClause;
+
   try {
-    const result = await sequelize.query(query, {
-      replacements: params,
-      type: sequelize.QueryTypes.SELECT,
-    });
-    console.log(result);
-    res.json(result);
+      const results = await sequelize.query(query, {
+          replacements: params,
+          type: sequelize.QueryTypes.SELECT,
+      });
+
+      const biens = [];
+      let currentBien = null;
+
+      for (const result of results) {
+          if (!currentBien || currentBien.id !== result.id) {
+              currentBien = {
+                  id: result.id,
+                  ville: result.ville,
+                  adresse: result.adresse,
+                  id_ClientBailleur: result.id_ClientBailleur,
+                  prix: result.prix,
+                  nomBien: result.nomBien,
+                  description: result.description,
+                  statutValidation: result.statutValidation,
+                  disponible: result.disponible,
+                  typeDePropriete: result.typeDePropriete,
+                  nombreChambres: result.nombreChambres,
+                  nombreLits: result.nombreLits,
+                  nombreSallesDeBain: result.nombreSallesDeBain,
+                  wifi: result.wifi,
+                  cuisine: result.cuisine,
+                  balcon: result.balcon,
+                  jardin: result.jardin,
+                  parking: result.parking,
+                  piscine: result.piscine,
+                  jaccuzzi: result.jaccuzzi,
+                  salleDeSport: result.salleDeSport,
+                  climatisation: result.climatisation,
+                  images: []
+              };
+              biens.push(currentBien);
+          }
+
+          if (result.imagePath) {
+              currentBien.images.push(result.imagePath);
+          }
+      }
+
+      res.json(biens);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'An error occurred while filtering' });
+      console.error(err);
+      res.status(500).json({ error: 'An error occurred while filtering' });
   }
 });
 
+
 router.get('/biens', async (req, res) => {
   const { user } = req.session;
-  const [bienImo] = await sequelize.query(`SELECT * FROM bienImo WHERE id_ClientBailleur = ${user.id}`);
-  res.send(bienImo);
+  const results = await sequelize.query(`
+    SELECT b.*, i.imagePath
+    FROM bienImo b
+    LEFT JOIN bienImoImages i ON b.id = i.bienImoId
+    WHERE b.id_ClientBailleur = ${user.id}
+  `);
+
+  const biens = [];
+  let currentBien = null;
+
+  for (const result of results[0]) {
+    if (!currentBien || currentBien.id !== result.id) {
+      currentBien = {
+        id: result.id,
+        ville: result.ville,
+        adresse: result.adresse,
+        id_ClientBailleur: result.id_ClientBailleur,
+        prix: result.prix,
+        nomBien: result.nomBien,
+        description: result.description,
+        statutValidation: result.statutValidation,
+        disponible: result.disponible,
+        typeDePropriete: result.typeDePropriete,
+        nombreChambres: result.nombreChambres,
+        nombreLits: result.nombreLits,
+        nombreSallesDeBain: result.nombreSallesDeBain,
+        wifi: result.wifi,
+        cuisine: result.cuisine,
+        balcon: result.balcon,
+        jardin: result.jardin,
+        parking: result.parking,
+        piscine: result.piscine,
+        jaccuzzi: result.jaccuzzi,
+        salleDeSport: result.salleDeSport,
+        climatisation: result.climatisation,
+        productId: result.productId,
+        images: []
+      };
+      biens.push(currentBien);
+    }
+
+    if (result.imagePath) {
+      currentBien.images.push(result.imagePath);
+    }
+  }
+
+  res.send(biens);
 });
 
 // GESTION DES RESERVATIONS
@@ -720,10 +924,63 @@ router.get('/MyCalendar', async (req, res) => {
 
 
 router.get('/reservation', async (req, res) => {
-  const [reservation] = await sequelize.query('SELECT * FROM reservation');
-  console.log(reservation);
-  res.send(reservation);
-}); 
+  try {
+    const results = await sequelize.query(`
+      SELECT r.*, bi.*, cb.nom as bailleurNom, cb.prenom as bailleurPrenom, cb.adresseMail as bailleurMail, i.imagePath
+      FROM reservation r
+      JOIN bienImo bi ON r.id_BienImmobilier = bi.id 
+      JOIN clientsBailleurs cb on bi.id_ClientBailleur = cb.id
+      LEFT JOIN bienImoImages i ON bi.id = i.bienImoId
+    `);
+
+    const reservations = [];
+    let currentReservation = null;
+
+    for (const result of results[0]) {
+      if (!currentReservation || currentReservation.id !== result.id) {
+        currentReservation = {
+          id: result.id,
+          ville: result.ville,
+          adresse: result.adresse,
+          id_ClientBailleur: result.id_ClientBailleur,
+          prix: result.prix,
+          nomBien: result.nomBien,
+          description: result.description,
+          statutValidation: result.statutValidation,
+          disponible: result.disponible,
+          typeDePropriete: result.typeDePropriete,
+          nombreChambres: result.nombreChambres,
+          nombreLits: result.nombreLits,
+          nombreSallesDeBain: result.nombreSallesDeBain,
+          wifi: result.wifi,
+          cuisine: result.cuisine,
+          balcon: result.balcon,
+          jardin: result.jardin,
+          parking: result.parking,
+          piscine: result.piscine,
+          jaccuzzi: result.jaccuzzi,
+          salleDeSport: result.salleDeSport,
+          climatisation: result.climatisation,
+          bailleurNom: result.bailleurNom,
+          bailleurPrenom: result.bailleurPrenom,
+          bailleurMail: result.bailleurMail,
+          images: []
+        };
+        reservations.push(currentReservation);
+      }
+
+      if (result.imagePath) {
+        currentReservation.images.push(result.imagePath);
+      }
+    }
+
+    console.log(reservations);
+    res.send(reservations); // Return the array of reservations
+  } catch (error) {
+    console.error("Error fetching reservations:", error);
+    res.status(500).send("Internal server error");
+  }
+});
 
 router.delete('/reservation/:id', async (req, res) => {
   const {id} = req.params;
@@ -844,21 +1101,63 @@ router.get("/reservation/:idVoyageur/voyageur", async (req, res) => {
   console.log("route /reservation/:idVoyageur/voyageur called");
   const idVoyageur = req.params.idVoyageur;
   try {
-    const reservations = await sequelize.query(`
-      SELECT r.*, bi.*, cb.nom as bailleurNom, cb.prenom as bailleurPrenom, cb.adresseMail as bailleurMail
+    const results = await sequelize.query(`
+      SELECT r.*, bi.*, cb.nom as bailleurNom, cb.prenom as bailleurPrenom, cb.adresseMail as bailleurMail, i.imagePath
       FROM reservation r
       JOIN bienImo bi ON r.id_BienImmobilier = bi.id 
       JOIN clientsBailleurs cb on bi.id_ClientBailleur = cb.id
+      LEFT JOIN bienImoImages i ON bi.id = i.bienImoId
       WHERE id_ClientVoyageur = ${idVoyageur}
     `);
+
+    const reservations = [];
+    let currentReservation = null;
+
+    for (const result of results[0]) {
+      if (!currentReservation || currentReservation.id !== result.id) {
+        currentReservation = {
+          id: result.id,
+          ville: result.ville,
+          adresse: result.adresse,
+          id_ClientBailleur: result.id_ClientBailleur,
+          prix: result.prix,
+          nomBien: result.nomBien,
+          description: result.description,
+          statutValidation: result.statutValidation,
+          disponible: result.disponible,
+          typeDePropriete: result.typeDePropriete,
+          nombreChambres: result.nombreChambres,
+          nombreLits: result.nombreLits,
+          nombreSallesDeBain: result.nombreSallesDeBain,
+          wifi: result.wifi,
+          cuisine: result.cuisine,
+          balcon: result.balcon,
+          jardin: result.jardin,
+          parking: result.parking,
+          piscine: result.piscine,
+          jaccuzzi: result.jaccuzzi,
+          salleDeSport: result.salleDeSport,
+          climatisation: result.climatisation,
+          bailleurNom: result.bailleurNom,
+          bailleurPrenom: result.bailleurPrenom,
+          bailleurMail: result.bailleurMail,
+          images: []
+        };
+        reservations.push(currentReservation);
+      }
+
+      if (result.imagePath) {
+        currentReservation.images.push(result.imagePath);
+      }
+    }
+
     console.log(reservations);
-    res.send(reservations[0]); // Return the array of reservations
+    res.send(reservations); // Return the array of reservations
   } catch (error) {
     console.error("Error fetching reservations:", error);
     res.status(500).send("Internal server error");
   }
 });
-
 
 
 // GESTION DES PAIEMENTS
@@ -968,8 +1267,9 @@ router.post("/bienDispo", async (req, res) => {
     prixMin, prixMax, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation } = req.body;
   let query = `SELECT bienImo.id, cheminImg, ville, adresse, prix, nomBien, description, statutValidation, disponible, typeDePropriete,
   nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi,
-  salleDeSport, climatisation, clientsBailleurs.nom, clientsBailleurs.prenom
+  salleDeSport, climatisation, clientsBailleurs.nom, clientsBailleurs.prenom, bienImoImages.imagePath
   FROM bienImo
+  LEFT JOIN bienImoImages ON bienImo.id = bienImoImages.bienImoId
   JOIN clientsBailleurs ON bienImo.Id_ClientBailleur = clientsBailleurs.id
   WHERE disponible = 1
   AND bienImo.id NOT IN (
@@ -1028,8 +1328,49 @@ router.post("/bienDispo", async (req, res) => {
   }
 
   const [bienDispo] = await sequelize.query(query);
-  console.log(bienDispo);
-  res.send(bienDispo);
+
+
+  const results = await sequelize.query(query);
+  const biens = [];
+  let currentBien = null;
+
+  for (const result of results[0]) {
+    if (!currentBien || currentBien.id !== result.id) {
+      currentBien = {
+        id: result.id,
+        ville: result.ville,
+        adresse: result.adresse,
+        id_ClientBailleur: result.id_ClientBailleur,
+        prix: result.prix,
+        nomBien: result.nomBien,
+        description: result.description,
+        statutValidation: result.statutValidation,
+        disponible: result.disponible,
+        typeDePropriete: result.typeDePropriete,
+        nombreChambres: result.nombreChambres,
+        nombreLits: result.nombreLits,
+        nombreSallesDeBain: result.nombreSallesDeBain,
+        wifi: result.wifi,
+        cuisine: result.cuisine,
+        balcon: result.balcon,
+        jardin: result.jardin,
+        parking: result.parking,
+        piscine: result.piscine,
+        jaccuzzi: result.jaccuzzi,
+        salleDeSport: result.salleDeSport,
+        climatisation: result.climatisation,
+        images: []
+      };
+      biens.push(currentBien);
+    }
+
+    if (result.imagePath) {
+      currentBien.images.push(result.imagePath);
+    }
+  }
+
+  console.log(biens);
+  res.send(biens);
 });
 
 module.exports = router;

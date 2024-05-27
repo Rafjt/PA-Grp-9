@@ -78,6 +78,7 @@ const GestionAnnonce = () => {
                     data = await fetchAnnonce();
                 }
                 setAnnonces(data);
+                console.log('Annonces:', data);
             } catch (error) {
                 console.error('Error fetching annonces:', error);
             }
@@ -451,7 +452,7 @@ const GestionAnnonce = () => {
                     )
                     .map((annonce) => (
                         annonce && <div key={annonce.id} className="annonce">
-                            <img src={`${BACK_URL}/uploads/${annonce.cheminImg}`} alt={annonce.nomBien} className='gestionAnnonceImg' />
+                            <img src={`${BACK_URL}/${annonce.images[0]}`} alt={annonce.nomBien} className='gestionAnnonceImg' />
                             <h2> ID :{annonce.id}, {annonce.nomBien} </h2>
                             <h2> ID du client bailleur propriétaire :{annonce.id_ClientBailleur}</h2>
                             <h3>Prix par nuits: {annonce.prix}€</h3>

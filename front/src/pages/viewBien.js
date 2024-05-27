@@ -25,6 +25,7 @@ const ViewBien = () => {
   useEffect(() => {
     fetchAnnonceById(id).then((fetchedData) => {
       setData(fetchedData);
+      console.log(fetchedData.images);
     });
   }, [id]);
 
@@ -65,18 +66,6 @@ const ViewBien = () => {
     });
   }, []);
 
-  // const handleSubmit = (e) => {
-  //     e.preventDefault();
-  //     createReservation(id, arrivee, depart,)
-  //         .then((res) => {
-  //             if (res.status === 200) {
-  //                 alert('Reservation created successfully');
-  //             } else {
-  //                 alert('Error creating reservation');
-  //             }
-  //         });
-  // };
-
   const handleBack = () => {
     window.location.replace("/Biens");
   };
@@ -84,6 +73,9 @@ const ViewBien = () => {
   if (!data) {
     return <div>Loading...</div>;
   }
+
+  const imagesToDisplay = data.images ? data.images.slice(0,5) : [];
+
 
   return (
     <div className="container">
@@ -98,11 +90,16 @@ const ViewBien = () => {
                 <div>
                   <h1 className="nomDuBien">{data.nomBien}</h1>
                 </div>
-                <img
-                  className="photoDuBien"
-                  src={`${BACK_URL}/uploads/${data.cheminImg}`}
-                  alt={data.nomBien}
-                />
+                <div className="gallery-container">
+      {imagesToDisplay.map((image, index) => (
+        <img
+          key={index}
+          className={`gallery-item item-${index + 1}`}
+          src={`${BACK_URL}/${image}`}
+          alt={data.nomBien}
+        />
+      ))}
+    </div>
                 <p>
                   {data.typeDePropriete} - {data.ville},{data.adresse}
                 </p>
@@ -178,7 +175,7 @@ const ViewBien = () => {
                     excludeDates={disabledDates}
                   />
                   {showErrorMessage && (
-                    <div class="alert alert-danger">
+                    <div className="alert alert-danger">
                       <strong>Attention!</strong> Vous ne pouvez pas
                       sélectionner une date déjà réservée.
                     </div>
@@ -195,42 +192,44 @@ const ViewBien = () => {
                 <hr />
                 <p>Equipements:</p>
                 <table className="equipment-table">
-                  <tr>
-                    <th>wifi</th>
-                    <td>{data.wifi === 1 ? "oui" : "non"}</td>
-                  </tr>
-                  <tr>
-                    <th>Cuisine</th>
-                    <td>{data.cuisine === 1 ? "oui" : "non"}</td>
-                  </tr>
-                  <tr>
-                    <th>Balcon</th>
-                    <td>{data.balcon === 1 ? "oui" : "non"}</td>
-                  </tr>
-                  <tr>
-                    <th>Jardin</th>
-                    <td>{data.jardin === 1 ? "oui" : "non"}</td>
-                  </tr>
-                  <tr>
-                    <th>Parking</th>
-                    <td>{data.parking === 1 ? "oui" : "non"}</td>
-                  </tr>
-                  <tr>
-                    <th>Piscine</th>
-                    <td>{data.piscine === 1 ? "oui" : "non"}</td>
-                  </tr>
-                  <tr>
-                    <th>Jaccuzzi</th>
-                    <td>{data.jaccuzzi === 1 ? "oui" : "non"} </td>
-                  </tr>
-                  <tr>
-                    <th>Salle de sport</th>
-                    <td>{data.salleDeSport === 1 ? "oui" : "non"}</td>
-                  </tr>
-                  <tr>
-                    <th>Climatisation</th>
-                    <td>{data.climatisation === 1 ? "oui" : "non"}</td>
-                  </tr>
+                  <tbody>
+                    <tr>
+                      <th>wifi</th>
+                      <td>{data.wifi === 1 ? "oui" : "non"}</td>
+                    </tr>
+                    <tr>
+                      <th>Cuisine</th>
+                      <td>{data.cuisine === 1 ? "oui" : "non"}</td>
+                    </tr>
+                    <tr>
+                      <th>Balcon</th>
+                      <td>{data.balcon === 1 ? "oui" : "non"}</td>
+                    </tr>
+                    <tr>
+                      <th>Jardin</th>
+                      <td>{data.jardin === 1 ? "oui" : "non"}</td>
+                    </tr>
+                    <tr>
+                      <th>Parking</th>
+                      <td>{data.parking === 1 ? "oui" : "non"}</td>
+                    </tr>
+                    <tr>
+                      <th>Piscine</th>
+                      <td>{data.piscine === 1 ? "oui" : "non"}</td>
+                    </tr>
+                    <tr>
+                      <th>Jaccuzzi</th>
+                      <td>{data.jaccuzzi === 1 ? "oui" : "non"} </td>
+                    </tr>
+                    <tr>
+                      <th>Salle de sport</th>
+                      <td>{data.salleDeSport === 1 ? "oui" : "non"}</td>
+                    </tr>
+                    <tr>
+                      <th>Climatisation</th>
+                      <td>{data.climatisation === 1 ? "oui" : "non"}</td>
+                    </tr>
+                  </tbody>
                 </table>
                 <hr />
               </>
@@ -240,7 +239,7 @@ const ViewBien = () => {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 export default ViewBien;
