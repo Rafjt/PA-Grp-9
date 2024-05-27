@@ -6,6 +6,7 @@ export const BACK_URL = "http://localhost:3001";
 const URL_ANNONCE = `${BASE_URL}/bienImo`;
 const URL_PAIEMENT = `${BASE_URL}/paiement`;
 const URL_ENVOI_MAIL = `${BASE_URL}/mail`;
+const URL_ABONNEMENT = `${URL}/abonnement`;
 const URL_RESERVATION = `${BASE_URL}/reservation`;
 const URL_AUTH = `${URL}/auth`;
 
@@ -154,7 +155,7 @@ export const updateUser = async (userId, userType, userData) => {
 export const banUser = async (userId, userType, userData) => {
   try {
     const response = await fetch(
-      `${URL_USERS}/bannir/vatefaireenculer/${userId}/${userType}`,
+      `${URL_USERS}/bannir/ausecours/${userId}/${userType}`,
       {
         method: "POST",
         headers: {
@@ -903,3 +904,58 @@ export const fetchFinanceByUserId = async () => {
     console.log(error);
   }
 }
+
+
+// PARTIE STRIPE 
+
+// services.js
+export const createAbonnementSession = async (typeAbonnement) => {
+  const response = await fetch(`${URL_ABONNEMENT}/create-abonnement-session`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ typeAbonnement })
+  });
+
+  if (response.ok) {
+    const session = await response.json();
+    window.location.href = session.url;
+  } else {
+    console.error('Failed to create checkout session');
+  }
+};
+
+export const insertAbonnementInfos = async (typeAbonnement, userId, userType, price) => {
+  const response = await fetch(`${URL_ABONNEMENT}/insert-abonnement-info`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ typeAbonnement, userId, userType, price })
+  });
+
+  if (response.ok) {
+    const data = await response.json();
+    return data;
+  } else {
+    console.error('Failed to insert abonnement info');
+  }
+};
+
+export const checkAbonnement = async (userId) => {
+  const response = await fetch(`${URL_ABONNEMENT}/check-abonnement?userId=${userId}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (response.ok) {
+    const data = await response.json();
+    return data;
+  } else {
+    console.error('Failed to fetch abonnement info');
+    throw new Error('Failed to fetch abonnement info');
+  }
+};
