@@ -1,0 +1,11 @@
+            .gallery-container-Modify {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+
+            .gallery-item-Modify {
+                width: 100%;
+                height: 200px; /* Adjust this value to your preference */
+                object-fit: cover;
+            }

@@ -101,23 +101,6 @@ const UpdateAnnonce = () => {
         }
     }
 
-/*
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        console.log('name:', name, 'value:', value);
-        setValues({
-            ...values,
-            [name]: value,
-        e.preventDefault();
-        console.log('Modifying annonce:', values);
-        try {
-            const data = await updateAnnonce(id, values); 
-            console.log(data);
-        } catch (error) {
-            console.log(error);
-    };
-    */
-
     const handleModify = async (e) => {
         e.preventDefault();
         console.log('Modifying annonce:', values);
@@ -158,7 +141,7 @@ const UpdateAnnonce = () => {
             {annonceData && (
                 <form className="modif">
                     <img 
-                        src={`${BACK_URL}/uploads/${values.cheminImg}`} 
+                        src={`${BACK_URL}/${annonceData.images[0]}`} 
                         alt={`${values.nomBien}`} 
                         style={{ width: '30%' }} 
                     />

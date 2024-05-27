@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { updateAnnonce } from "../services";
+import { updateAnnonce, fetchAnnonceById, BACK_URL } from "../services";
 import { useNavigate } from "react-router-dom";
+import "./modifyBien.css";
 
 const ModifyBien = () => {
   const [annonce, setAnnonce] = useState(null);
@@ -8,11 +9,13 @@ const ModifyBien = () => {
 
   useEffect(() => {
     const id = sessionStorage.getItem("elementId");
-
-    // Fetch the data for this id from your API
-    fetch(`http://localhost:3001/api/bienImo/${id}`, { credentials: "include" })
-      .then((response) => response.json())
-      .then((data) => setAnnonce(data));
+    fetchAnnonceById(id)
+      .then((data) => {
+        setAnnonce(data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }, []);
 
   const handleChange = (event) => {
@@ -31,6 +34,8 @@ const ModifyBien = () => {
     navigate("/mesBiens");
   };
 
+  // const imagesToDisplay = annonce?.images ? annonce.images.slice(0,5) : [];
+
   return (
     <div>
       <h1>Modifier le bien</h1>
@@ -46,15 +51,26 @@ const ModifyBien = () => {
                 onChange={handleChange}
               />
             </h1>
-            <img
-              src={
+            <div className="gallery-container-Modify">
+              {
                 selectedFile
-                  ? URL.createObjectURL(selectedFile)
-                  : `http://localhost:3001/uploads/${annonce.cheminImg}`
+                  ? <img
+                    className="gallery-item-Modify"
+                    src={URL.createObjectURL(selectedFile)}
+                    alt={annonce.nomBien}
+                    style={{ maxHeight: "500px" }}
+                  />
+                  : annonce.images.map((image, index) => (
+                    <img
+                      key={index}
+                      className={`gallery-item-Modify item-${index + 1}-Modify rounded`}
+                      src={`${BACK_URL}/${image}`}
+                      alt={`${annonce.nomBien}-${index}`}
+                      style={{ maxHeight: "500px" }}
+                    />
+                  ))
               }
-              alt={annonce.nomBien}
-              style={{ maxHeight: "500px" }} 
-            />
+            </div>
             <input type="file" onChange={handleFileChange} />
             <h2>
               <input
