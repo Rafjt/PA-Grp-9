@@ -310,29 +310,35 @@ export const deleteAnnonce = async (annonceId) => {
 export const createAnnonce = async (annonceData) => {
   try {
     const formData = new FormData();
-    formData.append("pictures", annonceData.pictures); // Append the file
+
+    // Append each file in the pictures array
+    if (annonceData.pictures && Array.isArray(annonceData.pictures)) {
+      annonceData.pictures.forEach((file, index) => {
+        formData.append(`pictures`, file);
+      });
+    }
 
     // Append all other form values
     for (let key in annonceData) {
       if (key !== "pictures") {
-        // Exclude the file because it's already appended
         formData.append(key, annonceData[key]);
       }
     }
 
-    console.log("annonceData-> p", annonceData.pictures);
+    console.log("annonceData :", annonceData);
 
     const response = await fetch(URL_ANNONCE, {
       method: "POST",
-      body: formData,
+      body: annonceData,
     });
 
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("ici", error);
+    console.log("Error creating annonce:", error);
   }
 };
+
 
 export const fetchAnnonceById = async (annonceId) => {
   try {
@@ -395,6 +401,22 @@ export const fetchAnnonceByBailleur = async () => {
   try {
     const response = await fetch(`${BASE_URL}/biens`, {
       credentials: "include",
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const fetchBienDispo = async (defaultFilters) => {
+  try {
+    const response = await fetch(`${BACK_URL}/api/bienDispo`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(defaultFilters),
     });
     const data = await response.json();
     return data;

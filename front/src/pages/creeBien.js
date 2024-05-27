@@ -17,7 +17,7 @@ function CreeBien() {
     prix: "",
     ville: "Paris",
     adresse: "",
-    pictures: "",
+    pictures: [], // Change to array to handle multiple files
     disponible: "1",
     typeDePropriete: "Maison",
     nombreChambres: "",
@@ -47,14 +47,14 @@ function CreeBien() {
 
   const handleChange = (e) => {
     if (e.target.type === "file") {
-      const file = e.target.files[0];
+      const files = Array.from(e.target.files);
       setForm({
         ...form,
-        pictures: file,
+        pictures: files, // Update state with array of files
       });
+      console.log('File changed:', files); // Print the changed files
     } else {
-      const value =
-        e.target.type === "checkbox" ? (e.target.checked ? 1 : 0) : e.target.value;
+      const value = e.target.type === "checkbox" ? (e.target.checked ? 1 : 0) : e.target.value;
       setForm({
         ...form,
         [e.target.name]: value,
@@ -64,61 +64,28 @@ function CreeBien() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!form.nomBien.trim()) {
-      setModalMessage("Veuillez entrer le nom de la propriété.");
-      setShowModal(true);
-      return;
+  
+    const formData = new FormData();
+    for (const key in form) {
+      if (key === "pictures") {
+        form.pictures.forEach((file, index) => {
+          formData.append(`pictures`, file);
+        });
+      } else {
+        formData.append(key, form[key]);
+      }
     }
-
-    if (!form.description.trim()) {
-      setModalMessage("Veuillez entrer une description.");
-      setShowModal(true);
-      return;
+  
+    // Log the FormData object to verify its contents
+    for (let [key, value] of formData.entries()) {
+      console.log(`ICIIIIIIII ${key}: ${value}`);
     }
-
-    if (!form.prix || isNaN(form.prix) || form.prix <= 0 || form.prix >= 99999) {
-      setModalMessage("Veuillez entrer un prix valide.");
-      setShowModal(true);
-      return;
-    }
-
-    if (!form.adresse.trim()) {
-      setModalMessage("Veuillez entrer une adresse.");
-      setShowModal(true);
-      return;
-    }
-
-    if (!form.nombreChambres || isNaN(form.nombreChambres) || form.nombreChambres <= 0) {
-      setModalMessage("Veuillez entrer un nombre valide de chambres.");
-      setShowModal(true);
-      return;
-    }
-
-    if (!form.nombreLits || isNaN(form.nombreLits) || form.nombreLits <= 0) {
-      setModalMessage("Veuillez entrer un nombre valide de lits.");
-      setShowModal(true);
-      return;
-    }
-
-    if (!form.nombreSallesDeBain || isNaN(form.nombreSallesDeBain) || form.nombreSallesDeBain <= 0) {
-      setModalMessage("Veuillez entrer un nombre valide de salles de bain.");
-      setShowModal(true);
-      return;
-    }
-
-    if (!form.pictures) {
-      setModalMessage("Veuillez télécharger une photo du bien.");
-      setShowModal(true);
-      return;
-    }
-
-    console.log("form:", form);
+  
     try {
-      const data = await createAnnonce({ ...form });
-      setAnnonces([...annonces, data]);
-      console.log("Annonce créée:", data);
-
+      const response = await createAnnonce(formData);
+      setAnnonces([...annonces, response]);
+      console.log("Annonce créée:", response);
+  
       setSuccessMessage("Annonce créée avec succès !");
       setTimeout(() => {
         navigate("/mesBiens");
@@ -127,6 +94,7 @@ function CreeBien() {
       console.error("Erreur lors de la création de l'annonce:", error);
     }
   };
+  
 
   return (
     <div>
@@ -201,11 +169,12 @@ function CreeBien() {
           <label htmlFor="pictures">Photos du bien :</label>
           <input
             type="file"
-            placeholder="photos du bien"
             name="pictures"
             accept="image/*"
+            multiple // Enable multiple file selection
             onChange={handleChange}
           />
+
           <br />
           <br />
           <label htmlFor="disponible">Disponible :</label>

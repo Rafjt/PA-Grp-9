@@ -74,9 +74,9 @@ const MesReservations = () => {
         {reservations.length > 0 ? (
           reservations.map((reservation, index) => (
             <div key={reservation.id} className="reservation-item">
-              {reservation.cheminImg && (
+              {reservation.images && (
                 <img
-                  src={`${BACK_URL}/uploads/${reservation.cheminImg}`}
+                  src={`${BACK_URL}/${reservation.images[0]}`}
                   alt={reservation.nomBien}
                   className="reservation-image-small"
                 />

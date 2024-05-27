@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { BACK_URL, deleteAnnonce } from "../services";
+import { BACK_URL, deleteAnnonce,fetchAnnonceByBailleur } from "../services";
 import { Link } from "react-router-dom";
 import "./mesBiens.css";
 
@@ -9,10 +9,12 @@ const MesBiens = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
 
   useEffect(() => {
-    fetch("http://localhost:3001/api/biens", { credentials: "include" }) // include credentials
-      .then((response) => response.json())
+    fetchAnnonceByBailleur()
       .then((data) => {
         setAnnonces(data);
+      })
+      .catch((error) => {
+        console.error(error);
       });
   }, []);
 
@@ -47,7 +49,7 @@ const MesBiens = () => {
             annonce && (
               <div key={annonce.id} className="annonce">
                 <img
-                  src={`${BACK_URL}/uploads/${annonce.cheminImg}`}
+                  src={`${BACK_URL}/${annonce.images[0]}`}
                   alt={annonce.nomBien}
                   className="mesBiensImg"
                 />

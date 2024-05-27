@@ -52,10 +52,9 @@ const GestionReservations = () => {
      salleDeSport: 0,
      climatisation: 0
     });
-    
+
     useEffect(() => {
-        fetch('http://localhost:3001/api/reservation')
-            .then(response => response.json())
+        fetchReservation()
             .then(data => setReservations(data))
             .catch(error => console.error('Error fetching reservations:', error));
     }, []);
@@ -71,15 +70,6 @@ const GestionReservations = () => {
             .catch((error) => console.error('Error deleting reservation:', error));
     };
 
-/*
-    const handleModify = (e) => {
-        const value = e.target.type === 'checkbox' ? (e.target.checked ? 1 : 0) : e.target.value;
-        setForm({
-            ...form,
-            [e.target.name]: value,
-        });
-    };
-*/
     const handleSearch = (event) => {
         setSearchId(event.target.value);
     };
@@ -108,126 +98,6 @@ const GestionReservations = () => {
             setMessage("Échec de la création de la réservation.");
         }
     };
-    
-
-    /*
-    const handleFetchById = async () => {
-        if (searchId.trim() !== '') {
-            try {
-                const data = await fetchReservationById(searchId);
-                // Filtrer les réservations en fonction du statut
-                const filteredReservations = data.filter(reservation => reservation.statut === 'Disponible');
-                if (filteredReservations.length > 0) {
-                    setReservationDetails(filteredReservations[0]);
-                } else {
-                    setReservationDetails(null);
-                    console.log("Aucune réservation disponible trouvée pour cet ID.");
-                }
-            } catch (error) {
-                console.error("Erreur lors de la récupération de la réservation :", error);
-                setReservationDetails(null);
-            }
-        }
-    };
-
-    const handleFetchById = async () => {
-        if (searchId.trim() !== '') {
-            try {
-                const data = await fetchReservationById(searchId);
-                // Assurez-vous que la donnée est présente et est un tableau (si attendu)
-                if (data && Array.isArray(data)) {
-                    const filteredReservations = data.filter(reservation => reservation.statut === 'Disponible');
-                    if (filteredReservations.length > 0) {
-                        setReservationDetails(filteredReservations[0]);
-                    } else {
-                        console.log("Aucune réservation disponible trouvée pour cet ID.");
-                        setReservationDetails(null);
-                    }
-                } else if (data && data.statut === 'Disponible') { // Si c'est un objet et non un tableau
-                    setReservationDetails(data);
-                } else {
-                    console.log("Aucune réservation disponible ou donnée mal formée.");
-                    setReservationDetails(null);
-                }
-            } catch (error) {
-                console.error("Erreur lors de la récupération de la réservation :", error);
-                setReservationDetails(null);
-            }
-        }
-    };
- 
-
-    const handleFetchById = async () => {
-        if (searchId.trim() !== '') {
-            try {
-                const data = await fetchReservationById(searchId);
-                if (data) {
-                    switch (data.statut) {
-                        case 'Disponible':
-                            setReservationDetails(data);
-                            setMessage('');
-                            break;
-                        case 'Pending':
-                            setReservationDetails(null);
-                            setMessage("Ce bien est déjà réservé.");
-                            break;
-                        default:
-                            setReservationDetails(null);
-                            setMessage("Cette réservation n'est pas disponible pour vos dates.");
-                            break;
-                    }
-                } else {
-                    setReservationDetails(null);
-                    setMessage("Aucun résultat pour cet ID.");
-                }
-            } catch (error) {
-                console.error("Erreur lors de la récupération de la réservation :", error);
-                setReservationDetails(null);
-                setMessage("Erreur lors de la récupération de la réservation.");
-            }
-        } else {
-            setMessage("Veuillez entrer un ID valide.");
-        }
-    };
-    
-
-  
-    const handleFetchById = async () => {
-        if (searchId.trim() !== '') {
-            try {
-                const data = await fetchReservationById(searchId);
-                if (data) {
-                    switch (data.statut) {
-                        case 'Disponible':
-                            setReservationDetails(data);
-                            const dates = await fetchDisabledDates(searchId);
-                            setDisabledDates(dates.map(date => new Date(date)));
-                            setMessage('');
-                            break;
-                        case 'Pending':
-                            setReservationDetails(null);
-                            setMessage("Ce bien est déjà réservé.");
-                            break;
-                        default:
-                            setReservationDetails(null);
-                            setMessage("Cette réservation n'est pas disponible pour vos dates.");
-                            break;
-                    }
-                } else {
-                    setReservationDetails(null);
-                    setMessage("Aucun résultat pour cet ID.");
-                }
-            } catch (error) {
-                console.error("Erreur lors de la récupération de la réservation :", error);
-                setReservationDetails(null);
-                setMessage("Erreur lors de la récupération de la réservation.");
-            }
-        } else {
-            setMessage("Veuillez entrer un ID valide.");
-        }
-    };
-    
-    */
 
     const handleFetchById = async () => {
         if (!searchId.trim()) {
@@ -401,7 +271,7 @@ const GestionReservations = () => {
                     .map(reservation => (
                         <div key={reservation.id} className="reservation">
                         <h3>Votre réservation : {reservation.nomBien}</h3>
-                        <img className="photoDuBien" src={`${BACK_URL}/uploads/${reservation.cheminImg}`} alt={reservation.nomBien} />
+                        <img className="photoDuBien" src={`${BACK_URL}/${reservation.images[0]}`} alt={reservation.nomBien} />
                         <p>ID du Bien Immobilier : {reservation.id_BienImmobilier}</p>
                         <p>ID du Client voyageur : {reservation.id_ClientVoyageur}</p>
                         <h3>Prix par nuit: {reservation.prix}€</h3>

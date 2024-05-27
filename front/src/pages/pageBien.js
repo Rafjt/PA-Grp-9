@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { fetchAnnonce, fetchUsers } from "../services";
+import { fetchUsers, fetchBienDispo } from "../services";
 import "./pageBien.css";
 import { BACK_URL } from "../services";
 
@@ -13,8 +13,8 @@ const PageBien = () => {
     setCurrentPage(page);
   };
 
-  const [bailleur, setBailleur] = React.useState([]);
-  const [data, setData] = React.useState([]);
+  const [bailleur, setBailleur] = useState([]);
+  const [data, setData] = useState([]);
 
   useEffect(() => {
     fetchUsers().then((response) => {
@@ -44,16 +44,9 @@ const PageBien = () => {
       climatisation: 0,
     };
 
-    fetch(`${BACK_URL}/api/bienDispo`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(defaultFilters),
-    })
-    .then((response) => response.json())
-    .then((data) => {
+    fetchBienDispo(defaultFilters).then((data) => {
       setData(data);
+      console.log(data);
       setCurrentPage(1);
     });
   }, []);
@@ -72,7 +65,7 @@ const PageBien = () => {
     );
   };
 
-  const [filtres, setFiltres] = React.useState({
+  const [filtres, setFiltres] = useState({
     ville: "",
     arrivee: new Date().toISOString().split("T")[0],
     depart: new Date().toISOString().split("T")[0],
@@ -94,15 +87,7 @@ const PageBien = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     console.log(filtres);
-    const response = await fetch(`${BACK_URL}/api/bienDispo`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(filtres),
-    });
-
-    const newData = await response.json();
+    const newData = await fetchBienDispo(filtres);
     setData(newData);
   };
 
@@ -343,7 +328,7 @@ const PageBien = () => {
             return (
               <div key={annonce.id} onClick={() => handleClick(annonce.id)}>
                 <img
-                  src={`${BACK_URL}/uploads/${annonce.cheminImg}`}
+                  src={`${BACK_URL}/${annonce.images[0]}`}
                   alt={annonce.nomBien}
                   className="img"
                 />
