@@ -372,20 +372,17 @@ export const fetchAnnonceFiltered = async (filter) => {
   }
 };
 
-export const updateAnnonce = async (annonceId, annonceData, file) => {
+export const updateAnnonce = async (annonceId, annonceData, files) => {
   try {
-    console.log("file", file);
     const formData = new FormData();
-    formData.append("cheminImg", file);
+    files.forEach(file => {
+      formData.append("cheminImg", file);
+    });
     for (let key in annonceData) {
       if (key !== "cheminImg") {
-        // Exclude the file because it's already appended
         formData.append(key, annonceData[key]);
-        console.log("key", key, annonceData[key]);
-        console.log("formData", formData);
       }
     }
-    console.log("formData", formData);
     const response = await fetch(`${URL_ANNONCE}/${annonceId}`, {
       method: "PUT",
       body: formData,
@@ -396,6 +393,7 @@ export const updateAnnonce = async (annonceId, annonceData, file) => {
     console.log(error);
   }
 };
+
 
 export const fetchAnnonceByBailleur = async () => {
   try {

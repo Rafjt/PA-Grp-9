@@ -421,50 +421,53 @@ router.get("/bienImo", async (req, res) => {
 
 router.delete('/bienImo/:id', async (req, res) => {
   const { id } = req.params;
-  let cheminImg;
+
   try {
-    const [[result]] = await sequelize.query(
-      `SELECT cheminImg FROM bienImo WHERE id = ${id}`
+    // Get the paths of the associated images
+    const [results] = await sequelize.query(
+      `SELECT imagePath FROM bienImoImages WHERE bienImoId = ${id}`
     );
-    cheminImg = result.cheminImg;
-  } catch (error) {
-    console.error('Error getting bien:', error);
-    res.status(500).send('Failed to get bien');
-    return;
-  }
 
-  console.log('cheminImg:', cheminImg);
+    const imagePaths = results.map(row => row.imagePath);
+    console.log('imagePaths:', imagePaths);
 
-  const command = `mv uploads/${cheminImg} todelete.jpg`;
-
-  // rm ../uploads/${cheminImg}
-
-  exec(command, (error, stdout, stderr) => {
-    if (error) {
-      console.error(`Error executing the command: ${error}`);
-      return;
+    // Delete the images from the filesystem
+    for (const imgPath of imagePaths) {
+      const fullPath = path.join(__dirname, '..', imgPath);
+      fs.unlink(fullPath, (err) => {
+        if (err) {
+          console.error(`Error deleting image ${fullPath}:`, err);
+        } else {
+          console.log(`Deleted image ${fullPath}`);
+        }
+      });
     }
 
-    console.log(`stdout: ${stdout}`);
+    // Delete entries from bienImoImages
+    await sequelize.query(
+      `DELETE FROM bienImoImages WHERE bienImoId = ${id}`
+    );
 
-    console.error(`stderr: ${stderr}`);
-  });
+    console.log('Deleted bienImoImages entries for bien:', id);
 
-  console.log('trying to delete bien:', id, 'with cheminImg:', cheminImg);
+    // Delete entries from reservation
+    await sequelize.query(
+      `DELETE FROM reservation WHERE id_BienImmobilier = ${id}`
+    );
 
-  try {
-    await sequelize.query(`DELETE FROM reservation WHERE id_BienImmobilier = ${id}`);
-  } catch (error) {
-    console.error('Error deleting reservations:', error);
-    res.status(500).send('Failed to delete reservations');
-  }
+    console.log('Deleted reservations for bien:', id);
 
-  try {
-    await sequelize.query(`DELETE FROM bienImo WHERE id = ${id}`);
+    // Delete the bienImo entry
+    await sequelize.query(
+      `DELETE FROM bienImo WHERE id = ${id}`
+    );
+
+    console.log('Deleted bienImo entry for bien:', id);
+
     res.send("Bien deleted");
   } catch (error) {
-    console.error("Error deleting bien:", error);
-    res.status(500).send("Failed to delete bien");
+    console.error('Error deleting bien:', error);
+    res.status(500).send('Failed to delete bien');
   }
 });
 
@@ -626,16 +629,8 @@ router.get("/bienImo/:id", async (req, res) => {
 });
 
 
-router.put('/bienImo/:id', upload.single('cheminImg'), async (req, res) => {
-  console.log('Modifying bien:', req.body);
+router.put('/bienImo/:id', upload.array('cheminImg', 10), async (req, res) => {
   const { id } = req.params;
-  let pictures = req.body.cheminImg; // Use existing image by default
-  let updateImageQuery = '';
-  if (req.file) {
-    pictures = req.file.filename; // If a new file was uploaded, use it instead
-    updateImageQuery = `, cheminImg = '${pictures}'`;
-  }
-  console.log('pictures ==', pictures); // Log uploaded file information
   const {
     nomBien,
     description,
@@ -666,6 +661,7 @@ router.put('/bienImo/:id', upload.single('cheminImg'), async (req, res) => {
   const newTypeDePropriete = typeDePropriete.replace(/'/g, "''");
 
   try {
+    // Update the bienImo entry
     await sequelize.query(
       `UPDATE bienImo SET 
         nomBien = '${newNomBien}', 
@@ -688,15 +684,49 @@ router.put('/bienImo/:id', upload.single('cheminImg'), async (req, res) => {
         climatisation = '${climatisation}', 
         ville = '${ville}', 
         adresse = '${newAdresse}'
-        ${updateImageQuery} 
       WHERE id = ${id}`
     );
+
+    // Handle image update if new images are uploaded
+    if (req.files && req.files.length > 0) {
+      const imagePaths = req.files.map(file => 'uploads/' + file.filename);
+
+      // Insert the new image paths into bienImoImages table
+      for (const imagePath of imagePaths) {
+        await sequelize.query(
+          `INSERT INTO bienImoImages (bienImoId, imagePath) VALUES (${id}, '${imagePath}')`
+        );
+      }
+
+      // Optionally: Remove old images from filesystem if they are not needed
+      const [results] = await sequelize.query(
+        `SELECT imagePath FROM bienImoImages WHERE bienImoId = ${id} AND imagePath NOT IN ('${imagePaths.join("','")}')`
+      );
+
+      for (const row of results) {
+        const fullPath = path.join(__dirname, '..', row.imagePath);
+        fs.unlink(fullPath, (err) => {
+          if (err) {
+            console.error(`Error deleting image ${fullPath}:`, err);
+          } else {
+            console.log(`Deleted image ${fullPath}`);
+          }
+        });
+      }
+
+      // Delete old image paths from bienImoImages table
+      await sequelize.query(
+        `DELETE FROM bienImoImages WHERE bienImoId = ${id} AND imagePath NOT IN ('${imagePaths.join("','")}')`
+      );
+    }
+
     res.send('Bien modified');
   } catch (error) {
     console.error('Error modifying bien:', error);
     res.status(500).send('Error modifying bien');
   }
 });
+
 
 
 router.post('/bienImo/filter', async (req, res) => {
