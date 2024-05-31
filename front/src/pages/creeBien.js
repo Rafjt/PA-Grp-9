@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { createAnnonce,getCredentials } from "../services";
+import { createAnnonce, getCredentials } from "../services";
 import { Modal, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
@@ -64,7 +64,56 @@ function CreeBien() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
+    // Form validation
+    if (!form.nomBien.trim()) {
+      setModalMessage("Veuillez entrer le nom de la propriété.");
+      setShowModal(true);
+      return;
+    }
+
+    if (!form.description.trim()) {
+      setModalMessage("Veuillez entrer une description.");
+      setShowModal(true);
+      return;
+    }
+
+    if (!form.prix || isNaN(form.prix) || form.prix <= 0) {
+      setModalMessage("Veuillez entrer un prix valide.");
+      setShowModal(true);
+      return;
+    }
+
+    if (!form.adresse.trim()) {
+      setModalMessage("Veuillez entrer une adresse.");
+      setShowModal(true);
+      return;
+    }
+
+    if (!form.nombreChambres || isNaN(form.nombreChambres) || form.nombreChambres <= 0) {
+      setModalMessage("Veuillez entrer un nombre valide de chambres.");
+      setShowModal(true);
+      return;
+    }
+
+    if (!form.nombreLits || isNaN(form.nombreLits) || form.nombreLits <= 0) {
+      setModalMessage("Veuillez entrer un nombre valide de lits.");
+      setShowModal(true);
+      return;
+    }
+
+    if (!form.nombreSallesDeBain || isNaN(form.nombreSallesDeBain) || form.nombreSallesDeBain <= 0) {
+      setModalMessage("Veuillez entrer un nombre valide de salles de bain.");
+      setShowModal(true);
+      return;
+    }
+
+    if (form.pictures.length === 0) {
+      setModalMessage("Veuillez télécharger au moins une photo du bien.");
+      setShowModal(true);
+      return;
+    }
+
     const formData = new FormData();
     for (const key in form) {
       if (key === "pictures") {
@@ -75,17 +124,17 @@ function CreeBien() {
         formData.append(key, form[key]);
       }
     }
-  
+
     // Log the FormData object to verify its contents
     for (let [key, value] of formData.entries()) {
       console.log(`ICIIIIIIII ${key}: ${value}`);
     }
-  
+
     try {
       const response = await createAnnonce(formData);
       setAnnonces([...annonces, response]);
       console.log("Annonce créée:", response);
-  
+
       setSuccessMessage("Annonce créée avec succès !");
       setTimeout(() => {
         navigate("/mesBiens");
@@ -94,7 +143,6 @@ function CreeBien() {
       console.error("Erreur lors de la création de l'annonce:", error);
     }
   };
-  
 
   return (
     <div>
