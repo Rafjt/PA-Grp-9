@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { updateUser } from '../services';
+import { updateUser,fetchUserById } from '../services';
 
 const Update = () => {
   const { id } = useParams();
@@ -16,8 +16,7 @@ const Update = () => {
   });
 
   useEffect(() => {
-    fetch(`http://localhost:3001/api/users/${id}/${values.type}`)
-      .then((response) => response.json())
+    fetchUserById(id, values.type)
       .then((data) => {
         console.log(data);
         setValues({
@@ -29,7 +28,8 @@ const Update = () => {
           type: values.type,
           admin: data.admin,
         });
-      });
+      })
+      .catch((error) => console.log(error));
   }, [id, values.type]);
 
   const handleChange = (e) => {

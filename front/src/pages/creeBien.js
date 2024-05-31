@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { createAnnonce } from "../services";
+import { createAnnonce,getCredentials } from "../services";
 import { Modal, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
@@ -37,12 +37,12 @@ function CreeBien() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("http://localhost:3001/auth/me", { credentials: "include" })
-      .then((response) => response.json())
+    getCredentials()
       .then((data) => {
         setData(data);
         setForm((prevForm) => ({ ...prevForm, id_ClientBailleur: data.id }));
-      });
+      })
+      .catch((error) => console.log(error));
   }, []);
 
   const handleChange = (e) => {

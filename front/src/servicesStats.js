@@ -1,8 +1,5 @@
 // Define functions for backend calls
-const BASE_URL = "http://localhost:3001/api";
-const URL_USERS = `${BASE_URL}/users`;
-export const BACK_URL = "http://localhost:3001";
-const URL_ANNONCE = `${BASE_URL}/bienImo`;
+import { URL_USERS,URL_ANNONCE } from "./services.js";
 
 export const fetchNombreUsers = async (type) => {
   try {

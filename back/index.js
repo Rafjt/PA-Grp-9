@@ -9,6 +9,7 @@ const sequelize = require('./database');
 const router = require('./routes/myroutes');
 const auth = require('./routes/auth');
 const abonnement = require('./routes/abonnementRoute');
+const URL_FRONT = 'http://localhost:3000';
 
 const port = 3001;
 
@@ -16,7 +17,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:3000',
+    origin: URL_FRONT,
     methods: ['GET', 'POST'],
     credentials: true
   }
@@ -31,7 +32,7 @@ sequelize.authenticate().then(() => {
 app.use(bodyParser.json());
 
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: URL_FRONT,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
