@@ -46,7 +46,7 @@ const GestionAnnonce = () => {
         description: '',
         nomBien: '',
         statutValidation: '',
-        cheminImg: '',
+        cheminImg: [],
         ville: '',
         adresse: '',
         disponible: '1',
@@ -65,7 +65,8 @@ const GestionAnnonce = () => {
         piscine: 0,
         jaccuzzi: 0,
         salleDeSport: 0,
-        climatisation: 0
+        climatisation: 0,
+        pictures: [],
     });
 
     useEffect(() => {
@@ -86,14 +87,14 @@ const GestionAnnonce = () => {
 
         fetchData();
     }, [filterValues]);
-
+    
     const handleChange = (e) => {
         if (e.target.type === 'file') {
             // If the input is a file input, handle the file upload
-            const file = e.target.files[0]; // Get the first file from the input
+            const files = Array.from(e.target.files); // Convert FileList to Array
             setForm({
                 ...form,
-                pictures: file // Set the file object in the state
+                pictures: [...form.pictures, ...files] // Append new files to existing files
             });
         } else {
             // For other inputs, handle as usual
@@ -108,18 +109,33 @@ const GestionAnnonce = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('form:', form);
-        try {
-            const data = await createAnnonce({
-                ...form,
+      
+        const formData = new FormData();
+        for (const key in form) {
+          if (key === "pictures") {
+            form.pictures.forEach((file, index) => {
+              formData.append(`pictures`, file);
             });
-            setAnnonces([...annonces, data]);
-            console.log('Annonce created:', data);
-            console.log(data);
-        } catch (error) {
-            console.error('Error creating annonce:', error);
+          } else {
+            formData.append(key, form[key]);
+          }
         }
-    };
+      
+        // Log the FormData object to verify its contents
+        for (let [key, value] of formData.entries()) {
+          console.log(`ICIIIIIIII ${key}: ${value}`);
+        }
+      
+        try {
+          const response = await createAnnonce(formData);
+          setAnnonces([...annonces, response]);
+          console.log("Annonce créée:", response);
+          window.location.reload();
+      
+        } catch (error) {
+          console.error("Erreur lors de la création de l'annonce:", error);
+        }
+      };
 
     const handleDelete = (annonceId) => {
         console.log(annonceId);
@@ -226,6 +242,7 @@ const GestionAnnonce = () => {
                         placeholder="photos du bien"
                         name="pictures"
                         accept='image/*'
+                        multiple
                         onChange={handleChange}
                     />
                     <br />

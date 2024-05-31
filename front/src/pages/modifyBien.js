@@ -5,7 +5,7 @@ import "./modifyBien.css";
 
 const ModifyBien = () => {
   const [annonce, setAnnonce] = useState(null);
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedFiles, setSelectedFiles] = useState([]);
 
   useEffect(() => {
     const id = sessionStorage.getItem("elementId");
@@ -23,18 +23,16 @@ const ModifyBien = () => {
   };
 
   const handleFileChange = (event) => {
-    setSelectedFile(event.target.files[0]);
+    setSelectedFiles(Array.from(event.target.files));
   };
 
   const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const response = await updateAnnonce(annonce.id, annonce, selectedFile);
+    const response = await updateAnnonce(annonce.id, annonce, selectedFiles);
     navigate("/mesBiens");
   };
-
-  // const imagesToDisplay = annonce?.images ? annonce.images.slice(0,5) : [];
 
   return (
     <div>
@@ -52,15 +50,17 @@ const ModifyBien = () => {
               />
             </h1>
             <div className="gallery-container-Modify">
-              {
-                selectedFile
-                  ? <img
-                    className="gallery-item-Modify"
-                    src={URL.createObjectURL(selectedFile)}
-                    alt={annonce.nomBien}
-                    style={{ maxHeight: "500px" }}
-                  />
-                  : annonce.images.map((image, index) => (
+              {selectedFiles.length > 0
+                ? selectedFiles.map((file, index) => (
+                    <img
+                      key={index}
+                      className="gallery-item-Modify"
+                      src={URL.createObjectURL(file)}
+                      alt={annonce.nomBien}
+                      style={{ maxHeight: "500px" }}
+                    />
+                  ))
+                : annonce.images.map((image, index) => (
                     <img
                       key={index}
                       className={`gallery-item-Modify item-${index + 1}-Modify rounded`}
@@ -68,10 +68,9 @@ const ModifyBien = () => {
                       alt={`${annonce.nomBien}-${index}`}
                       style={{ maxHeight: "500px" }}
                     />
-                  ))
-              }
+                  ))}
             </div>
-            <input type="file" onChange={handleFileChange} />
+            <input type="file" onChange={handleFileChange} multiple />
             <h2>
               <input
                 type="text"
@@ -146,141 +145,143 @@ const ModifyBien = () => {
             <hr />
             <p>Equipements:</p>
             <table className="equipment-table">
-              <tr>
-                <th>wifi</th>
-                <td>
-                  <input
-                    type="checkbox"
-                    checked={annonce.wifi === 1}
-                    onChange={() =>
-                      setAnnonce({
-                        ...annonce,
-                        wifi: annonce.wifi === 1 ? 0 : 1,
-                      })
-                    }
-                  />
-                </td>
-              </tr>
-              <tr>
-                <th>Cuisine</th>
-                <td>
-                  <input
-                    type="checkbox"
-                    checked={annonce.cuisine === 1}
-                    onChange={() =>
-                      setAnnonce({
-                        ...annonce,
-                        cuisine: annonce.cuisine === 1 ? 0 : 1,
-                      })
-                    }
-                  />
-                </td>
-              </tr>
-              <tr>
-                <th>Balcon</th>
-                <td>
-                  <input
-                    type="checkbox"
-                    checked={annonce.balcon === 1}
-                    onChange={() =>
-                      setAnnonce({
-                        ...annonce,
-                        balcon: annonce.balcon === 1 ? 0 : 1,
-                      })
-                    }
-                  />
-                </td>
-              </tr>
-              <tr>
-                <th>Jardin</th>
-                <td>
-                  <input
-                    type="checkbox"
-                    checked={annonce.jardin === 1}
-                    onChange={() =>
-                      setAnnonce({
-                        ...annonce,
-                        jardin: annonce.jardin === 1 ? 0 : 1,
-                      })
-                    }
-                  />
-                </td>
-              </tr>
-              <tr>
-                <th>Parking</th>
-                <td>
-                  <input
-                    type="checkbox"
-                    checked={annonce.parking === 1}
-                    onChange={() =>
-                      setAnnonce({
-                        ...annonce,
-                        parking: annonce.parking === 1 ? 0 : 1,
-                      })
-                    }
-                  />
-                </td>
-              </tr>
-              <tr>
-                <th>Piscine</th>
-                <td>
-                  <input
-                    type="checkbox"
-                    checked={annonce.piscine === 1}
-                    onChange={() =>
-                      setAnnonce({
-                        ...annonce,
-                        piscine: annonce.piscine === 1 ? 0 : 1,
-                      })
-                    }
-                  />
-                </td>
-              </tr>
-              <tr>
-                <th>Jaccuzzi</th>
-                <td>
-                  <input
-                    type="checkbox"
-                    checked={annonce.jaccuzzi === 1}
-                    onChange={() =>
-                      setAnnonce({
-                        ...annonce,
-                        jaccuzzi: annonce.jaccuzzi === 1 ? 0 : 1,
-                      })
-                    }
-                  />
-                </td>
-              </tr>
-              <tr>
-                <th>Salle de sport</th>
-                <td>
-                  <input
-                    type="checkbox"
-                    checked={annonce.salleDeSport === 1}
-                    onChange={() =>
-                      setAnnonce({
-                        ...annonce,
-                        salleDeSport: annonce.salleDeSport === 1 ? 0 : 1,
-                      })
-                    }
-                  />
-                </td>
-              </tr>
-              <tr>
-                <th>Climatisation</th>
-                <td>
-                  <input
-                    type="checkbox"
-                    checked={annonce.climatisation === 1}
-                    onChange={() =>
-                      setAnnonce({
-                        ...annonce,
-                        climatisation: annonce.climatisation === 1 ? 0 : 1,
-                      })
-                    }
-                  />
-                </td>
-              </tr>
+              <tbody>
+                <tr>
+                  <th>wifi</th>
+                  <td>
+                    <input
+                      type="checkbox"
+                      checked={annonce.wifi === 1}
+                      onChange={() =>
+                        setAnnonce({
+                          ...annonce,
+                          wifi: annonce.wifi === 1 ? 0 : 1,
+                        })
+                      }
+                    />
+                  </td>
+                </tr>
+                <tr>
+                  <th>Cuisine</th>
+                  <td>
+                    <input
+                      type="checkbox"
+                      checked={annonce.cuisine === 1}
+                      onChange={() =>
+                        setAnnonce({
+                          ...annonce,
+                          cuisine: annonce.cuisine === 1 ? 0 : 1,
+                        })
+                      }
+                    />
+                  </td>
+                </tr>
+                <tr>
+                  <th>Balcon</th>
+                  <td>
+                    <input
+                      type="checkbox"
+                      checked={annonce.balcon === 1}
+                      onChange={() =>
+                        setAnnonce({
+                          ...annonce,
+                          balcon: annonce.balcon === 1 ? 0 : 1,
+                        })
+                      }
+                    />
+                  </td>
+                </tr>
+                <tr>
+                  <th>Jardin</th>
+                  <td>
+                    <input
+                      type="checkbox"
+                      checked={annonce.jardin === 1}
+                      onChange={() =>
+                        setAnnonce({
+                          ...annonce,
+                          jardin: annonce.jardin === 1 ? 0 : 1,
+                        })
+                      }
+                    />
+                  </td>
+                </tr>
+                <tr>
+                  <th>Parking</th>
+                  <td>
+                    <input
+                      type="checkbox"
+                      checked={annonce.parking === 1}
+                      onChange={() =>
+                        setAnnonce({
+                          ...annonce,
+                          parking: annonce.parking === 1 ? 0 : 1,
+                        })
+                      }
+                    />
+                  </td>
+                </tr>
+                <tr>
+                  <th>Piscine</th>
+                  <td>
+                    <input
+                      type="checkbox"
+                      checked={annonce.piscine === 1}
+                      onChange={() =>
+                        setAnnonce({
+                          ...annonce,
+                          piscine: annonce.piscine === 1 ? 0 : 1,
+                        })
+                      }
+                    />
+                  </td>
+                </tr>
+                <tr>
+                  <th>Jaccuzzi</th>
+                  <td>
+                    <input
+                      type="checkbox"
+                      checked={annonce.jaccuzzi === 1}
+                      onChange={() =>
+                        setAnnonce({
+                          ...annonce,
+                          jaccuzzi: annonce.jaccuzzi === 1 ? 0 : 1,
+                        })
+                      }
+                    />
+                  </td>
+                </tr>
+                <tr>
+                  <th>Salle de sport</th>
+                  <td>
+                    <input
+                      type="checkbox"
+                      checked={annonce.salleDeSport === 1}
+                      onChange={() =>
+                        setAnnonce({
+                          ...annonce,
+                          salleDeSport: annonce.salleDeSport === 1 ? 0 : 1,
+                        })
+                      }
+                    />
+                  </td>
+                </tr>
+                <tr>
+                  <th>Climatisation</th>
+                  <td>
+                    <input
+                      type="checkbox"
+                      checked={annonce.climatisation === 1}
+                      onChange={() =>
+                        setAnnonce({
+                          ...annonce,
+                          climatisation: annonce.climatisation === 1 ? 0 : 1,
+                        })
+                      }
+                    />
+                  </td>
+                </tr>
+              </tbody>
             </table>
             <hr />
             <button type="submit" className="btn btn-dark">
