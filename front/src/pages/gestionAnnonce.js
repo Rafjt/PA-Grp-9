@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import './gestionAnnonce.css';
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Link } from 'react-router-dom';
-import { fetchAnnonce, deleteAnnonce, createAnnonce, fetchAnnonceFiltered } from '../services';
-// import Popup from 'reactjs-popup';
-// import 'reactjs-popup/dist/index.css';
-
-const BACK_URL = "http://localhost:3001";
+import { fetchAnnonce, 
+    deleteAnnonce, 
+    createAnnonce, 
+    fetchAnnonceFiltered,
+    BACK_URL 
+} from '../services';
 
 
 const GestionAnnonce = () => {

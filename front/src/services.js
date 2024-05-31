@@ -1,14 +1,13 @@
 // Define functions for backend calls
-const URL = "http://localhost:3001";
-export const BASE_URL = "http://localhost:3001/api";
-const URL_USERS = `${BASE_URL}/users`;
 export const BACK_URL = "http://localhost:3001";
-const URL_ANNONCE = `${BASE_URL}/bienImo`;
-const URL_PAIEMENT = `${BASE_URL}/paiement`;
-const URL_ENVOI_MAIL = `${BASE_URL}/mail`;
-const URL_ABONNEMENT = `${URL}/abonnement`;
-const URL_RESERVATION = `${BASE_URL}/reservation`;
-const URL_AUTH = `${URL}/auth`;
+export const BASE_URL = `${BACK_URL}/api`;
+export const URL_USERS = `${BASE_URL}/users`;
+export const URL_ANNONCE = `${BASE_URL}/bienImo`;
+export const URL_PAIEMENT = `${BASE_URL}/paiement`;
+export const URL_ENVOI_MAIL = `${BASE_URL}/mail`;
+export const URL_ABONNEMENT = `${BACK_URL}/abonnement`;
+export const URL_RESERVATION = `${BASE_URL}/reservation`;
+export const URL_AUTH = `${BACK_URL}/auth`;
 
 export const fetchUsers = async () => {
   try {
@@ -294,7 +293,7 @@ export const fetchAnnonce = async () => {
 
 export const deleteAnnonce = async (annonceId) => {
   console.log("func :", annonceId);
-  console.log("URL :", `${URL_ANNONCE}/${annonceId}`);
+  console.log("BACK_URL :", `${URL_ANNONCE}/${annonceId}`);
   try {
     const response = await fetch(`${URL_ANNONCE}/${annonceId}`, {
       method: "DELETE",
@@ -507,7 +506,7 @@ export const fetchReservation = async () => {
 
 export const deleteReservation = async (reservationId) => {
   console.log("func :", reservationId);
-  console.log("URL :", `${URL_RESERVATION}/${reservationId}`);
+  console.log("BACK_URL :", `${URL_RESERVATION}/${reservationId}`);
   try {
     const response = await fetch(`${URL_RESERVATION}/${reservationId}`, {
       method: "DELETE",
@@ -940,7 +939,7 @@ export const createAbonnementSession = async (typeAbonnement) => {
 
   if (response.ok) {
     const session = await response.json();
-    window.location.href = session.url;
+    window.location.href = session.BACK_URL;
   } else {
     console.error('Failed to create checkout session');
   }

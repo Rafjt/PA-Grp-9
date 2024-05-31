@@ -17,23 +17,6 @@ const UpdateReservation = () => {
     });
 
     const [loading, setLoading] = useState(true);
-/*
-    useEffect(() => {
-        fetch(`http://localhost:3001/api/bienimo/${id}`)
-            .then((response) => response.json())
-            .then((data) => {
-                if (loading) {
-                    const initialData = {
-                        formuledejeuner: data.formuleDejeuner,
-                        mobilierSupp: data.mobilierSupp
-                    };
-                    setValues(initialData);
-                    setInitialValues(initialData);
-                    setLoading(false);
-                }
-            });
-    }, [id, loading]);
-*/
     const hasFormChanged = () => {
         return JSON.stringify(values) !== JSON.stringify(initialValues);
     }

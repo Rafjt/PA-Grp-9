@@ -3,10 +3,14 @@ import DatePicker from 'react-datepicker';
 import './gestionReservations.css';
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Link } from 'react-router-dom';
-import { fetchReservation, deleteReservation, createReservation, updateReservation, fetchAnnonceById,fetchDisabledDates, fetchReservationById } from '../services';
-//import {UpdateReservation} from './updateReservation'
-
-const BACK_URL = "http://localhost:3001";
+import { fetchReservation, 
+    deleteReservation, 
+    createReservation, 
+    updateReservation, 
+    fetchAnnonceById,
+    fetchDisabledDates, 
+    fetchReservationById,
+    BACK_URL } from '../services';
 
 const GestionReservations = () => {
 

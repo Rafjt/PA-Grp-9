@@ -3,14 +3,6 @@ import "./espaceBailleur.css";
 
 function EspaceBailleur() {
     console.log(document.cookie);
-    useEffect(() => {
-        fetch('http://localhost:3001/api/biens', { credentials: 'include' }) // include credentials
-            .then((response) => response.json())
-            .then((data) => {
-                console.log(data);
-            });
-    }, []);
-
     const toMesBiens = () => {
         window.location.href = "/MesBiens";
     }

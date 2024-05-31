@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from 'react-router-dom';
-import { fetchAnnonceById, updateAnnonce } from "../services";
+import { fetchAnnonceById, updateAnnonce, BACK_URL } from "../services";
 import './updateAnnonce.css';
-
-const BACK_URL = 'http://localhost:3001';
 
 const UpdateAnnonce = () => {
   const { id } = useParams();
@@ -39,8 +37,7 @@ const UpdateAnnonce = () => {
   const [files, setFiles] = useState([]);
 
   useEffect(() => {
-    fetch(`http://localhost:3001/api/bienimo/${id}`)
-      .then((response) => response.json())
+    fetchAnnonceById(id)
       .then((data) => {
         if (loading) {
           const initialData = {
@@ -70,7 +67,8 @@ const UpdateAnnonce = () => {
           setInitialValues(initialData);
           setLoading(false);
         }
-      });
+      })
+      .catch((error) => console.log(error));
   }, [id, loading]);
 
   const hasFormChanged = () => {
