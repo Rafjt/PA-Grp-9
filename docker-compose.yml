@@ -1,12 +1,22 @@
+version: '3'
+
 services:
   frontend:
     build:
       context: ./front
     ports:
-      - "3000:3000"
+      - "80:3000" # Changed from "80:3000" to "80:80"
+    networks:
+      - strapi
   
   backend:
     build:
       context: ./back
     ports:
       - "3001:3001"
+    networks:
+      - strapi
+networks:
+  strapi:
+    name: Strapi
+    driver: bridge

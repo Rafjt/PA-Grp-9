@@ -19,6 +19,10 @@ function EspaceVoyageur() {
     window.location.replace("/mesDocuments");
   }
 
+  const toReport = () => {
+    window.location.replace("/report");
+  }
+
   return (
     <div>
       <img
@@ -39,6 +43,7 @@ function EspaceVoyageur() {
           LOUER UN BIEN
         </button>
         <button className="grid-button" onClick={toPrestations}>LOUER OU SUIVRE UN SERVICE</button>
+        <button className="grid-button" onClick={toReport}>SIGNALER UN PROBLÈME</button>
       </div>
     </div>
   );
