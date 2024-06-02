@@ -978,3 +978,22 @@ export const checkAbonnement = async (userId) => {
     throw new Error('Failed to fetch abonnement info');
   }
 };
+
+// GESTION DES SIGNALEMENTS
+
+export const createSignalements = async (sujet) => {
+  try {
+    const response = await fetch(`${BASE_URL}/signalement`, {
+      credentials: "include",
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ sujet }),
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+}

@@ -19,6 +19,10 @@ function EspaceBailleur() {
     const toMesDoc = () => {
         window.location.replace("/mesDocuments");
       }
+
+    const toReport = () => {
+        window.location.href = "/report";
+    }
     
 
     return (
@@ -39,6 +43,7 @@ function EspaceBailleur() {
                 <button className="grid-button" onClick={toPrestations}>
                     LOUER OU SUIVRE UN SERVICE
                 </button>
+                <button className="grid-button" onClick={toReport}>SIGNALER UN PROBLÈME</button>
             </div>
         </div>
     );
