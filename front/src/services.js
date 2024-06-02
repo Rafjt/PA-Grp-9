@@ -928,18 +928,18 @@ export const fetchFinanceByUserId = async () => {
 // PARTIE STRIPE 
 
 // services.js
-export const createAbonnementSession = async (typeAbonnement) => {
+export const createAbonnementSession = async (typeAbonnement, userId) => {
   const response = await fetch(`${URL_ABONNEMENT}/create-abonnement-session`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ typeAbonnement })
+    body: JSON.stringify({ typeAbonnement, userId })
   });
 
   if (response.ok) {
     const session = await response.json();
-    window.location.href = session.BACK_URL;
+    window.location.href = session.url;
   } else {
     console.error('Failed to create checkout session');
   }

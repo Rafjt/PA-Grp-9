@@ -58,7 +58,7 @@ const Abonnement = () => {
     try {
       sessionStorage.setItem("typeAbonnement", typeAbonnement);
       sessionStorage.setItem("price", price);
-      await createAbonnementSession(typeAbonnement);
+      await createAbonnementSession(typeAbonnement, user.id);
     } catch (error) {
       console.error("Failed to create checkout session", error);
     }

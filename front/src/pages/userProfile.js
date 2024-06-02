@@ -386,22 +386,23 @@ const UserProfile = () => {
                 {userType === "voyageurs" ? (
                   <div>
                     {abonnements ? (
-                      <button type="button" className="btn btn-primary">
-                        {abonnements.length < 1 ? (
-                          <Link to="/abonnement" className="custom-link">
-                            <span>Consulter les offres d'abonnement</span>
-                          </Link>
-                        ) : (
-                          <a
-                            href="https://billing.stripe.com/p/login/test_dR65ljg3K4y22Ag144"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="custom-link"
-                          >
-                            <span>Gérer mon abonnement</span>
-                          </a>
-                        )}
-                      </button>
+                      abonnements.length < 1 ? (
+                        <Link
+                          to="/abonnement"
+                          className="btn btn-primary custom-link"
+                        >
+                          <span>Consulter les offres d'abonnement</span>
+                        </Link>
+                      ) : (
+                        <a
+                          href="https://billing.stripe.com/p/login/test_dR65ljg3K4y22Ag144"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="btn btn-primary custom-link"
+                        >
+                          <span>Gérer mon abonnement</span>
+                        </a>
+                      )
                     ) : (
                       <span>Loading...</span>
                     )}
