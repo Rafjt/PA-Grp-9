@@ -320,7 +320,7 @@ router.get("/users/verifyValidationPresta", async (req, res) => {
     console.error("Error fetching prestataire:", error);
     return res.status(500).json({ error: "Failed to fetch prestataire" });
   }
-  
+
   if (prestataire && prestataire.length > 0) {
     res.send(prestataire[0]);
   } else {
@@ -571,7 +571,7 @@ router.post('/bienImo', upload.array('pictures', 10), async (req, res) => {
 router.get("/bienImo/:id", async (req, res) => {
   console.log("route /bienImo/:id called");
   const id = req.params.id;
-  
+
   try {
     const [results] = await sequelize.query(
       `SELECT b.*, i.imagePath
@@ -731,22 +731,22 @@ router.put('/bienImo/:id', upload.array('cheminImg', 10), async (req, res) => {
 
 router.post('/bienImo/filter', async (req, res) => {
   let {
-      typeDePropriete,
-      nombreChambres,
-      nombreLits,
-      nombreSallesDeBain,
-      wifi,
-      cuisine,
-      balcon,
-      jardin,
-      parking,
-      piscine,
-      jaccuzzi,
-      salleDeSport,
-      climatisation,
-      prixMin,
-      prixMax,
-      ville,
+    typeDePropriete,
+    nombreChambres,
+    nombreLits,
+    nombreSallesDeBain,
+    wifi,
+    cuisine,
+    balcon,
+    jardin,
+    parking,
+    piscine,
+    jaccuzzi,
+    salleDeSport,
+    climatisation,
+    prixMin,
+    prixMax,
+    ville,
   } = req.body;
 
   wifi = wifi ? 1 : 0;
@@ -772,110 +772,110 @@ router.post('/bienImo/filter', async (req, res) => {
   const params = [];
 
   const properties = {
-      typeDePropriete,
-      nombreChambres,
-      nombreLits,
-      nombreSallesDeBain,
-      wifi,
-      cuisine,
-      balcon,
-      jardin,
-      parking,
-      piscine,
-      jaccuzzi,
-      salleDeSport,
-      climatisation,
-      ville,
+    typeDePropriete,
+    nombreChambres,
+    nombreLits,
+    nombreSallesDeBain,
+    wifi,
+    cuisine,
+    balcon,
+    jardin,
+    parking,
+    piscine,
+    jaccuzzi,
+    salleDeSport,
+    climatisation,
+    ville,
   };
 
   let whereClause = '';
 
   for (const property in properties) {
-      if (properties[property] !== undefined && properties[property] !== 'Tout' && properties[property] !== 0) {
-          if (whereClause === '') {
-              whereClause = ' WHERE';
-          } else {
-              whereClause += ' AND';
-          }
-
-          whereClause += ` ${property} = ?`;
-          params.push(properties[property]);
+    if (properties[property] !== undefined && properties[property] !== 'Tout' && properties[property] !== 0) {
+      if (whereClause === '') {
+        whereClause = ' WHERE';
+      } else {
+        whereClause += ' AND';
       }
+
+      whereClause += ` ${property} = ?`;
+      params.push(properties[property]);
+    }
   }
 
   // Add price range filter
   if (prixMin) {
-      if (whereClause === '') {
-          whereClause = ' WHERE';
-      } else {
-          whereClause += ' AND';
-      }
+    if (whereClause === '') {
+      whereClause = ' WHERE';
+    } else {
+      whereClause += ' AND';
+    }
 
-      whereClause += ' prix >= ?';
-      params.push(prixMin);
+    whereClause += ' prix >= ?';
+    params.push(prixMin);
   }
 
   if (prixMax) {
-      if (whereClause === '') {
-          whereClause = ' WHERE';
-      } else {
-          whereClause += ' AND';
-      }
+    if (whereClause === '') {
+      whereClause = ' WHERE';
+    } else {
+      whereClause += ' AND';
+    }
 
-      whereClause += ' prix <= ?';
-      params.push(prixMax);
+    whereClause += ' prix <= ?';
+    params.push(prixMax);
   }
 
   query += whereClause;
 
   try {
-      const results = await sequelize.query(query, {
-          replacements: params,
-          type: sequelize.QueryTypes.SELECT,
-      });
+    const results = await sequelize.query(query, {
+      replacements: params,
+      type: sequelize.QueryTypes.SELECT,
+    });
 
-      const biens = [];
-      let currentBien = null;
+    const biens = [];
+    let currentBien = null;
 
-      for (const result of results) {
-          if (!currentBien || currentBien.id !== result.id) {
-              currentBien = {
-                  id: result.id,
-                  ville: result.ville,
-                  adresse: result.adresse,
-                  id_ClientBailleur: result.id_ClientBailleur,
-                  prix: result.prix,
-                  nomBien: result.nomBien,
-                  description: result.description,
-                  statutValidation: result.statutValidation,
-                  disponible: result.disponible,
-                  typeDePropriete: result.typeDePropriete,
-                  nombreChambres: result.nombreChambres,
-                  nombreLits: result.nombreLits,
-                  nombreSallesDeBain: result.nombreSallesDeBain,
-                  wifi: result.wifi,
-                  cuisine: result.cuisine,
-                  balcon: result.balcon,
-                  jardin: result.jardin,
-                  parking: result.parking,
-                  piscine: result.piscine,
-                  jaccuzzi: result.jaccuzzi,
-                  salleDeSport: result.salleDeSport,
-                  climatisation: result.climatisation,
-                  images: []
-              };
-              biens.push(currentBien);
-          }
-
-          if (result.imagePath) {
-              currentBien.images.push(result.imagePath);
-          }
+    for (const result of results) {
+      if (!currentBien || currentBien.id !== result.id) {
+        currentBien = {
+          id: result.id,
+          ville: result.ville,
+          adresse: result.adresse,
+          id_ClientBailleur: result.id_ClientBailleur,
+          prix: result.prix,
+          nomBien: result.nomBien,
+          description: result.description,
+          statutValidation: result.statutValidation,
+          disponible: result.disponible,
+          typeDePropriete: result.typeDePropriete,
+          nombreChambres: result.nombreChambres,
+          nombreLits: result.nombreLits,
+          nombreSallesDeBain: result.nombreSallesDeBain,
+          wifi: result.wifi,
+          cuisine: result.cuisine,
+          balcon: result.balcon,
+          jardin: result.jardin,
+          parking: result.parking,
+          piscine: result.piscine,
+          jaccuzzi: result.jaccuzzi,
+          salleDeSport: result.salleDeSport,
+          climatisation: result.climatisation,
+          images: []
+        };
+        biens.push(currentBien);
       }
 
-      res.json(biens);
+      if (result.imagePath) {
+        currentBien.images.push(result.imagePath);
+      }
+    }
+
+    res.json(biens);
   } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'An error occurred while filtering' });
+    console.error(err);
+    res.status(500).json({ error: 'An error occurred while filtering' });
   }
 });
 
@@ -1013,16 +1013,16 @@ router.get('/reservation', async (req, res) => {
 });
 
 router.delete('/reservation/:id', async (req, res) => {
-  const {id} = req.params;
+  const { id } = req.params;
 
   console.log('trying to delete bien:', id);
 
   try {
-      await sequelize.query(`DELETE FROM reservation WHERE id = ${id}`);
-      res.send('Reservation deleted');
+    await sequelize.query(`DELETE FROM reservation WHERE id = ${id}`);
+    res.send('Reservation deleted');
   } catch (error) {
-      console.error('Error deleting reservation:', error);
-      res.status(500).send('Failed to delete reservation');
+    console.error('Error deleting reservation:', error);
+    res.status(500).send('Failed to delete reservation');
   }
 });
 
@@ -1108,22 +1108,22 @@ router.put('/reservation/:id', async (req, res) => {
   const { dateDebut, dateFin } = req.body;
 
   try {
-      await sequelize.query(`
+    await sequelize.query(`
           UPDATE reservation SET
           dateDebut = ${dateDebut},
           dateFin = ${dateFin}
           WHERE id = ${id}
       `, {
-          replacements: {
-              id,
-              dateDebut,
-              dateFin,
-          }
-      });
-      res.json({ success: true, message: 'Reservation updated successfully' });
+      replacements: {
+        id,
+        dateDebut,
+        dateFin,
+      }
+    });
+    res.json({ success: true, message: 'Reservation updated successfully' });
   } catch (error) {
-      console.error('Failed to update reservation', error);
-      res.status(500).json({ success: false, message: 'Internal server error' });
+    console.error('Failed to update reservation', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
   }
 });
 
@@ -1413,7 +1413,7 @@ router.get('/prestationsById', async (req, res) => {
   const { user } = req.session;
   let query = '';
 
-  switch(user.type) {
+  switch (user.type) {
     case 'clientsBailleurs':
       query = `
         SELECT prestation.*, bienImo.nomBien,
@@ -1429,7 +1429,7 @@ router.get('/prestationsById', async (req, res) => {
         WHERE prestation.id_clientBailleur = ${user.id} 
           AND prestation.statut != 'TERMINEE'`;
       break;
-  
+
     case 'voyageurs':
       query = `
         SELECT prestation.*,
@@ -1444,7 +1444,7 @@ router.get('/prestationsById', async (req, res) => {
         WHERE id_Voyageur = ${user.id} 
           AND statut != 'TERMINEE'`;
       break;
-  
+
     case 'prestataires':
       query = `
         SELECT prestation.*,
@@ -1458,7 +1458,7 @@ router.get('/prestationsById', async (req, res) => {
         FROM prestation 
         WHERE id_Prestataire = ${user.id}`;
       break;
-  
+
     default:
       res.status(400).send({ error: 'Invalid user type' });
       return;
@@ -1518,21 +1518,21 @@ router.get('/prestationsByIdPrestation', async (req, res) => {
   }
 });
 router.post('/createPrestation', async (req, res) => {
-  const {user} = req.session;
-  const {id_BienImmobilier, date, lieux, ville, typeIntervention, nom, description} = req.body; // Extract description from req.body
+  const { user } = req.session;
+  const { id_BienImmobilier, date, lieux, ville, typeIntervention, nom, description } = req.body; // Extract description from req.body
   console.log('Creating prestation:', req.body);
 
   let query = '';
   let replacements = {};
 
-  switch(user.type) {
+  switch (user.type) {
     case 'clientsBailleurs':
-      query = `INSERT INTO prestation (id_BienImmobilier, id_ClientBailleur, date, statut, lieux, ville, typeIntervention, nom, description) VALUES (:id_BienImmobilier, :id_ClientBailleur, :date, 'EN ATTENTE', :lieux, :ville, :typeIntervention, :nom, :description)`; 
-      replacements = {id_BienImmobilier, id_ClientBailleur: user.id, date, lieux, ville, typeIntervention, nom, description};
+      query = `INSERT INTO prestation (id_BienImmobilier, id_ClientBailleur, date, statut, lieux, ville, typeIntervention, nom, description) VALUES (:id_BienImmobilier, :id_ClientBailleur, :date, 'EN ATTENTE', :lieux, :ville, :typeIntervention, :nom, :description)`;
+      replacements = { id_BienImmobilier, id_ClientBailleur: user.id, date, lieux, ville, typeIntervention, nom, description };
       break;
     case 'voyageurs':
-      query = `INSERT INTO prestation (id_Voyageur, date, statut, lieux, ville, typeIntervention, nom, description) VALUES (:id_Voyageur, :date, 'EN ATTENTE', :lieux, :ville, :typeIntervention, :nom, :description)`; 
-      replacements = {id_Voyageur: user.id, date, lieux, ville, typeIntervention, nom, description};
+      query = `INSERT INTO prestation (id_Voyageur, date, statut, lieux, ville, typeIntervention, nom, description) VALUES (:id_Voyageur, :date, 'EN ATTENTE', :lieux, :ville, :typeIntervention, :nom, :description)`;
+      replacements = { id_Voyageur: user.id, date, lieux, ville, typeIntervention, nom, description };
       break;
     default:
       res.status(400).send({ error: 'Invalid user type' });
@@ -1569,7 +1569,7 @@ router.put('/acceptPrestation/:prestationId', async (req, res) => {
 
   try {
     await sequelize.query(`UPDATE prestation SET statut = 'ACCEPTEE', id_Prestataire = ${user.id} WHERE id = ${prestationId}`);
-    
+
     // Fetch the updated prestation record
     const [results] = await sequelize.query(`SELECT * FROM prestation WHERE id = ${prestationId}`);
     const updatedPrestation = results[0];
@@ -1602,7 +1602,7 @@ router.put('/archiverPrestation/:prestationId', async (req, res) => {
 
   try {
     await sequelize.query(`UPDATE prestation SET statut = 'TERMINEE' WHERE id = ${prestationId}`);
-    
+
     // Fetch the updated prestation record
     const [results] = await sequelize.query(`SELECT * FROM prestation WHERE id = ${prestationId}`);
     const updatedPrestation = results[0];
@@ -1675,11 +1675,11 @@ router.get('/avis/general/:prestataireId', async (req, res) => {
         p.prenom, 
         p.dateDeNaissance, 
         p.adresseMail
-    `, 
-    {
-      replacements: { prestataireId },
-      type: sequelize.QueryTypes.SELECT,
-    });
+    `,
+      {
+        replacements: { prestataireId },
+        type: sequelize.QueryTypes.SELECT,
+      });
 
     res.json(generalInfo);
   } catch (error) {
@@ -1711,11 +1711,11 @@ router.get('/evaluations/avis/:prestataireId', async (req, res) => {
         clientsBailleurs cb on pon.id_ClientBailleur = cb.id
       WHERE 
         pon.id_Prestataire = :prestataireId
-    `, 
-    {
-      replacements: { prestataireId },
-      type: sequelize.QueryTypes.SELECT,
-    });
+    `,
+      {
+        replacements: { prestataireId },
+        type: sequelize.QueryTypes.SELECT,
+      });
 
     // Query for evaluations with id_Voyageur
     const voyageurEvaluations = await sequelize.query(`
@@ -1734,11 +1734,11 @@ router.get('/evaluations/avis/:prestataireId', async (req, res) => {
         voyageurs cb on pon.id_Voyageur = cb.id
       WHERE 
         pon.id_Prestataire = :prestataireId
-    `, 
-    {
-      replacements: { prestataireId },
-      type: sequelize.QueryTypes.SELECT,
-    });
+    `,
+      {
+        replacements: { prestataireId },
+        type: sequelize.QueryTypes.SELECT,
+      });
 
     // Combine the results from both queries
     const evaluations = clientBailleurEvaluations.concat(voyageurEvaluations);
@@ -1780,7 +1780,7 @@ router.get('/avis/:prestationId/:prestataireId', async (req, res) => {
 router.post('/create-checkout-session', async (req, res) => {
   const { pId, numberOfNights } = req.body;
   console.log('Creating checkout session with price ID:', pId, 'and quantity:', numberOfNights);
-  
+
   try {
     const session = await stripe.checkout.sessions.create({
       line_items: [
@@ -1805,7 +1805,7 @@ router.post('/create-checkout-session', async (req, res) => {
 
 
 router.post('/createFirstMessage', async (req, res) => {
-  const {id_sender, id_receiver, type_sender, type_receiver, content } = req.body;
+  const { id_sender, id_receiver, type_sender, type_receiver, content } = req.body;
   console.log('Creating message:', req.body);
   try {
     const [results] = await sequelize.query(`SELECT * FROM messages WHERE id_sender='${id_sender}' AND id_receiver='${id_receiver}' AND content='${content}'`);
@@ -1837,7 +1837,7 @@ router.get('/discussionsOfUser', async (req, res) => {
     const [contacts] = await sequelize.query(`SELECT DISTINCT id_receiver, type_receiver FROM messages WHERE id_sender = ${user.id}`);
     const contactsDetailsPromises = contacts.map(async (contact) => {
       const [details] = await sequelize.query(`SELECT id, nom, prenom FROM ${contact.type_receiver} WHERE id = ${contact.id_receiver}`);
-      return {...details[0], type: contact.type_receiver};
+      return { ...details[0], type: contact.type_receiver };
     });
     const contactsDetails = await Promise.all(contactsDetailsPromises);
     res.json(contactsDetails);
@@ -1858,11 +1858,11 @@ router.post('/messagesOfDiscussionById', async (req, res) => {
       OR (id_sender = :idReceiver AND type_sender = :typeReceiver AND id_receiver = :userId AND type_receiver = :userType))
       AND content != 'init'
     `, {
-      replacements: { 
-        userId: user.id, 
-        userType: user.type, 
-        idReceiver: id_receiver, 
-        typeReceiver: type_receiver 
+      replacements: {
+        userId: user.id,
+        userType: user.type,
+        idReceiver: id_receiver,
+        typeReceiver: type_receiver
       }
     });
     res.json(messages);
@@ -1881,14 +1881,14 @@ router.post('/storeMessage', async (req, res) => {
   let query = '';
   let replacements = {};
 
-  switch(user.type) {
+  switch (user.type) {
     case 'clientsBailleurs':
       query = `INSERT INTO messages (id_sender, id_receiver, type_sender, type_receiver, content) VALUES (:id_sender, :id_receiver, :type_sender, :type_receiver, :content)`;
-      replacements = {id_sender: user.id, id_receiver, type_sender: user.type, type_receiver, content};
+      replacements = { id_sender: user.id, id_receiver, type_sender: user.type, type_receiver, content };
       break;
     case 'voyageurs':
       query = `INSERT INTO messages (id_sender, id_receiver, type_sender, type_receiver, content) VALUES (:id_sender, :id_receiver, :type_sender, :type_receiver, :content)`;
-      replacements = {id_sender: user.id, id_receiver, type_sender: user.type, type_receiver, content};
+      replacements = { id_sender: user.id, id_receiver, type_sender: user.type, type_receiver, content };
       break;
     default:
       res.status(400).send({ error: 'Invalid user type' });
@@ -1980,19 +1980,19 @@ router.get('/financesByUserId', async (req, res) => {
   const { user } = req.session;
   let query = '';
 
-  switch(user.type) {
+  switch (user.type) {
     case 'clientsBailleurs':
       query = `SELECT * FROM finances WHERE id_ClientBailleur = ${user.id}`;
       break;
-  
+
     case 'voyageurs':
       query = `SELECT * FROM finances WHERE id_Voyageur = ${user.id}`;
       break;
-  
+
     case 'prestataires':
       query = `SELECT * FROM finances WHERE id_Prestataire = ${user.id}`;
       break;
-  
+
     default:
       res.status(400).send({ error: 'Invalid user type' });
       return;
@@ -2016,4 +2016,54 @@ router.get('/download/:file', (req, res) => {
       res.status(404).send('File not found');
     }
   });
+});
+
+// GESTION DES SIGNALEMENTS
+
+router.post('/signalement', async (req, res) => {
+  const { user } = req.session;
+  const { sujet } = req.body;
+  console.log('Creating signalement:', req.body);
+
+  let query = 'INSERT INTO signalement (';
+  let values = 'VALUES (';
+  let replacements = {};
+
+  // Sanitize user type
+  const userType = user.type.replace(/'/g, "");
+
+  switch (userType) {
+    case 'clientsBailleurs':
+      query += 'id_ClientBailleur, ';
+      values += ':id_ClientBailleur, ';
+      replacements.id_ClientBailleur = user.id;
+      break;
+    case 'voyageurs':
+      query += 'id_Voyageur, ';
+      values += ':id_Voyageur, ';
+      replacements.id_Voyageur = user.id;
+      break;
+    case 'prestataires':
+      query += 'id_Prestataire, ';
+      values += ':id_Prestataire, ';
+      replacements.id_Prestataire = user.id;
+      break;
+    default:
+      res.status(400).send({ error: 'Invalid user type' });
+      return;
+  }
+
+  query += 'sujet) ';
+  values += ':sujet)';
+  replacements.sujet = sujet;
+
+  query += values;
+
+  try {
+    await sequelize.query(query, { replacements });
+    res.status(200).send({ message: 'Signalement created successfully' });
+  } catch (error) {
+    console.error('Error creating signalement:', error);
+    return res.status(500).send('Error creating signalement');
+  }
 });
