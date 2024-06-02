@@ -2023,49 +2023,47 @@ router.get('/download/:file', (req, res) => {
 // GESTION DES SIGNALEMENTS
 
 router.post('/signalement', async (req, res) => {
-  const { user } = req.session;
-  const { sujet } = req.body;
-  console.log('Creating signalement:', req.body);
+    const { user } = req.session;
+    let { sujet } = req.body;
+    console.log('Creating signalement:', req.body);
 
-  let query = 'INSERT INTO signalement (';
-  let values = 'VALUES (';
-  let replacements = {};
+    let query = 'INSERT INTO signalement (';
+    let values = 'VALUES (';
+    let replacements = {};
 
-  // Sanitize user type
-  const userType = user.type.replace(/'/g, "");
+    switch (user.type) {
+        case 'clientsBailleurs':
+            query += 'id_ClientBailleur, ';
+            values += ':id_ClientBailleur, ';
+            replacements.id_ClientBailleur = user.id;
+            break;
+        case 'voyageurs':
+            query += 'id_Voyageur, ';
+            values += ':id_Voyageur, ';
+            replacements.id_Voyageur = user.id;
+            break;
+        case 'prestataires':
+            query += 'id_Prestataire, ';
+            values += ':id_Prestataire, ';
+            replacements.id_Prestataire = user.id;
+            break;
+        default:
+            res.status(400).send({ error: 'Invalid user type' });
+            return;
+    }
 
-  switch (userType) {
-    case 'clientsBailleurs':
-      query += 'id_ClientBailleur, ';
-      values += ':id_ClientBailleur, ';
-      replacements.id_ClientBailleur = user.id;
-      break;
-    case 'voyageurs':
-      query += 'id_Voyageur, ';
-      values += ':id_Voyageur, ';
-      replacements.id_Voyageur = user.id;
-      break;
-    case 'prestataires':
-      query += 'id_Prestataire, ';
-      values += ':id_Prestataire, ';
-      replacements.id_Prestataire = user.id;
-      break;
-    default:
-      res.status(400).send({ error: 'Invalid user type' });
-      return;
-  }
+    query += 'sujet, statut) ';
+    values += ':sujet, :statut)';
+    replacements.sujet = sujet;
+    replacements.statut = 0; // Added statut with a default value of 1
 
-  query += 'sujet) ';
-  values += ':sujet)';
-  replacements.sujet = sujet;
+    query += values;
 
-  query += values;
-
-  try {
-    await sequelize.query(query, { replacements });
-    res.status(200).send({ message: 'Signalement created successfully' });
-  } catch (error) {
-    console.error('Error creating signalement:', error);
-    return res.status(500).send('Error creating signalement');
-  }
+    try {
+        await sequelize.query(query, { replacements });
+        res.status(200).send({ message: 'Signalement created successfully' });
+    } catch (error) {
+        console.error('Error creating signalement:', error);
+        return res.status(500).send('Error creating signalement');
+    }
 });

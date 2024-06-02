@@ -3,3 +3,9 @@ dist
 /back/node_modules/*
 # /back/uploads/*
 *.log
+.env
+myenv/*
+ssl/*
+build/*
+.DS_Store
+DS_Store
