@@ -197,39 +197,35 @@ function Prestations() {
                             </button>
                           )}
                           {prestation.evalExists ? (
-                            <button>
-                              <Link
-                                to={`/viewAvis/${prestation.id}/${prestation.id_Prestataire}`}
-                                style={{
-                                  cursor: "pointer",
-                                  color: "inherit",
-                                  textDecoration: "none",
-                                }}
-                              >
-                                Visualiser l'avis
-                              </Link>
-                            </button>
+                            <Link
+                              to={`/viewAvis/${prestation.id}/${prestation.id_Prestataire}`}
+                              style={{
+                                cursor: "pointer",
+                                color: "inherit",
+                                textDecoration: "none",
+                              }}
+                            >
+                              <button>Visualiser l'avis</button>
+                            </Link>
                           ) : (
-                            <button className="btn-avis">
-                              <Link
-                                to={`/avisPrestation/${prestation.id}/${prestation.id_Prestataire}`}
-                                style={{
-                                  cursor: "pointer",
-                                  color: "inherit",
-                                  textDecoration: "none",
-                                }}
-                              >
+                            <Link
+                              to={`/avisPrestation/${prestation.id}/${prestation.id_Prestataire}`}
+                              style={{
+                                cursor: "pointer",
+                                color: "inherit",
+                                textDecoration: "none",
+                              }}
+                            >
+                              <button className="btn-avis">
                                 Laisser un avis
-                              </Link>
-                            </button>
+                              </button>
+                            </Link>
                           )}
                         </>
                       ) : (
                         <button
                           className="delete-button"
-                          onClick={() =>
-                            handleDelete(prestation.id, "delete")
-                          }
+                          onClick={() => handleDelete(prestation.id, "delete")}
                         >
                           Annuler
                         </button>
@@ -308,12 +304,7 @@ function Prestations() {
                 />
 
                 <label htmlFor="nom">Intitulé de la demande</label>
-                <Field
-                  type="text"
-                  id="nom"
-                  name="nom"
-                  className="form-input"
-                />
+                <Field type="text" id="nom" name="nom" className="form-input" />
                 <ErrorMessage
                   name="nom"
                   component="div"

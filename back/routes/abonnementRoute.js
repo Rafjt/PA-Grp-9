@@ -44,34 +44,37 @@ const priceIds = {
 };
 
 router.post("/create-abonnement-session", async (req, res) => {
-  const { typeAbonnement, userId } = req.body;
-  const pId = priceIds[typeAbonnement];
+    const { typeAbonnement, userId } = req.body;
+    const pId = priceIds[typeAbonnement];
+  
+    if (!pId) {
+      return res.status(400).send({ error: 'Invalid abonnement type.' });
+    }
 
-  if (!pId) {
-    return res.status(400).send({ error: 'Invalid abonnement type.' });
-  }
-
-  try {
-    const session = await stripe.checkout.sessions.create({
-      line_items: [
-        {
-          price: pId,
-          quantity: 1,
-        },
-      ],
-      mode: 'subscription',
-      success_url: `${URL}/paiementAbonnement?success=true`,
-      cancel_url: `${URL}/paiementAbonnement?canceled=true`,
-      metadata: { userId, typeAbonnement }
-    });
-
-    res.json({ url: session.url });
-  } catch (error) {
-    console.error('Error creating checkout session:', error);
-    res.status(500).send({ error: 'An error occurred while creating the checkout session.' });
-  }
-});
-
+    console.log(userId, typeAbonnement);
+  
+    try {
+      const session = await stripe.checkout.sessions.create({
+        line_items: [
+          {
+            price: pId,
+            quantity: 1,
+          },
+        ],
+        mode: 'subscription',
+        client_reference_id: userId,
+        success_url: `${URL}/paiementAbonnement?success=true`,
+        cancel_url: `${URL}/paiementAbonnement?canceled=true`,
+        metadata: { userId, typeAbonnement }
+      });
+  
+      res.json({ url: session.url });
+    } catch (error) {
+      console.error('Error creating checkout session:', error);
+      res.status(500).send({ error: 'An error occurred while creating the checkout session.' });
+    }
+  });
+  
 router.post("/insert-abonnement-info", async (req, res) => {
   const { typeAbonnement, userId, userType, price } = req.body;
 
@@ -194,6 +197,39 @@ router.get("/check-abonnement", async (req, res) => {
       console.error('Error fetching abonnement info', error);
       res.status(500).send({ error: 'Failed to fetch abonnement info' });
     }
+  });
+
+
+  router.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
+    const sig = req.headers['stripe-signature'];
+  
+    let event;
+    try {
+      event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+    } catch (err) {
+      console.log(`Webhook signature verification failed: ${err.message}`);
+      return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+  
+    // Handle the event
+    switch (event.type) {
+      case 'checkout.session.completed':
+        const session = event.data.object;
+  
+        // Fulfill the purchase and update the subscription status in your database
+        const userId = session.metadata.userId;
+        const typeAbonnement = session.metadata.typeAbonnement;
+        
+        // Add your logic to handle the successful subscription here
+        // Example: Update the user subscription status in the database
+  
+        break;
+      // Handle other event types as needed
+      default:
+        console.log(`Unhandled event type ${event.type}`);
+    }
+  
+    res.json({ received: true });
   });
   
 
