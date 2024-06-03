@@ -1153,6 +1153,8 @@ router.get("/reservation/:idVoyageur/voyageur", async (req, res) => {
           prix: result.prix,
           nomBien: result.nomBien,
           description: result.description,
+          dateDebut: result.dateDebut,
+          dateFin: result.dateFin,
           statutValidation: result.statutValidation,
           disponible: result.disponible,
           typeDePropriete: result.typeDePropriete,
