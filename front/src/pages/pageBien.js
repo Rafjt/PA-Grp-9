@@ -316,15 +316,11 @@ const PageBien = () => {
         <div className="grid-container">
           {/* Display items for the current page */}
           {data.slice(startIndex, endIndex).map((annonce) => {
-            const bailleurInfo = bailleur.find(
-              (b) => b.id === annonce.bailleurId
-            );
             const clientName =
-              annonce.prenom && annonce.nom
-                ? annonce.prenom + " " + annonce.nom
-                : bailleurInfo
-                ? bailleurInfo.prenom + " " + bailleurInfo.nom
+              annonce.bailleurPrenom && annonce.bailleurNom
+                ? `${annonce.bailleurPrenom} ${annonce.bailleurNom}`
                 : "Unknown";
+
             return (
               <div key={annonce.id} onClick={() => handleClick(annonce.id)}>
                 <img
