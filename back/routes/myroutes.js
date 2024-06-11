@@ -1295,20 +1295,24 @@ router.put("/paiement/:id", async (req, res) => {
 
 router.post("/bienDispo", async (req, res) => {
   console.log("route /bienDispo called");
-  const { ville, arrivee, depart, typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain,
-    prixMin, prixMax, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation } = req.body;
-  let query = `SELECT bienImo.id, cheminImg, ville, adresse, prix, nomBien, description, statutValidation, disponible, typeDePropriete,
-  nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi,
-  salleDeSport, climatisation, clientsBailleurs.nom, clientsBailleurs.prenom, bienImoImages.imagePath
-  FROM bienImo
-  LEFT JOIN bienImoImages ON bienImo.id = bienImoImages.bienImoId
-  JOIN clientsBailleurs ON bienImo.Id_ClientBailleur = clientsBailleurs.id
-  WHERE disponible = 1
-  AND bienImo.id NOT IN (
-      SELECT id_BienImmobilier
-      FROM reservation
-      WHERE dateDebut <= '${arrivee}' AND dateFin >= '${depart}'
-  )`;
+  const {
+    ville, arrivee, depart, typeDePropriete, nombreChambres, nombreLits, nombreSallesDeBain,
+    prixMin, prixMax, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi, salleDeSport, climatisation
+  } = req.body;
+
+  let query = `
+    SELECT bienImo.id, cheminImg, ville, adresse, prix, nomBien, description, statutValidation, disponible, typeDePropriete,
+    nombreChambres, nombreLits, nombreSallesDeBain, wifi, cuisine, balcon, jardin, parking, piscine, jaccuzzi,
+    salleDeSport, climatisation, clientsBailleurs.nom as bailleurNom, clientsBailleurs.prenom as bailleurPrenom, bienImoImages.imagePath, clientsBailleurs.id AS bailleurId
+    FROM bienImo
+    LEFT JOIN bienImoImages ON bienImo.id = bienImoImages.bienImoId
+    JOIN clientsBailleurs ON bienImo.Id_ClientBailleur = clientsBailleurs.id
+    WHERE disponible = 1
+    AND bienImo.id NOT IN (
+        SELECT id_BienImmobilier
+        FROM reservation
+        WHERE dateDebut <= '${arrivee}' AND dateFin >= '${depart}'
+    )`;
 
   if (ville) {
     query += ` AND ville = '${ville}'`;
@@ -1359,9 +1363,6 @@ router.post("/bienDispo", async (req, res) => {
     query += ` AND climatisation = ${climatisation}`;
   }
 
-  const [bienDispo] = await sequelize.query(query);
-
-
   const results = await sequelize.query(query);
   const biens = [];
   let currentBien = null;
@@ -1372,7 +1373,9 @@ router.post("/bienDispo", async (req, res) => {
         id: result.id,
         ville: result.ville,
         adresse: result.adresse,
-        id_ClientBailleur: result.id_ClientBailleur,
+        id_ClientBailleur: result.bailleurId,
+        bailleurNom: result.bailleurNom, 
+        bailleurPrenom: result.bailleurPrenom, 
         prix: result.prix,
         nomBien: result.nomBien,
         description: result.description,
@@ -1406,7 +1409,6 @@ router.post("/bienDispo", async (req, res) => {
 });
 
 module.exports = router;
-
 
 
 // GESTION DES PRESTATIONS
