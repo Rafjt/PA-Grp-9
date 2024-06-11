@@ -1,5 +1,5 @@
 // Define functions for backend calls
-export const BACK_URL = "http://localhost:3001";
+export const BACK_URL = "https://communal-raccoon-glowing.ngrok-free.app";
 export const BASE_URL = `${BACK_URL}/api`;
 export const URL_USERS = `${BASE_URL}/users`;
 export const URL_ANNONCE = `${BASE_URL}/bienImo`;

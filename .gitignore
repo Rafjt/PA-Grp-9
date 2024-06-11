@@ -4,8 +4,8 @@ dist
 # /back/uploads/*
 *.log
 .env
-myenv/*
-ssl/*
-build/*
+App_ticketing/
+ssl/
+build/
 .DS_Store
 DS_Store

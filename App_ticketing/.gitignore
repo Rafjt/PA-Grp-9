@@ -1,0 +1,10 @@
+dist
+.envnode_modules
+/back/node_modules/*
+*.log
+.env
+App_ticketing/myenv/
+ssl/
+build/
+.DS_Store
+DS_Store
