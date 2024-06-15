@@ -3,7 +3,7 @@ const sequelize = require("../database");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 
-router.post("/login", async (req, res) => {
+router.post('/login', async (req, res) => {
   console.log("route /login called", req.body);
   const { email, password, type } = req.body;
 
@@ -17,7 +17,6 @@ router.post("/login", async (req, res) => {
     if (userBanned[0].length > 0) {
       res.status(409).send("UserBanned");
       console.log("User is Banned");
-
     } else if (response[0].length > 0) {
       const user = response[0][0];
       const hashedPasswordFromDB = user.motDePasse;
@@ -27,7 +26,6 @@ router.post("/login", async (req, res) => {
       const match = await bcrypt.compare(password, hashedPasswordFromDB); // Use bcrypt.compare()
 
       if (match) {
-
         req.session.user = {
           id: user.id,
           nom: user.nom,
@@ -37,8 +35,9 @@ router.post("/login", async (req, res) => {
           admin: user.admin,
           type: type,
         };
-        res.json(req.session.user); 
-      } else if (!match) {
+        console.log("session user:", req.session.user);
+        res.json(req.session.user);
+      } else {
         res.status(403).send("WrongPWD");
         console.log("WrongPWD");
       }
@@ -50,6 +49,7 @@ router.post("/login", async (req, res) => {
     res.status(500).send("Server error");
   }
 });
+
 
 router.get("/logout", (req, res) => {
   req.session.destroy();

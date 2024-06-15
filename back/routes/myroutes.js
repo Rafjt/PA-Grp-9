@@ -1080,28 +1080,6 @@ router.post('/reservation', async (req, res) => {
   res.send('Reservation created');
 });
 
-/*
-router.put("/reservation/:id", async (req, res) => {
-  console.log("Modifying reservation :", req.body);
-  const { id } = req.params;
-  const {
-    dateDebut,
-    dateFin,
-    statut,
-  } = req.body;
-
-  try {
-    await sequelize.query(
-      `UPDATE reservation SET dateDebut = '${dateDebut}', dateFin = '${dateFin}', statut = '${statut}' WHERE id = ${id}`
-    );
-  } catch (error) {
-    console.error("Error modifying reservation :", error);
-  }
-
-  res.send("Reservation successfully updated");
-});
-
-*/
 
 router.put('/reservation/:id', async (req, res) => {
   const { id } = req.params;
@@ -1414,7 +1392,14 @@ module.exports = router;
 // GESTION DES PRESTATIONS
 
 router.get('/prestationsById', async (req, res) => {
-  const { user } = req.session;
+  const user = req.session.user;
+  console.log("Fetching prestations for user:", user);
+
+  if (!user) {
+    res.status(401).send({ error: 'Unauthorized' });
+    return;
+  }
+
   let query = '';
 
   switch (user.type) {
@@ -1468,9 +1453,83 @@ router.get('/prestationsById', async (req, res) => {
       return;
   }
 
-  const [prestations] = await sequelize.query(query);
-  res.send(prestations);
+  try {
+    const [prestations] = await sequelize.query(query);
+    res.send(prestations);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server error");
+  }
 });
+
+
+router.get('/mobile/fetchActivePrestationbyId', async (req,res) => {
+  const {user} = req.session.user;
+  if (!user) {
+    res.status(401).send({ error: 'Unauthorized' });
+    return;
+  }
+
+  switch (user.type) {
+    case 'clientsBailleurs':
+      query = `
+        SELECT prestation.*, bienImo.nomBien,
+               CASE 
+                   WHEN EXISTS (SELECT 1 
+                                FROM evaluationPrestation ep 
+                                WHERE ep.id_Prestation = prestation.id) 
+                   THEN 1 
+                   ELSE 0 
+               END as evalExists
+        FROM prestation 
+        INNER JOIN bienImo ON prestation.id_BienImmobilier = bienImo.id 
+        WHERE prestation.id_clientBailleur = ${user.id} 
+          AND prestation.statut != 'TERMINEE'`;
+      break;
+
+    case 'voyageurs':
+      query = `
+        SELECT prestation.*,
+               CASE 
+                   WHEN EXISTS (SELECT 1 
+                                FROM evaluationPrestation ep 
+                                WHERE ep.id_Prestation = prestation.id) 
+                   THEN 1 
+                   ELSE 0 
+               END as evalExists
+        FROM prestation 
+        WHERE id_Voyageur = ${user.id} 
+          AND statut != 'TERMINEE' AND statut = 'ACCEPTÉE'`;
+      break;
+
+    case 'prestataires':
+      query = `
+        SELECT prestation.*,
+               CASE 
+                   WHEN EXISTS (SELECT 1 
+                                FROM evaluationPrestation ep 
+                                WHERE ep.id_Prestation = prestation.id) 
+                   THEN 1 
+                   ELSE 0 
+               END as evalExists
+        FROM prestation 
+        WHERE id_Prestataire = ${user.id}`;
+      break;
+
+    default:
+      res.status(400).send({ error: 'Invalid user type' });
+      return;
+  }
+
+  try {
+    const [prestations] = await sequelize.query(query);
+    res.send(prestations);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server error");
+  }
+});
+
 
 router.get('/prestationsByIdPrestation', async (req, res) => {
   const { idPrestation } = req.query; // Use req.query to get query parameters

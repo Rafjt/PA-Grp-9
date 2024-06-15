@@ -48,6 +48,7 @@ import Abonnement from "./pages/abonnement.js"
 import MesDocuments from "./pages/mesDocuments.js";
 import PaiementAbonnement from "./pages/paiementAbonnement.js";
 import Report from "./pages/report.js";
+import MobileLogin from "./mobile/mobileLogin.js";
 // import { use } from "../../back/routes/auth.js";
 
 function ProtectedRoute({ component: Component }) {
@@ -148,6 +149,7 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/Biens" element={<PageBien />} />
           <Route path="/mailConfirm" element={<MailConfirm />} />
+          <Route path="/mobileLogin" element={<MobileLogin />} />
           {/* Routes Authent ALL*/}
           <Route path="/userProfile" element={ <ProtectedAuthRoute path="/userProfile" component={UserProfile} authType="all"/>} />
           <Route path="/pagePaiement" element={ <ProtectedAuthRoute path="/pagePaiement" component={PagePaiement} authType="all"/>} />

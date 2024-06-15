@@ -51,3 +51,8 @@ networks:
   strapi:
     name: Strapi
     driver: bridge
+
+
+//rajouter bdd + volumes 
+// .env et creds dans le docker compose 
+// rajouter des depends on pour verifier que le bdd est up avant le back 
