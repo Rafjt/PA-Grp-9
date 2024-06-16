@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { fetchUsers, fetchBienDispo } from "../services";
+import { fetchUsers, fetchBienDispo, BACK_URL } from "../services";
+import { useTranslation } from "react-i18next";
 import "./pageBien.css";
-import { BACK_URL } from "../services";
 
 const PageBien = () => {
+  const { t } = useTranslation();
   const ITEMS_PER_PAGE = 8;
 
   const [currentPage, setCurrentPage] = useState(1);
-
-  // Function to handle pagination navigation
-  const goToPage = (page) => {
-    setCurrentPage(page);
-  };
-
   const [bailleur, setBailleur] = useState([]);
   const [data, setData] = useState([]);
+  const [filtres, setFiltres] = useState({
+    ville: "",
+    arrivee: new Date().toISOString().split("T")[0],
+    depart: new Date().toISOString().split("T")[0],
+  });
 
   useEffect(() => {
     fetchUsers().then((response) => {
@@ -51,10 +51,11 @@ const PageBien = () => {
     });
   }, []);
 
-  // Calculate the total number of pages
-  const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
+  const goToPage = (page) => {
+    setCurrentPage(page);
+  };
 
-  // Calculate the index of the first and last item to display on the current page
+  const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, data.length);
 
@@ -64,12 +65,6 @@ const PageBien = () => {
       `./viewBien/${id}?arrivee=${arrivee}&depart=${depart}`
     );
   };
-
-  const [filtres, setFiltres] = useState({
-    ville: "",
-    arrivee: new Date().toISOString().split("T")[0],
-    depart: new Date().toISOString().split("T")[0],
-  });
 
   const handleInputChange = (event) => {
     const value =
@@ -91,12 +86,17 @@ const PageBien = () => {
     setData(newData);
   };
 
+  console.log(bailleur);
+
   return (
     <div className="mb-5">
-      <h1>Page Bien</h1>
+      <h1 className="mt-5">{t("pageTitle")}</h1>
+      <button onClick={() => window.history.back()} className="back-button">
+        {t("back")}
+      </button>
       <div className="searchbar-top">
         <select name="ville" value={filtres.ville} onChange={handleInputChange}>
-          <option value="">-- Ville --</option>
+          <option value="">{t("city")}</option>
           <option value="Paris">Paris</option>
           <option value="Nice">Nice</option>
           <option value="Biarritz">Biarritz</option>
@@ -104,7 +104,6 @@ const PageBien = () => {
         <input
           type="date"
           name="arrivee"
-          placeholder="arrivée"
           min={new Date().toISOString().split("T")[0]}
           value={filtres.arrivee}
           onChange={handleInputChange}
@@ -112,7 +111,6 @@ const PageBien = () => {
         <input
           type="date"
           name="depart"
-          placeholder="départ"
           min={filtres.arrivee}
           value={filtres.depart}
           onChange={handleInputChange}
@@ -122,199 +120,106 @@ const PageBien = () => {
         <div className="filters">
           <div className="filter-section">
             <label>
-              <h5>Type de propriété</h5>
+              <h5>{t("propertyType")}</h5>
               <select
                 name="typeDePropriete"
-                id="typeDePropriete"
                 value={filtres.typeDePropriete}
                 onChange={handleInputChange}
               >
-                <option value="">Tout</option>
-                <option value="Maison">Maison</option>
-                <option value="Appartement">Appartement</option>
-                <option value="Maison d'hôtes">Maison d'hôtes</option>
-                <option value="Hôtel">Hôtel</option>
+                <option value="">{t("all")}</option>
+                <option value="Maison">{t("house")}</option>
+                <option value="Appartement">{t("apartment")}</option>
+                <option value="Maison d'hôtes">{t("guestHouse")}</option>
+                <option value="Hôtel">{t("hotel")}</option>
               </select>
             </label>
-            <br></br>
             <label>
-              <h5>Chambres</h5>
+              <h5>{t("rooms")}</h5>
               <select
                 name="nombreChambres"
-                id="nombreChambres"
                 value={filtres.nombreChambres}
                 onChange={handleInputChange}
               >
-                <option value="">Tout</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8+">8+</option>
+                <option value="">{t("all")}</option>
+                {[...Array(8)].map((_, i) => (
+                  <option key={i} value={i + 1}>
+                    {i + 1}
+                  </option>
+                ))}
+                <option value="8+">{t("eightPlus")}</option>
               </select>
             </label>
-
             <label>
-              <h5>Lits</h5>
+              <h5>{t("beds")}</h5>
               <select
                 name="nombreLits"
-                id="nombreLits"
                 value={filtres.nombreLits}
                 onChange={handleInputChange}
               >
-                <option value="">Tout</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8+">8+</option>
+                <option value="">{t("all")}</option>
+                {[...Array(8)].map((_, i) => (
+                  <option key={i} value={i + 1}>
+                    {i + 1}
+                  </option>
+                ))}
+                <option value="8+">{t("eightPlus")}</option>
               </select>
             </label>
             <label>
-              <h5>Salles de bain</h5>
+              <h5>{t("bathrooms")}</h5>
               <select
                 name="nombreSallesDeBain"
-                id="nombreSallesDeBain"
                 value={filtres.nombreSallesDeBain}
                 onChange={handleInputChange}
               >
-                <option value="">Tout</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8+">8+</option>
+                <option value="">{t("all")}</option>
+                {[...Array(8)].map((_, i) => (
+                  <option key={i} value={i + 1}>
+                    {i + 1}
+                  </option>
+                ))}
+                <option value="8+">{t("eightPlus")}</option>
               </select>
             </label>
-            <br></br>
             <label>
-              <h5>Prix</h5>
+              <h5>{t("price")}</h5>
               <input
                 type="number"
                 name="prixMin"
                 value={filtres.prixMin}
                 onChange={handleInputChange}
-                placeholder="Prix min"
+                placeholder={t("minPrice")}
               />
               <input
                 type="number"
                 name="prixMax"
                 value={filtres.prixMax}
                 onChange={handleInputChange}
-                placeholder="Prix max"
+                placeholder={t("maxPrice")}
               />
             </label>
           </div>
-          <br></br>
-          <h4>Équipements</h4>
+          <h4>{t("amenities")}</h4>
           <div className="filter-checkboxes">
-            <label>
-              <input
-                type="checkbox"
-                name="wifi"
-                className="form-check-input"
-                value={filtres.wifi}
-                onChange={handleInputChange}
-              />
-              Wifi
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                name="cuisine"
-                className="form-check-input"
-                value={filtres.cuisine}
-                onChange={handleInputChange}
-              />
-              Cuisine
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                name="balcon"
-                className="form-check-input"
-                value={filtres.balcon}
-                onChange={handleInputChange}
-              />
-              Balcon
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                name="jardin"
-                className="form-check-input"
-                value={filtres.jardin}
-                onChange={handleInputChange}
-              />
-              Jardin
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                name="parking"
-                className="form-check-input"
-                value={filtres.parking}
-                onChange={handleInputChange}
-              />
-              Parking
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                name="piscine"
-                className="form-check-input"
-                value={filtres.piscine}
-                onChange={handleInputChange}
-              />
-              Piscine
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                name="jaccuzzi"
-                className="form-check-input"
-                value={filtres.jaccuzzi}
-                onChange={handleInputChange}
-              />
-              Jaccuzzi
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                name="salleDeSport"
-                className="form-check-input"
-                value={filtres.salleDeSport}
-                onChange={handleInputChange}
-              />
-              Salle de sport
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                name="climatisation"
-                className="form-check-input"
-                value={filtres.climatisation}
-                onChange={handleInputChange}
-              />
-              Climatisation
-            </label>
+            {["wifi", "cuisine", "balcon", "jardin", "parking", "piscine", "jaccuzzi", "salleDeSport", "climatisation"].map((amenity) => (
+              <label key={amenity}>
+                <input
+                  type="checkbox"
+                  name={amenity}
+                  className="form-check-input"
+                  checked={filtres[amenity] === 1}
+                  onChange={handleInputChange}
+                />
+                {t(amenity)}
+              </label>
+            ))}
           </div>
         </div>
-        <button type="submit">Rechercher</button>
+        <button type="submit">{t("search")}</button>
       </form>
       <hr />
       <div>
         <div className="grid-container">
-          {/* Display items for the current page */}
           {data.slice(startIndex, endIndex).map((annonce) => {
             const clientName =
               annonce.bailleurPrenom && annonce.bailleurNom
@@ -331,37 +236,30 @@ const PageBien = () => {
                 <h2>
                   {annonce.ville}, {annonce.nomBien}
                 </h2>
-                <p className="grey">Proposé par {clientName}</p>
+                <p className="grey">{t("offeredBy", { clientName })}</p>
                 <p>
-                  <strong>{annonce.prix}€</strong> par nuits
+                  <strong>{annonce.prix}€</strong> {t("perNight")}
                 </p>
               </div>
             );
           })}
         </div>
-
-        {/* Pagination controls */}
         <div className="paginationBtn">
-          <button
-            onClick={() => goToPage(currentPage - 1)}
-            disabled={currentPage === 1}
-          >
-            Précédent
+          <button onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1}>
+            {t("previous")}
           </button>
           {Array.from({ length: totalPages }, (_, index) => (
             <button key={index + 1} onClick={() => goToPage(index + 1)}>
               {index + 1}
             </button>
           ))}
-          <button
-            onClick={() => goToPage(currentPage + 1)}
-            disabled={currentPage === totalPages}
-          >
-            Suivant
+          <button onClick={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages}>
+            {t("next")}
           </button>
         </div>
       </div>
     </div>
   );
 };
+
 export default PageBien;

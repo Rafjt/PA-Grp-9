@@ -1,17 +1,16 @@
-import "./header.css";
-import { Link, useRoutes } from "react-router-dom";
-import "bootstrap/dist/css/bootstrap.min.css";
+import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
-import { useEffect, useState } from "react";
+import "./header.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 import { getCredentials } from "../services";
+import { useTranslation } from "react-i18next";
 
 const Header = () => {
-  // Check if the user is connected
-  // Initialize isConnected state and set it based on the cookie value
   const [user, setUser] = useState(null);
   const [userType, setUserType] = useState("");
   const [isConnected, setIsConnected] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     const checkSession = async () => {
@@ -20,7 +19,7 @@ const Header = () => {
         if (userData) {
           setUser(userData);
           setUserType(userData.type);
-          setIsConnected(true); // Assuming isAdmin is a property indicating admin status
+          setIsConnected(true);
           if (userData.admin === 1) {
             setIsAdmin(true);
           }
@@ -35,41 +34,44 @@ const Header = () => {
       }
     };
 
-    // Call checkSession once to set the initial state
     checkSession();
 
-    // Set up interval to check for changes in the user session periodically
     let executionCount = 0;
     const intervalId = setInterval(() => {
       if (executionCount < 1) {
-        // Execute the function
         checkSession();
         executionCount++;
       } else {
-        // Clear the interval after executing the function three times
         clearInterval(intervalId);
-        // Set up interval to execute the function every 10 minutes
         const tenMinutesIntervalId = setInterval(checkSession, 10 * 60 * 1000);
-
-        // Clean up the interval when the component unmounts
         return () => clearInterval(tenMinutesIntervalId);
       }
     }, 1000);
 
-    // Clean up the initial interval when the component unmounts
     return () => clearInterval(intervalId);
   }, []);
 
   const getMonEspaceLink = () => {
-    if (userType === "voyageurs") {
-      return "/espaceVoyageur";
-    } else if (userType === "clientsBailleurs") {
-      return "/espaceBailleur";
-    } else if (userType === "prestataires") {
-      return "/espacePrestataire";
-    } else {
-      // Handle default case, e.g., return a generic URL
-      return "/acceuil";
+    switch (userType) {
+      case "voyageurs":
+        return "/espaceVoyageur";
+      case "clientsBailleurs":
+        return "/espaceBailleur";
+      case "prestataires":
+        return "/espacePrestataire";
+      default:
+        return "/acceuil";
+    }
+  };
+
+  const changeLangage = (language) => {
+    const currentLanguage = sessionStorage.getItem("langage");
+    if (language === "en" && currentLanguage !== "en") {
+      sessionStorage.setItem("langage", "en");
+      i18n.changeLanguage("en");
+    } else if (language === "fr" && currentLanguage !== "fr") {
+      sessionStorage.removeItem("langage");
+      i18n.changeLanguage("fr");
     }
   };
 
@@ -78,15 +80,15 @@ const Header = () => {
       <div className="upper-section">
         <div className="envs">
           {isConnected ? (
-            <>
-              <span className="env">
-                {userType === "clientsBailleurs" && "Bailleur"}
-                {userType === "voyageurs" && "Voyageur"}
-                {userType === "prestataires" && "Prestataire"}
-              </span>
-            </>
+            <span className="env">
+              {userType === "clientsBailleurs" && t("bailleur")}
+              {userType === "voyageurs" && t("voyageur")}
+              {userType === "prestataires" && t("prestataire")}
+            </span>
           ) : (
-            <span className="env">Bienvenue</span>
+            <span className="env" data-translate="welcome">
+              {t("welcome")}
+            </span>
           )}
         </div>
       </div>
@@ -94,41 +96,47 @@ const Header = () => {
         <nav className="mr-2">
           <ul className="list-unstyled">
             <li className="locali">
-              <a href="#">
+              <a id="en" onClick={() => changeLangage("en")}>
                 <img className="icon" src="/logouk.ico" alt="Logo UK" />
               </a>
             </li>
             <li className="locali">
-              <a href="#">
+              <a id="fr" onClick={() => changeLangage("fr")}>
                 <img className="icon" src="/logofrance.ico" alt="Logo France" />
               </a>
             </li>
             <li className="locali">
-              <a href="/" className="text-white ml-3">
-                Accueil
+              <a href="/" className="text-white ml-3" data-translate="Accueil">
+                {t("accueil")}
               </a>
             </li>
             {isAdmin && (
               <li className="locali">
-                <a href="/backOffice" className="text-white ml-3">
-                  Gestion BackOffice
+                <a
+                  href="/backOffice"
+                  className="text-white ml-3"
+                  data-translate="Gestion BackOffice"
+                >
+                  {t("gestionBackoffice")}
                 </a>
               </li>
             )}
             {isConnected && (
               <li className="locali">
-                <a href={getMonEspaceLink()} className="text-white ml-3">
-                  Mon espace
+                <a
+                  href={getMonEspaceLink()}
+                  className="text-white ml-3"
+                  data-translate="Mon espace"
+                >
+                  {t("monEspace")}
                 </a>
               </li>
             )}
-            {/* Conditionally render "Connexion" or user logo */}
             {!isConnected ? (
               <li className="locali">
                 <a href="/login" className="text-white ml-3 mr-2">
                   {" "}
-                  {/* Add mr-2 for margin right */}
-                  Connexion
+                  {t("connexion")}
                 </a>
               </li>
             ) : (

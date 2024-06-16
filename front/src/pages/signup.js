@@ -5,6 +5,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup"; // Import Yup for validation
 import { createUser } from "../services";
 import { FadeLoader } from "react-spinners";
+import { useTranslation } from "react-i18next";
 
 const Signup = () => {
   const nomRegex =
@@ -21,6 +22,8 @@ const Signup = () => {
 
   const [loading, setLoading] = useState(false);
 
+  const { t } = useTranslation();
+
   const formik = useFormik({
     initialValues: {
       nom: "",
@@ -34,34 +37,31 @@ const Signup = () => {
     },
     validationSchema: Yup.object({
       nom: Yup.string()
-        .matches(nomRegex, "Le nom doit contenir uniquement des lettres")
-        .required("Ce champ est requis")
-        .min(1, "Le nom doit contenir au moins 1 caractère")
-        .max(30, "Le nom ne peut pas dépasser 30 caractères"),
+        .matches(nomRegex, t('nomValidation'))
+        .required(t('requiredField'))
+        .min(1, t('nomMin'))
+        .max(30, t('nomMax')),
       prenom: Yup.string()
-        .matches(nomRegex, "Le prénom doit contenir uniquement des lettres")
-        .required("Ce champ est requis")
-        .min(1, "Le prénom doit contenir au moins 1 caractère")
-        .max(30, "Le prénom ne peut pas dépasser 30 caractères"),
+        .matches(nomRegex, t('prenomValidation'))
+        .required(t('requiredField'))
+        .min(1, t('prenomMin'))
+        .max(30, t('prenomMax')),
       dateDeNaissance: Yup.date()
-        .required("Ce champ est requis")
-        .min(minDate, "Vous devez avoir moins de 100 ans pour vous inscrire")
-        .max(maxDate, "Vous devez avoir strictement 18 ans pour vous inscrire"),
+        .required(t('requiredField'))
+        .min(minDate, t('dateMin'))
+        .max(maxDate, t('dateMax')),
       adresseMail: Yup.string()
-        .matches(emailRegex, "l'adresse email n'est pas valide")
-        .email("Adresse mail invalide")
-        .required("Ce champ est requis")
-        .max(50, "L'adresse mail ne peut pas dépasser 30 caractères"),
+        .matches(emailRegex, t('emailValidation'))
+        .email(t('invalidEmail'))
+        .required(t('requiredField'))
+        .max(50, t('emailMax')),
       motDePasse: Yup.string()
-        .required("Ce champ est requis")
-        .min(8, "Le mot de passe doit contenir au moins 8 caractères")
-        .max(50, "Le mot de passe ne peut pas dépasser 30 caractères"),
+        .required(t('requiredField'))
+        .min(8, t('passwordMin'))
+        .max(50, t('passwordMax')),
       motDePasseConfirm: Yup.string()
-        .oneOf(
-          [Yup.ref("motDePasse"), null],
-          "Les mots de passe doivent correspondre"
-        )
-        .required("Ce champ est requis"),
+        .oneOf([Yup.ref("motDePasse"), null], t('passwordMatch'))
+        .required(t('requiredField')),
     }),
     onSubmit: (values) => {
       var button = document.getElementById("boutonload");
@@ -72,7 +72,7 @@ const Signup = () => {
           return [key, typeof value === "string" ? value.trim() : value];
         })
       );
-
+  
       createUser(trimmedValues)
         .then((data) => {
           console.log(data);
@@ -82,13 +82,11 @@ const Signup = () => {
         .catch((error) => {
           if (error === "EmailDuplicate") {
             formik.setErrors({
-              adresseMail:
-                "Cet email est déjà utilisé. Veuillez en choisir un autre.",
+              adresseMail: t('emailDuplicate'),
             });
           } else if (error === "UserBanned") {
             formik.setErrors({
-              adresseMail:
-                "Cet email a été banni, veuillez contacter l'assistance",
+              adresseMail: t('emailBanned'),
             });
           } else {
             console.error("Error creating user:", error);
@@ -125,7 +123,7 @@ const Signup = () => {
         <div className="col">
           <div className="margin mt-2 fs-2 mb-2">
             <h5>
-              <b>Formulaire d'inscription</b>
+              <b>{t("formulaireInscription")}</b>
             </h5>
           </div>
         </div>
@@ -134,7 +132,7 @@ const Signup = () => {
         <input
           className="input"
           type="text"
-          placeholder="Nom"
+          placeholder={t("Nom")}
           name="nom"
           value={formik.values.nom}
           onChange={formik.handleChange}
@@ -145,7 +143,7 @@ const Signup = () => {
         <input
           className="input"
           type="text"
-          placeholder="Prénom"
+          placeholder={t("Prénom")}
           name="prenom"
           value={formik.values.prenom}
           onChange={formik.handleChange}
@@ -156,7 +154,7 @@ const Signup = () => {
         <input
           className="input"
           type="date"
-          placeholder="Date de naissance"
+          placeholder={t("Date de naissance")}
           name="dateDeNaissance"
           value={formik.values.dateDeNaissance}
           onChange={formik.handleChange}
@@ -167,7 +165,7 @@ const Signup = () => {
         <input
           className="input"
           type="email"
-          placeholder="Adresse mail"
+          placeholder={t("Adresse mail")}
           name="adresseMail"
           value={formik.values.adresseMail}
           onChange={formik.handleChange}
@@ -181,7 +179,7 @@ const Signup = () => {
               id="mdp"
               className="input"
               type="password"
-              placeholder="Mot de passe"
+              placeholder={t("motDePasse")}
               name="motDePasse"
               value={formik.values.motDePasse}
               onChange={formik.handleChange}
@@ -189,7 +187,7 @@ const Signup = () => {
             <br />
             <label className="position-relative d-inline-block text-center showpwd">
               <input type="checkbox" className="ntm" onClick={showPassword} />{" "}
-              Afficher
+              {t("afficher")}
             </label>
             {formik.touched.motDePasse && formik.errors.motDePasse ? (
               <div className="error">{formik.errors.motDePasse}</div>
@@ -200,14 +198,14 @@ const Signup = () => {
               id="mdp2"
               className="input mt-3"
               type="password"
-              placeholder="Confirmer le mot de passe"
+              placeholder={t("mdpConfirm")}
               name="motDePasseConfirm"
               value={formik.values.motDePasseConfirm}
               onChange={formik.handleChange}
             />
             <br />
             <label className="position-relative d-inline-block text-center showpwd">
-              <input type="checkbox" onClick={showPasswordConfirm} /> Afficher
+              <input type="checkbox" onClick={showPasswordConfirm} /> {t("afficher")}
             </label>
             {formik.touched.motDePasseConfirm &&
             formik.errors.motDePasseConfirm ? (
@@ -215,7 +213,7 @@ const Signup = () => {
             ) : null}
           </div>
         </div>
-        <label htmlFor="type">Type de compte :</label>
+        <label htmlFor="type">{t("typeCompte")}</label>
         <br></br>
         <select
           name="type"
@@ -224,9 +222,9 @@ const Signup = () => {
           value={formik.values.type}
           onChange={formik.handleChange}
         >
-          <option value="voyageurs">Voyageur</option>
-          <option value="clientsBailleurs">Bailleur</option>
-          <option value="prestataires">Prestataire</option>
+          <option value="voyageurs">{t("voyageur")}</option>
+          <option value="clientsBailleurs">{t("bailleur")}</option>
+          <option value="prestataires">{t("prestataire")}</option>
         </select>
 
         <br></br>
@@ -239,7 +237,7 @@ const Signup = () => {
           {loading ? (
             <FadeLoader color="#ffffff" size={20} className="spinner" />
           ) : (
-            "Créer un compte"
+            t("creerCompte") // Translated button text
           )}
         </button>
       </form>

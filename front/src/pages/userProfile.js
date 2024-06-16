@@ -5,6 +5,7 @@ import Prompt from "../components/prompt.js";
 import * as Yup from "yup";
 import { updateUser, updateCookie, checkAbonnement } from "../services";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const UserProfile = () => {
   const nomRegex =
@@ -25,6 +26,7 @@ const UserProfile = () => {
   const [userType, setUserType] = useState(null);
   const [abonnements, setAbonnements] = useState([]);
 
+  const { t } = useTranslation();
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -62,24 +64,24 @@ const UserProfile = () => {
 
   const validationSchema = Yup.object().shape({
     nom: Yup.string()
-      .matches(nomRegex, "Le nom doit contenir uniquement des lettres")
-      .required("Ce champ est requis")
-      .min(1, "Le nom doit contenir au moins 1 caractère")
-      .max(30, "Le nom ne peut pas dépasser 30 caractères"),
+      .matches(nomRegex, t("nomValidation"))
+      .required(t("requiredField"))
+      .min(1, t("nomMin"))
+      .max(30, t("nomMax")),
     prenom: Yup.string()
-      .matches(nomRegex, "Le prénom doit contenir uniquement des lettres")
-      .required("Ce champ est requis")
-      .min(1, "Le prénom doit contenir au moins 1 caractère")
-      .max(30, "Le prénom ne peut pas dépasser 30 caractères"),
+      .matches(nomRegex, t("prenomValidation"))
+      .required(t("requiredField"))
+      .min(1, t("prenomMin"))
+      .max(30, t("prenomMax")),
     dateDeNaissance: Yup.date()
-      .required("Ce champ est requis")
-      .min(minDate, "Vous devez avoir moins de 100 ans pour vous inscrire")
-      .max(maxDate, "Vous devez avoir strictement 18 ans pour vous inscrire"),
+      .required(t("requiredField"))
+      .min(minDate, t("dateMin"))
+      .max(maxDate, t("dateMax")),
     adresseMail: Yup.string()
-      .matches(emailRegex, "L'adresse email n'est pas valide")
-      .email("Adresse mail invalide")
-      .required("Ce champ est requis")
-      .max(50, "L'adresse mail ne peut pas dépasser 50 caractères"),
+      .matches(emailRegex, t("emailValidation"))
+      .email(t("invalidEmail"))
+      .required(t("requiredField"))
+      .max(50, t("emailMax")),
   });
 
   const handleDisconnect = async () => {
@@ -187,6 +189,12 @@ const UserProfile = () => {
     setEditMode(false);
     // Reset input values to current user state
     setInputValues(user);
+    setValidationErrors({
+      nom: "",
+      prenom: "",
+      dateDeNaissance: "",
+      adresseMail: "",
+    });
   };
 
   function formatDate(dateString) {
@@ -246,10 +254,14 @@ const UserProfile = () => {
     return (
       <div key={abonnement.id} className="abonnement-item">
         <h6>Type: {abonnement.type}</h6>
-        <p>Type d'échéance: {abonnement.typeEcheance}</p>
-        <p>Date de début: {formatDate(abonnement.dateDebut)}</p>
         <p>
-          Date de renouvellement: {formatDate(abonnement.dateRenouvellement)}
+          {t("typeEcheance")} {abonnement.typeEcheance}
+        </p>
+        <p>
+          {t("dateDebut")} {formatDate(abonnement.dateDebut)}
+        </p>
+        <p>
+          {t("renouvellementDate")} {formatDate(abonnement.dateRenouvellement)}
         </p>
         {/* Render other abonnement fields as needed */}
       </div>
@@ -284,13 +296,13 @@ const UserProfile = () => {
                 </div>
                 {userType === "voyageurs" ? (
                   <div className="abonnement-info mt-4">
-                    <h5>Abonnement en cours:</h5>
+                    <h5>{t("abonnementEnCours")}</h5>
                     {abonnements.length > 0 ? (
                       abonnements.map((abonnement) =>
                         renderAbonnement(abonnement)
                       )
                     ) : (
-                      <span>pas d'abonnement</span>
+                      <span>{t("pasDabonnement")}</span>
                     )}
                   </div>
                 ) : (
@@ -305,18 +317,18 @@ const UserProfile = () => {
             <div className="card-body shadow">
               <div className="row gutters">
                 <div className="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                  <h6 className="mb-2 text-primary">Détails du compte</h6>
+                  <h6 className="mb-2 text-primary">{t("compteDetail")}</h6>
                 </div>
                 {/* Render input fields with validation errors */}
                 {renderInputField(
-                  "Nom",
+                  t("Nom"),
                   user ? user.nom : "",
                   "nom",
                   (e) => handleInputChange(e, "nom"),
                   validationErrors.nom // Pass the validation error for the field
                 )}
                 {renderInputField(
-                  "Prénom",
+                  t("Prénom"),
                   user ? user.prenom : "",
                   "prenom",
                   (e) => handleInputChange(e, "prenom"),
@@ -330,7 +342,7 @@ const UserProfile = () => {
                   validationErrors.adresseMail // Pass the validation error for the field
                 )}
                 {renderInputField(
-                  "Date de Naissance",
+                  t("Date de Naissance"),
                   user ? user.dateDeNaissance : "",
                   "dateNaissance",
                   (e) => handleInputChange(e, "dateDeNaissance"),
@@ -348,14 +360,14 @@ const UserProfile = () => {
                           className="btn btn-secondary mr-2"
                           onClick={handleCancelEditMode}
                         >
-                          Annuler
+                          {t("annuler")}
                         </button>
                         <button
                           type="button"
                           className="btn btn-primary mr-2"
                           onClick={handleSaveChanges}
                         >
-                          Terminer
+                          {t("terminer")}
                         </button>
                       </>
                     ) : (
@@ -364,7 +376,7 @@ const UserProfile = () => {
                         className="btn btn-primary mr-2"
                         onClick={handleEditMode}
                       >
-                        Modifier les informations
+                        {t("modifInfo")}
                       </button>
                     )}
                     <button
@@ -372,7 +384,7 @@ const UserProfile = () => {
                       className="btn btn-danger mr-2"
                       onClick={handleDeleteAccount}
                     >
-                      Supprimer le compte
+                      {t("suppCompte")}
                     </button>
                     {showPrompt && (
                       <Prompt
@@ -391,7 +403,7 @@ const UserProfile = () => {
                           to="/abonnement"
                           className="btn btn-primary custom-link"
                         >
-                          <span>Consulter les offres d'abonnement</span>
+                          <span>{t("consulterOffre")}</span>
                         </Link>
                       ) : (
                         <a
@@ -400,7 +412,7 @@ const UserProfile = () => {
                           rel="noopener noreferrer"
                           className="btn btn-primary custom-link"
                         >
-                          <span>Gérer mon abonnement</span>
+                          <span>{t("gererAbo")}</span>
                         </a>
                       )
                     ) : (
@@ -423,7 +435,8 @@ const UserProfile = () => {
           className="btn btn-danger shadow"
           onClick={handleDisconnect}
         >
-          Se déconnecter <span>&times;</span>
+          {t("logout")}
+          <span>&times;</span>
         </button>
       </div>
     </div>
