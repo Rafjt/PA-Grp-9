@@ -4,18 +4,22 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 import { login } from "../services";
-
-const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-
-const validationSchema = Yup.object().shape({
-  adresseMail: Yup.string()
-    .matches(emailRegex, "Adresse email invalide")
-    .max(70, "L'adresse mail ne peut pas dépasser 70 caractères")
-    .required("Ce champ est requis"),
-  motDePasse: Yup.string().required("Ce champ est requis"),
-});
+import { useTranslation } from "react-i18next";
 
 function Login() {
+  const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+  const { t } = useTranslation();
+
+  const validationSchema = Yup.object().shape({
+    adresseMail: Yup.string()
+      .matches(emailRegex, t("emailValidation"))
+      .email(t("invalidEmail"))
+      .required(t("requiredField"))
+      .max(50, t("emailMax")),
+    motDePasse: Yup.string().required(t("requiredField")),
+  });
+
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -31,11 +35,11 @@ function Login() {
     } catch (error) {
       console.error(error);
       if (error.message === "Unauthorized") {
-        setErrorMessage("Compte introuvable");
+        setErrorMessage(t("compteIntrouvable")); // Use translation for "Compte introuvable"
       } else if (error.message === "UserBanned") {
-        setErrorMessage("Votre compte est banni");
-      } else if (error.message === "WrongPWD"){
-        setErrorMessage("Mot de passe erroné");
+        setErrorMessage(t("compteBanni")); // Use translation for "Votre compte est banni"
+      } else if (error.message === "WrongPWD") {
+        setErrorMessage(t("motDePasseErrone")); // Use translation for "Mot de passe erroné"
       }
     }
   };
@@ -56,7 +60,7 @@ function Login() {
           boxShadow: "4.0px 8.0px 8.0px hsl(0deg 0% 0% / 0.38)",
         }}
       >
-        <h2 className="mb-4">Se connecter</h2>
+        <h2 className="mb-4">{t("seConnecter")}</h2>
         <Formik
           initialValues={{ adresseMail: "", motDePasse: "", type: "voyageurs" }}
           validationSchema={validationSchema}
@@ -71,9 +75,13 @@ function Login() {
                 className="input form-control"
                 style={{ width: "100%" }}
               />
-            {errorMessage && <div className="error">{errorMessage}</div>}
+              {errorMessage && <div className="error">{errorMessage}</div>}
             </div>
-            <ErrorMessage name="adresseMail" component="div" className="error" />
+            <ErrorMessage
+              name="adresseMail"
+              component="div"
+              className="error"
+            />
             <div className="mb-3">
               <Field
                 type={showPassword ? "text" : "password"}
@@ -82,7 +90,11 @@ function Login() {
                 className="input form-control"
                 style={{ width: "100%" }}
               />
-              <ErrorMessage name="motDePasse" component="div" className="error" />
+              <ErrorMessage
+                name="motDePasse"
+                component="div"
+                className="error"
+              />
             </div>
             <div className="mb-3 form-check" style={{ width: "100%" }}>
               <input
@@ -91,16 +103,25 @@ function Login() {
                 id="showPassword"
                 onChange={() => setShowPassword(!showPassword)}
               />
-              <label className="form-check-label" htmlFor="showPassword" style={{ width: "auto" }}>
-                Afficher le mot de passe
+              <label
+                className="form-check-label"
+                htmlFor="showPassword"
+                style={{ width: "auto" }}
+              >
+                {t("showPwd")}
               </label>
             </div>
             <div className="mb-3">
-              <label htmlFor="type">Type de compte :</label>
-              <Field as="select" name="type" className="form-select" style={{ width: "100%" }}>
-                <option value="voyageurs">Voyageur</option>
-                <option value="clientsBailleurs">Bailleur</option>
-                <option value="prestataires">Prestataire</option>
+              <label htmlFor="type">{t("typeCompte")}</label>
+              <Field
+                as="select"
+                name="type"
+                className="form-select"
+                style={{ width: "100%" }}
+              >
+                <option value="voyageurs">{t("voyageur")}</option>
+                <option value="clientsBailleurs">{t("bailleur")}</option>
+                <option value="prestataires">{t("prestataire")}</option>
               </Field>
             </div>
             <button
@@ -112,15 +133,15 @@ function Login() {
                 color: "#FFFFFF",
               }}
             >
-              Se connecter
+              {t("seConnecter")}
             </button>
           </Form>
         </Formik>
         <div className="mt-3">
           <p>
-            Vous n'avez pas de compte ?{" "}
+          {t("noAccount")}{" "}
             <a href="/signup" className="text-white">
-              S'inscrire
+              {t("signUp")}
             </a>
           </p>
         </div>

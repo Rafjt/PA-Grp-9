@@ -1,7 +1,10 @@
 import React, { useEffect } from "react";
 import "./espaceBailleur.css";
+import { useTranslation } from 'react-i18next';
 
 function EspaceVoyageur() {
+  const { t } = useTranslation();
+
   console.log(document.cookie);
   const toMesBiens = () => {
     window.location.replace("/mesReservations");
@@ -30,20 +33,20 @@ function EspaceVoyageur() {
         alt="bailleur"
         className="banBailleur"
       />
-      <h1>Espace Voyageur</h1>
+      <h1>{t("espaceVoyageur")}</h1>
       <hr />
       <div className="button-grid">
         <button className="grid-button" onClick={toMesBiens}>
-          MES RESERVATIONS
+        {t("mesReservation")}
         </button>
         <button className="grid-button" onClick={toMesDoc}>
-          MES DOCUMENTS ADMINISTRATIF ET PAIEMENTS
+        {t("docAdminPaiment")}
         </button>
         <button className="grid-button" onClick={toLouerBien}>
-          LOUER UN BIEN
+        {t("louerBien")}
         </button>
-        <button className="grid-button" onClick={toPrestations}>LOUER OU SUIVRE UN SERVICE</button>
-        <button className="grid-button" onClick={toReport}>SIGNALER UN PROBLÈME</button>
+        <button className="grid-button" onClick={toPrestations}>{t("louerSuivreService")}</button>
+        <button className="grid-button" onClick={toReport}>{t("signalerProb")}</button>
       </div>
     </div>
   );

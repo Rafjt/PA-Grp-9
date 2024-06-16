@@ -13,6 +13,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import Prompt from "../components/prompt.js";
+import { useTranslation } from "react-i18next";
 
 function Prestations() {
   const [user, setUser] = useState(null);
@@ -24,6 +25,7 @@ function Prestations() {
   const [selectedPrestationId, setSelectedPrestationId] = useState(null);
   const [actionType, setActionType] = useState(null);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const today = new Date();
   const dd = String(today.getDate()).padStart(2, "0");
@@ -66,6 +68,7 @@ function Prestations() {
     return `${day}/${month}/${year}`;
   }
 
+  console.log(user);
   const fetchData = async () => {
     const userData = await getCredentials();
     setUser(userData);
@@ -102,33 +105,38 @@ function Prestations() {
   }, []);
 
   const validationSchema = Yup.object({
-    typeIntervention: Yup.string().required(
-      "Le type de service demandé est requis"
-    ),
-    nom: Yup.string().required("L'intitulé de la demande est requis"),
+    typeIntervention: Yup.string().required(t("requiredType")),
+    nom: Yup.string().required(t("requiredName")),
     date: Yup.date()
-      .min(
-        todayFormatted,
-        "La date doit être postérieure ou égale à aujourd'hui"
-      )
-      .required("La date est requise"),
-    ville: Yup.string().required("La ville est requise"),
-    lieux: Yup.string().required("Le lieu est requis"),
-    description: Yup.string().required("La description est requise"),
+      .min(todayFormatted, t("dateAfterToday"))
+      .required(t("requiredDate")),
+    ville: Yup.string().required(t("requiredCity")),
+    lieux: Yup.string().required(t("requiredPlace")),
+    description: Yup.string().required(t("requiredDescription")),
     id_BienImmobilier: Yup.string().when("user", {
       is: (user) => user && user.type === "clientsBailleurs",
-      then: Yup.string().required("Le bien associé est requis"),
+      then: Yup.string().required(t("requiredProperty")),
     }),
   });
+  const handleRedirect = (userType) => {
+    switch (userType) {
+      case "clientBailleurs":
+        window.location.href = "/espaceBailleur";
+        break;
+      case "voyageurs":
+        window.location.href = "/espaceVoyageur";
+        break;
+      default:
+        // Handle any other user types or redirect to a default location
+        window.location.href = "/";
+    }
+  };
 
   return (
     <div>
-      <h1 className="mt-5">Prestations demandées</h1>
-      <button
-        onClick={() => (window.location.href = "/espaceVoyageur")}
-        className="back-button"
-      >
-        Retour
+      <h1 className="mt-5">{t("prestationsDemandees")}</h1>
+      <button onClick={() => handleRedirect(user.type)} className="back-button">
+        {t("back")}
       </button>
       <hr />
       <div>
@@ -136,14 +144,14 @@ function Prestations() {
           <thead>
             <tr>
               <th>Type</th>
-              <th>Nom</th>
+              <th>{t("name")}</th>
               <th>Description</th>
-              <th>Statut</th>
-              <th>Prix</th>
+              <th>{t("status")}</th>
+              <th>{t("price")}</th>
               <th>Date</th>
-              <th>Lieu</th>
+              <th>{t("location")}</th>
               {user && user.type === "clientsBailleurs" && (
-                <th>Bien associé</th>
+                <th>{t("associatedProperty")}</th>
               )}
               <th>Action</th>
             </tr>
@@ -162,7 +170,7 @@ function Prestations() {
                 <td>{prestation.prix}</td>
                 <td>
                   {new Date(prestation.date) < new Date() ? (
-                    <span style={{ color: "red" }}>Date limite passée</span>
+                    <span style={{ color: "red" }}>{t("dateDepassee")}</span>
                   ) : (
                     formatDate(prestation.date)
                   )}
@@ -193,7 +201,7 @@ function Prestations() {
                                 handleDelete(prestation.id, "archive")
                               }
                             >
-                              Archiver
+                              {t("archive")}
                             </button>
                           )}
                           {prestation.evalExists ? (
@@ -205,7 +213,7 @@ function Prestations() {
                                 textDecoration: "none",
                               }}
                             >
-                              <button>Visualiser l'avis</button>
+                              <button>{t("viewReview")}</button>
                             </Link>
                           ) : (
                             <Link
@@ -217,7 +225,7 @@ function Prestations() {
                               }}
                             >
                               <button className="btn-avis">
-                                Laisser un avis
+                                {t("leaveReview")}
                               </button>
                             </Link>
                           )}
@@ -227,7 +235,7 @@ function Prestations() {
                           className="delete-button"
                           onClick={() => handleDelete(prestation.id, "delete")}
                         >
-                          Annuler
+                          {t("cancel")}
                         </button>
                       )}
                     </>
@@ -236,7 +244,7 @@ function Prestations() {
                       className="delete-button"
                       onClick={() => handleDelete(prestation.id, "delete")}
                     >
-                      Supprimer
+                      {t("delete")}
                     </button>
                   )}
                 </td>
@@ -248,7 +256,7 @@ function Prestations() {
       <hr />
       <div className="form-container-presta">
         <div className="formPresta">
-          <h1>Demander un service</h1>
+          <h1>{t("requestService")}</h1>
           <Formik
             initialValues={{
               typeIntervention: "",
@@ -270,32 +278,32 @@ function Prestations() {
           >
             {({ isSubmitting }) => (
               <Form>
-                <label htmlFor="typeIntervention">
-                  Type de service demandé
-                </label>
+                <label htmlFor="typeIntervention">{t("serviceType")}</label>
                 <Field
                   as="select"
                   id="typeIntervention"
                   name="typeIntervention"
                   className="form-input"
                 >
-                  <option value="">Sélectionner...</option>
-                  <option value="Conciergerie">Conciergerie</option>
-                  <option value="Entretien ménager">Entretien ménager</option>
-                  <option value="Maintenance">Maintenance</option>
-                  <option value="Jardinage et entretien extérieur">
-                    Jardinage et entretien extérieur
+                  <option value="">{t("select")}</option>
+                  <option value="Conciergerie">{t("conciergerie")}</option>
+                  <option value="Entretien ménager">
+                    {t("entretienMenager")}
                   </option>
-                  <option value="Livraison">Livraison</option>
+                  <option value="Maintenance">{t("maintenance")}</option>
+                  <option value="Jardinage et entretien extérieur">
+                    {t("jardinage")}
+                  </option>
+                  <option value="Livraison">{t("livraison")}</option>
                   <option value="Gestion des déchets">
-                    Gestion des déchets
+                    {t("gestionDechets")}
                   </option>
                   <option value="Soutien administratif">
-                    Soutien administratif
+                    {t("soutienAdministratif")}
                   </option>
-                  <option value="Déménagement">Déménagement</option>
-                  <option value="Chauffeur">Chauffeur</option>
-                  <option value="Sécurité">Sécurité</option>
+                  <option value="Déménagement">{t("demenagement")}</option>
+                  <option value="Chauffeur">{t("chauffeur")}</option>
+                  <option value="Sécurité">{t("securite")}</option>
                 </Field>
                 <ErrorMessage
                   name="typeIntervention"
@@ -303,7 +311,7 @@ function Prestations() {
                   className="error-message"
                 />
 
-                <label htmlFor="nom">Intitulé de la demande</label>
+                <label htmlFor="nom">{t("requestTitle")}</label>
                 <Field type="text" id="nom" name="nom" className="form-input" />
                 <ErrorMessage
                   name="nom"
@@ -325,14 +333,14 @@ function Prestations() {
                   className="error-message"
                 />
 
-                <label htmlFor="ville">Ville</label>
+                <label htmlFor="ville">{t("city")}</label>
                 <Field
                   as="select"
                   id="ville"
                   name="ville"
                   className="form-input"
                 >
-                  <option value="">Sélectionner...</option>
+                  <option value="">{t("select")}</option>
                   <option value="Paris">Paris</option>
                   <option value="Nice">Nice</option>
                   <option value="Biarritz">Biarritz</option>
@@ -343,7 +351,7 @@ function Prestations() {
                   className="error-message"
                 />
 
-                <label htmlFor="lieux">Lieu</label>
+                <label htmlFor="lieux">{t("location")}</label>
                 <Field
                   type="text"
                   id="lieux"
@@ -358,14 +366,16 @@ function Prestations() {
 
                 {user && user.type === "clientsBailleurs" && (
                   <>
-                    <label htmlFor="id_BienImmobilier">Bien associé</label>
+                    <label htmlFor="id_BienImmobilier">
+                      {t("associatedProperty")}
+                    </label>
                     <Field
                       as="select"
                       id="id_BienImmobilier"
                       name="id_BienImmobilier"
                       className="form-input"
                     >
-                      <option value="">Sélectionner...</option>
+                      <option value="">{t("select")}</option>
                       {biens.map((bien) => (
                         <option key={bien.id} value={bien.id}>
                           {bien.nomBien}
@@ -400,7 +410,7 @@ function Prestations() {
                   className="form-submit"
                   disabled={isSubmitting}
                 >
-                  Submit
+                  {t("submit")}
                 </button>
               </Form>
             )}
@@ -410,9 +420,7 @@ function Prestations() {
       {showPrompt && (
         <Prompt
           message={
-            actionType === "delete"
-              ? "Êtes-vous sûr de vouloir supprimer cette prestation ?<br>Cette action est irréversible"
-              : "Êtes-vous sûr de vouloir archiver cette prestation ?"
+            actionType === "delete" ? t("confirmDelete") : t("confirmArchive")
           }
           onConfirm={confirmDelete}
           onCancel={cancelDelete}

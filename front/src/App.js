@@ -1,5 +1,6 @@
 import "./App.css";
 import React from "react";
+import './i18n';
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Header from "./components/header.js";
 import BackOffice from "./pages/backOffice.js";

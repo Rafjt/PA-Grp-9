@@ -5,9 +5,11 @@ import {
   BACK_URL,
 } from "../services";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import "./mesReservations.css";
 
 const MesReservations = () => {
+  const { t } = useTranslation();
   const [reservations, setReservations] = useState([]); // Initialize with an empty array
   const [showDetails, setShowDetails] = useState([]); // State to control showing details for each reservation
 
@@ -21,7 +23,7 @@ const MesReservations = () => {
             .then((data) => {
               if (Array.isArray(data)) {
                 setReservations(data); // Set reservations array
-                // Initialize showDetails state array with false for each reservation
+                console.log(data);
                 setShowDetails(Array(data.length).fill(false));
               } else {
                 console.error("Data is not an array:", data);
@@ -56,18 +58,18 @@ const MesReservations = () => {
     return `${day}/${month}/${year}`;
   }
 
-  function goToDiscussion(){
+  function goToDiscussion() {
     window.location.replace("/espaceDiscussion");
   }
 
   return (
     <div className="reservationBoard">
-      <h1 className="mt-1">Mes Réservations</h1>
+      <h1 className="mt-1">{t("myReservations")}</h1>
       <button
         onClick={() => (window.location.href = "/espaceVoyageur")}
         className="back-button"
       >
-        Retour
+        {t("back")}
       </button>
       <hr />
       <div className="mesResa rounded p-3 shadow">
@@ -85,15 +87,15 @@ const MesReservations = () => {
                 {reservation.ville} {reservation.nomBien}
               </h2>
               <h3>{reservation.adresse}</h3>
-              <p>Prix par nuit: {reservation.prix}€</p>
+              <p>{t("pricePerNight")}: {reservation.prix}€</p>
               {/* Button to toggle showing details for the current reservation */}
               <button
                 onClick={() => toggleDetails(index)}
                 className="boutondetail"
               >
                 {showDetails[index]
-                  ? "Masquer les détails"
-                  : "Afficher les détails"}
+                  ? t("hideDetails")
+                  : t("showDetails")}
               </button>
               {/* Reservation details */}
               {showDetails[index] && (
@@ -103,28 +105,28 @@ const MesReservations = () => {
                     className="p-3 rounded shadow"
                     style={{ border: "2px solid #ccc" }}
                   >
-                    <h5 className="mb-3">Informations générales</h5>
+                    <h5 className="mb-3">{t("generalInfo")}</h5>
                     <p>
-                      <strong>Date de début:</strong>{" "}
+                      <strong>{t("startDate")}:</strong>{" "}
                       {formatDate(reservation.dateDebut)}
                     </p>
                     <p>
-                      <strong>Date de fin:</strong>{" "}
+                      <strong>{t("endDate")}:</strong>{" "}
                       {formatDate(reservation.dateFin)}
                     </p>
                     <p>
-                      <strong>Type de propriété:</strong>{" "}
+                      <strong>{t("propertyType")}:</strong>{" "}
                       {reservation.typeDePropriete}
                     </p>
                     <p>
-                      <strong>Nombre de chambres:</strong>{" "}
+                      <strong>{t("numberOfRooms")}:</strong>{" "}
                       {reservation.nombreChambres}
                     </p>
                     <p>
-                      <strong>Nombre de lits:</strong> {reservation.nombreLits}
+                      <strong>{t("numberOfBeds")}:</strong> {reservation.nombreLits}
                     </p>
                     <p>
-                      <strong>Nombre de salles de bain:</strong>{" "}
+                      <strong>{t("numberOfBathrooms")}:</strong>{" "}
                       {reservation.nombreSallesDeBain}
                     </p>
                   </div>
@@ -134,13 +136,13 @@ const MesReservations = () => {
                     className="p-3 rounded shadow"
                     style={{ border: "2px solid #ccc" }}
                   >
-                    <h5 className="mb-3">Informations du bailleur</h5>
+                    <h5 className="mb-3">{t("landlordInfo")}</h5>
                     <p>
-                      <strong>Nom du bailleur:</strong>{" "}
+                      <strong>{t("landlordName")}:</strong>{" "}
                       {reservation.bailleurPrenom} {reservation.bailleurNom}
                     </p>
                     <p>
-                      <strong>Adresse mail du bailleur:</strong>{" "}
+                      <strong>{t("landlordEmail")}:</strong>{" "}
                       {reservation.bailleurMail}
                     </p>
                     <button
@@ -148,7 +150,7 @@ const MesReservations = () => {
                       className="btn btn-primary mr-2 mt-3"
                       onClick={goToDiscussion}
                     >
-                      Discuter avec le bailleur
+                      {t("chatWithLandlord")}
                     </button>
                   </div>
 
@@ -157,42 +159,42 @@ const MesReservations = () => {
                     className="p-3 rounded shadow"
                     style={{ border: "2px solid #ccc" }}
                   >
-                    <h5 className="mb-3">Options</h5>
+                    <h5 className="mb-3">{t("options")}</h5>
                     <p>
-                      <strong>Wifi:</strong>{" "}
-                      {reservation.wifi === 1 ? "Oui" : "Non"}
+                      <strong>{t("wifi")}:</strong>{" "}
+                      {reservation.wifi === 1 ? t("yes") : t("no")}
                     </p>
                     <p>
-                      <strong>Cuisine:</strong>{" "}
-                      {reservation.cuisine === 1 ? "Oui" : "Non"}
+                      <strong>{t("kitchen")}:</strong>{" "}
+                      {reservation.cuisine === 1 ? t("yes") : t("no")}
                     </p>
                     <p>
-                      <strong>Balcon:</strong>{" "}
-                      {reservation.balcon === 1 ? "Oui" : "Non"}
+                      <strong>{t("balcony")}:</strong>{" "}
+                      {reservation.balcon === 1 ? t("yes") : t("no")}
                     </p>
                     <p>
-                      <strong>Jardin:</strong>{" "}
-                      {reservation.jardin === 1 ? "Oui" : "Non"}
+                      <strong>{t("garden")}:</strong>{" "}
+                      {reservation.jardin === 1 ? t("yes") : t("no")}
                     </p>
                     <p>
-                      <strong>Parking:</strong>{" "}
-                      {reservation.parking === 1 ? "Oui" : "Non"}
+                      <strong>{t("parking")}:</strong>{" "}
+                      {reservation.parking === 1 ? t("yes") : t("no")}
                     </p>
                     <p>
-                      <strong>Piscine:</strong>{" "}
-                      {reservation.piscine === 1 ? "Oui" : "Non"}
+                      <strong>{t("pool")}:</strong>{" "}
+                      {reservation.piscine === 1 ? t("yes") : t("no")}
                     </p>
                     <p>
-                      <strong>Jaccuzzi:</strong>{" "}
-                      {reservation.jaccuzzi === 1 ? "Oui" : "Non"}
+                      <strong>{t("jacuzzi")}:</strong>{" "}
+                      {reservation.jaccuzzi === 1 ? t("yes") : t("no")}
                     </p>
                     <p>
-                      <strong>Salle de sport:</strong>{" "}
-                      {reservation.salleDeSport === 1 ? "Oui" : "Non"}
+                      <strong>{t("gym")}:</strong>{" "}
+                      {reservation.salleDeSport === 1 ? t("yes") : t("no")}
                     </p>
                     <p>
-                      <strong>Climatisation:</strong>{" "}
-                      {reservation.climatisation === 1 ? "Oui" : "Non"}
+                      <strong>{t("airConditioning")}:</strong>{" "}
+                      {reservation.climatisation === 1 ? t("yes") : t("no")}
                     </p>
                   </div>
                 </div>
@@ -200,7 +202,7 @@ const MesReservations = () => {
             </div>
           ))
         ) : (
-          <p>Aucune réservation trouvée.</p>
+          <p>{t("noReservationsFound")}</p>
         )}
       </div>
     </div>
