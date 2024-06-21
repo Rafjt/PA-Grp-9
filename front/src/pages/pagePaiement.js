@@ -171,14 +171,12 @@ const PagePaiement = () => {
                         console.error('Error creating reservation:', error);
                     });
 
-                // Redirect after a delay, regardless of success or cancellation
-                setTimeout(() => {
-                    navigate('/mesReservations');
-                }, 2000);
             }
+               
 
             // Redirect after a delay, regardless of success or cancellation
             setTimeout(() => {
+                console.log('Redirecting to /mesReservations');
                 navigate('/mesReservations');
             }, 2000);
         });

@@ -12,7 +12,7 @@ const { Console } = require("console");
 router.use("/mail", mailRoute);
 const { STRIPE_PUBLIC_KEY, STRIPE_SECRET_KEY } = require('../credsStripe.js');
 const stripe = require('stripe')(STRIPE_SECRET_KEY);
-const URL = 'http://frontend:3000';
+const URL = 'https://communal-raccoon-glowing.ngrok-free.app';
 
 // stripe.products.list(
 //   { limit: 10 },
@@ -1665,6 +1665,24 @@ router.put('/archiverPrestation/:prestationId', async (req, res) => {
 
   try {
     await sequelize.query(`UPDATE prestation SET statut = 'TERMINEE' WHERE id = ${prestationId}`);
+
+    // Fetch the updated prestation record
+    const [results] = await sequelize.query(`SELECT * FROM prestation WHERE id = ${prestationId}`);
+    const updatedPrestation = results[0];
+
+    res.send(updatedPrestation);
+  } catch (error) {
+    console.error('Error accepting prestation:', error);
+    res.status(500).send('Failed to accept prestation');
+  }
+});
+
+router.put('/TerminerPrestation/:prestationId', async (req, res) => {
+  const { prestationId,status } = req.params;
+  console.log('Accepting prestation:', prestationId);
+
+  try {
+    await sequelize.query(`UPDATE prestation SET statut = ${status} WHERE id = ${prestationId}`);
 
     // Fetch the updated prestation record
     const [results] = await sequelize.query(`SELECT * FROM prestation WHERE id = ${prestationId}`);

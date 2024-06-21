@@ -9,11 +9,11 @@ const sequelize = require('./database');
 const router = require('./routes/myroutes');
 const auth = require('./routes/auth');
 const abonnement = require('./routes/abonnementRoute');
-const allowedOrigins = [
-  'http://localhost:3000',
-  'http://localhost:8080',
-  'http://communal-raccoon-glowing.ngrok-free.app'
-];
+// const allowedOrigins = [
+//   'http://localhost:3000',
+//   'http://localhost:8080',
+//   'http://communal-raccoon-glowing.ngrok-free.app'
+// ];
 
 const port = 3001;
 
@@ -21,7 +21,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigins,
+    origin: "*",
     methods: ['GET', 'POST'],
     credentials: true
   }
@@ -36,7 +36,7 @@ sequelize.authenticate().then(() => {
 app.use(bodyParser.json());
 
 app.use(cors({
-  origin: allowedOrigins,
+  origin: "*",
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));

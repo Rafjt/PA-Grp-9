@@ -3,7 +3,8 @@ dist
 /back/node_modules/
 *.log
 .env
-App_ticketing/myenv/
+App_ticketing/
+myenv/
 ssl/
 build/
 .DS_Store
