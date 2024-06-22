@@ -4,4 +4,4 @@ tunnels:
   pa:
     proto: http
     addr: 8080
-    domain: communal-raccoon-glowing.ngrok-free.app
+    domain: akita-content-presumably.ngrok-free.app
