@@ -1,7 +1,0 @@
-version: 2
-authtoken: 2hxwLDqLHhcSfivXZXjKk2lBL1R_7PNqkMdMe7Lo97XR2NaJD
-tunnels:
-  pa:
-    proto: http
-    addr: 8080
-    domain: akita-content-presumably.ngrok-free.app
