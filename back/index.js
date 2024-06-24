@@ -9,7 +9,7 @@ const sequelize = require('./database');
 const router = require('./routes/myroutes');
 const auth = require('./routes/auth');
 const abonnement = require('./routes/abonnementRoute');
-const URL_FRONT = 'http://localhost:3000';
+const URL_FRONT = process.env.URL_FRONT;
 
 const port = 3001;
 
