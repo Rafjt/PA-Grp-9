@@ -5,6 +5,7 @@ dist
 *.log
 .env
 App_ticketing/
+myenv/
 ssl/
 build/
 .DS_Store
