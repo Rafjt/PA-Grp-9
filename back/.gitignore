@@ -24,3 +24,5 @@ yarn-error.log*
 
 #variables
 .env
+
+App_ticketing/
