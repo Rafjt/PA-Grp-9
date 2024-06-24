@@ -1,6 +1,6 @@
 dist
 .envnode_modules
-/back/node_modules/*
+/back/node_modules/
 # /back/uploads/*
 *.log
 .env

@@ -12,6 +12,7 @@ const PagePaiement = () => {
     const [depart, setDepart] = useState("");
     const [price, setPrice] = useState(0);
     const [user, setUser] = useState(null);
+    const [pId, setPId] = useState("");
 
     const location = useLocation();
     const navigate = useNavigate();
@@ -29,6 +30,7 @@ const PagePaiement = () => {
             const arrivee = sessionStorage.getItem('arrivee');
             const depart = sessionStorage.getItem('depart');
             const price = sessionStorage.getItem('price');
+            const pId = sessionStorage.getItem('pId');
 
             setTotalCost(totalCost);
             setNumberOfNights(numberOfNights);
@@ -36,24 +38,7 @@ const PagePaiement = () => {
             setArrivee(arrivee);
             setDepart(depart);
             setPrice(price);
-
-            fetch('/api/create-checkout-session', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    pId: id,
-                    numberOfNights: numberOfNights,
-                }),
-            })
-                .then(response => response.json())
-                .then(data => {
-                    window.location.href = data.url;
-                })
-                .catch((error) => {
-                    console.error('Error:', error);
-                });
+            setPId(pId);
 
             if (success === 'true' && data) {
                 const convertDate = (inputFormat) => {
@@ -175,12 +160,31 @@ const PagePaiement = () => {
                 setTimeout(() => {
                     navigate('/mesReservations');
                 }, 2000);
+            } else if (canceled === 'true') {
+                // Handle canceled payment
+                setTimeout(() => {
+                    navigate('/mesReservations');
+                }, 2000);
+            } else {
+                // Create checkout session only if not redirected from success or canceled
+                fetch(`${BACK_URL}/api/create-checkout-session`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        pId: pId,
+                        numberOfNights: numberOfNights,
+                    }),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        window.location.href = data.url;
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                    });
             }
-
-            // Redirect after a delay, regardless of success or cancellation
-            setTimeout(() => {
-                navigate('/mesReservations');
-            }, 2000);
         });
     }, [success, canceled, navigate]);
 
