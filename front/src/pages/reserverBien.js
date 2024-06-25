@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import "./reserverBien.css";
 import { fetchAnnonceById, createCheckoutSession } from "../services.js";
-import { BACK_URL } from "../services.js";
+import { BACK_URL, BASE_URL } from "../services.js";
 
 const ReserverBien = () => {
     const location = useLocation();
@@ -46,7 +46,7 @@ const ReserverBien = () => {
         sessionStorage.setItem('price', price);
 
         const createCheckoutSession = async () => {
-            const response = await fetch(`${BACK_URL}/api/create-checkout-session`, {
+            const response = await fetch(`${BASE_URL}/create-checkout-session`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
