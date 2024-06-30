@@ -48,6 +48,7 @@ import Abonnement from "./pages/abonnement.js"
 import MesDocuments from "./pages/mesDocuments.js";
 import PaiementAbonnement from "./pages/paiementAbonnement.js";
 import Report from "./pages/report.js";
+import EtatDesLieux from "./pages/etatDesLieux.js";
 // import { use } from "../../back/routes/auth.js";
 
 function ProtectedRoute({ component: Component }) {
@@ -167,6 +168,7 @@ function App() {
           <Route path="/modifyBien" element={<ProtectedAuthRoute path="/modifyBien" component={ModifyBien} authType="clientsBailleurs" />} />
           <Route path="/calendarBailleurs" element={<ProtectedAuthRoute path="/calendarBailleurs" component={CalendarBailleurs} authType="clientsBailleurs" />} />
           <Route path="/creeBien" element={<ProtectedAuthRoute path="/creeBien" component={CreeBien} authType="clientsBailleurs" />} />
+          <Route path="/etatDesLieux" element={<ProtectedAuthRoute path="/etatDesLieux" component={EtatDesLieux} authType="clientsBailleurs" />} />
           {/* Routes Authent ClientsBailleurs et Voyageurs*/}
           <Route path="/avisPrestation/:prestationId/:prestataireId" element={<ProtectedAuthRoute path="avisPrestation" component={AvisPrestation} authType="bailleurEtVoyageurs" />}/>
           <Route path="/viewAvis/:prestationId/:prestataireId" element={<ProtectedAuthRoute path="viewAvis" component={ViewAvis} authType="bailleurEtVoyageurs" />}/>
