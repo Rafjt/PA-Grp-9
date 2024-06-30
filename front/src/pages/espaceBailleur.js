@@ -1,7 +1,24 @@
 import React, { useEffect } from "react";
+import { BASE_URL } from "../services";
 import "./espaceBailleur.css";
 
 function EspaceBailleur() {
+
+    useEffect(() => {
+        fetch(BASE_URL + "/getBienReserve", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            credentials: "include",
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                console.log(data);
+            });
+    }, []);
+
+
     console.log(document.cookie);
     const toMesBiens = () => {
         window.location.href = "/MesBiens";
@@ -24,6 +41,9 @@ function EspaceBailleur() {
         window.location.href = "/report";
     }
     
+    const toEtatDesLieux = () => {
+        window.location.href = "/etatDesLieux";
+    }
 
     return (
         <div>
@@ -44,6 +64,7 @@ function EspaceBailleur() {
                     LOUER OU SUIVRE UN SERVICE
                 </button>
                 <button className="grid-button" onClick={toReport}>SIGNALER UN PROBLÈME</button>
+                <button className="grid-button" onClick={toEtatDesLieux}>GESTION ÉTAT DES LIEUX</button>
             </div>
         </div>
     );

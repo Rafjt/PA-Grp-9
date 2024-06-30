@@ -12,6 +12,7 @@ const { Console } = require("console");
 router.use("/mail", mailRoute);
 const { STRIPE_PUBLIC_KEY, STRIPE_SECRET_KEY } = require('../credsStripe.js');
 const stripe = require('stripe')(STRIPE_SECRET_KEY);
+const xss = require('xss');
 const URL = process.env.PCS_URL;
 
 // stripe.products.list(
@@ -931,6 +932,74 @@ router.get('/biens', async (req, res) => {
   res.send(biens);
 });
 
+router.get('/getBienReserve', async (req, res) => {
+  const { user } = req.session;
+  const today = new Date().toISOString().split('T')[0]; // Get today's date in 'YYYY-MM-DD' format
+
+  try {
+    const results = await sequelize.query(`
+      SELECT b.*, i.imagePath
+      FROM bienImo b
+      LEFT JOIN bienImoImages i ON b.id = i.bienImoId
+      INNER JOIN reservation r ON b.id = r.id_BienImmobilier
+      WHERE b.id_ClientBailleur = ${user.id}
+        AND r.dateDebut >= '${today}'
+        AND NOT EXISTS (
+          SELECT 1 FROM etatDesLieux e
+          WHERE e.id_BienImmobilier = b.id
+        )
+    `, {
+      type: sequelize.QueryTypes.SELECT
+    });
+
+    const biens = [];
+    let currentBien = null;
+
+    for (const result of results) {
+      if (!currentBien || currentBien.id !== result.id) {
+        currentBien = {
+          id: result.id,
+          ville: result.ville,
+          adresse: result.adresse,
+          id_ClientBailleur: result.id_ClientBailleur,
+          prix: result.prix,
+          nomBien: result.nomBien,
+          description: result.description,
+          statutValidation: result.statutValidation,
+          disponible: result.disponible,
+          typeDePropriete: result.typeDePropriete,
+          nombreChambres: result.nombreChambres,
+          nombreLits: result.nombreLits,
+          nombreSallesDeBain: result.nombreSallesDeBain,
+          wifi: result.wifi,
+          cuisine: result.cuisine,
+          balcon: result.balcon,
+          jardin: result.jardin,
+          parking: result.parking,
+          piscine: result.piscine,
+          jaccuzzi: result.jaccuzzi,
+          salleDeSport: result.salleDeSport,
+          climatisation: result.climatisation,
+          productId: result.productId,
+          images: []
+        };
+        biens.push(currentBien);
+      }
+
+      if (result.imagePath) {
+        currentBien.images.push(result.imagePath);
+      }
+    }
+
+    res.send(biens);
+  } catch (error) {
+    console.error('Error fetching reserved biens:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
+
 // GESTION DES RESERVATIONS
 
 router.get('/MyCalendar', async (req, res) => {
@@ -1192,6 +1261,107 @@ router.get("/reservation/:idVoyageur/voyageur", async (req, res) => {
 });
 
 
+router.post("/createEtatDesLieux", async (req, res) => {
+  console.log("Creating etat des lieux:", req.body);
+  const { id_BienImmobilier, typeEtat, 
+    dateEtat,
+    etatGeneral, 
+    piecesManquantes, 
+    dommagesConstates, 
+    signatureBailleur, 
+    signatureLocataire,
+    status } = req.body;
+  const { user } = req.session;
+
+  // Convert signatures to 1 if they are true
+  const signatureBailleurValue = signatureBailleur === true ? 1 : signatureBailleur;
+  const signatureLocataireValue = signatureLocataire === true ? 1 : signatureLocataire;
+
+  // Sanitize the input data
+  const sanitizedData = [
+    xss(id_BienImmobilier),
+    xss(user.id), // Use the ID of the currently logged-in user as id_Bailleur
+    xss(typeEtat),
+    xss(dateEtat),
+    xss(etatGeneral),
+    xss(piecesManquantes),
+    xss(dommagesConstates),
+    xss(signatureBailleurValue),
+    xss(signatureLocataireValue),
+    xss(status)
+  ];
+
+  console.log("Sanitized data:", sanitizedData);
+
+  // Check if there is an ongoing reservation for the given id_BienImmobilier
+  const [reservation] = await sequelize.query(
+    `SELECT * FROM reservation WHERE id_BienImmobilier = ? AND dateDebut <= NOW() AND dateFin >= NOW()`,
+    {
+      replacements: [id_BienImmobilier],
+      type: sequelize.QueryTypes.SELECT
+    }
+  );
+
+  if (!reservation) {
+    return res.status(400).send("No ongoing reservation found for this property");
+  }
+
+  // Add the reservation ID to the sanitized data
+  sanitizedData.splice(2, 0, reservation.id);
+
+  try {
+    await sequelize.query(
+      `INSERT INTO etatDesLieux (id_BienImmobilier,id_Bailleur,id_Reservation,typeEtat, dateEtat, etatGeneral, piecesManquantes, dommagesConstates, signatureBailleur, signatureLocataire, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      {
+        replacements: sanitizedData,
+        type: sequelize.QueryTypes.INSERT
+      }
+    );
+    res.sendStatus(200); // Send a 200 status code when the operation is successful
+  } catch (error) {
+    console.error("Error creating etat des lieux:", error);
+    res.status(500).send("Error creating etat des lieux"); // Send a 500 status code and an error message when an error occurs
+  }
+});
+
+
+router.get('/EtatDesLieux', async (req, res) => {
+  const { user } = req.session;
+  try {
+    const results = await sequelize.query(`
+      SELECT e.*, b.nomBien, r.dateDebut, r.dateFin
+      FROM etatDesLieux e
+      JOIN reservation r ON e.id_Reservation = r.id
+      JOIN bienImo b ON e.id_BienImmobilier = b.id
+      WHERE e.id_Bailleur = ${user.id}
+    `);
+
+    res.json(results[0]);
+  } catch (error) {
+    console.error('Error fetching etat des lieux:', error);
+    res.status(500).json({ error: 'An error occurred while fetching etat des lieux' });
+  }
+});
+
+router.put('/updateEtatDesLieux', async (req, res) => {
+  const { id } = req.body;
+  const { status } = req.body;
+  console.log('Changing etat des lieux status:', id, status);
+  try {
+    await sequelize.query(
+      `UPDATE etatDesLieux SET status = ? WHERE id = ?`,
+      {
+        replacements: [status, id],
+        type: sequelize.QueryTypes.UPDATE
+      }
+    );
+    res.sendStatus(200);
+  } catch (error) {
+    console.error('Error changing etat des lieux:', error);
+    res.status(500).json({ error: 'An error occurred while changing etat des lieux' });
+  }
+});
+
 // GESTION DES PAIEMENTS
 
 router.get("/paiement", async (req, res) => {
@@ -1230,20 +1400,20 @@ router.put("/paiement/:id/validate", async (req, res) => {
   }
 });
 
-// router.put("/paiement/:id/pending", async (req, res) => {
-//   const { id } = req.params;
+router.put("/paiement/:id/pending", async (req, res) => {
+  const { id } = req.params;
 
-//   console.log("Pending paiement:", id);
+  console.log("Pending paiement:", id);
 
-//   try {
-//     await sequelize.query(`UPDATE paiement SET statut = 'En attente' WHERE id = ${id}`);
-//     res.send("Paiement pending");
-//   }
-//   catch (error) {
-//     console.error("Error pending paiement:", error);
-//     res.status(500).send("Failed to pending paiement");
-//   }
-// });
+  try {
+    await sequelize.query(`UPDATE paiement SET statut = 'En attente' WHERE id = ${id}`);
+    res.send("Paiement pending");
+  }
+  catch (error) {
+    console.error("Error pending paiement:", error);
+    res.status(500).send("Failed to pending paiement");
+  }
+});
 
 router.post("/paiement", async (req, res) => {
   console.log("Creating paiement:", req.body);

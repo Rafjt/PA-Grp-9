@@ -13,7 +13,6 @@ const ReserverBien = () => {
     const price = Number(sessionStorage.getItem('price'));
     console.log(pId);
 
-
     const arriveeString = arrivee.toLocaleDateString();
     const departString = depart.toLocaleDateString();
     const arriveeDate = new Date(arrivee);
@@ -73,7 +72,13 @@ const ReserverBien = () => {
             <div className="ResaContainer">
                 {fetchedData && (
                     <>
-                        <img className="imgResa" src={`${BACK_URL}/uploads/${fetchedData.cheminImg}`} alt={fetchedData.nomBien} />
+                        {fetchedData && fetchedData.images && 
+                            <img
+                                className="gallery-item-Update"
+                                src={`${BACK_URL}/${fetchedData.images[0]}`}
+                                alt={`${fetchedData.nomBien}-0`}
+                            />
+                        }
                         <p>{fetchedData.typeDePropriete}, {fetchedData.nomBien}</p>
                         <p>Arrivee: {arriveeString}</p>
                         <p>Depart: {departString}</p>

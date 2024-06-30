@@ -1,5 +1,5 @@
 // Define functions for backend calls
-export const BACK_URL = process.env.PCS_URL;
+export const BACK_URL = process.env.REACT_APP_PCS_URL;
 export const BASE_URL = `${BACK_URL}/api`;
 export const URL_USERS = `${BASE_URL}/users`;
 export const URL_ANNONCE = `${BASE_URL}/bienImo`;
@@ -422,6 +422,19 @@ export const fetchBienDispo = async (defaultFilters) => {
   }
 };
 
+
+export const fetchBienReserve = async () => {
+  try {
+    const response = await fetch(`${BASE_URL}/getBienReserve`, {
+      credentials: "include",
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 // GESTION DES PAIEMENTS
 
 export const fetchPaiement = async () => {
@@ -600,6 +613,66 @@ export const createReservation = async (reservationData) => {
     console.log(error);
   }
 };
+
+
+export const fetchEtatDesLieux = async () => {
+  try {
+    const response = await fetch(`${BASE_URL}/EtatDesLieux`, {
+      credentials: "include",
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export const createEtatDesLieux = async (etatDesLieuxData) => {
+  try {
+    const response = await fetch(`${BASE_URL}/createEtatDesLieux`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(etatDesLieuxData),
+      credentials: "include", 
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.message || 'Error creating etat des lieux');
+    }
+
+    return response;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
+export const UpdateEtatDesLieux = async (etatDesLieuxData) => {
+  console.log("UpdateEtatDesLieux avec :", etatDesLieuxData);
+  try {
+    const response = await fetch(`${BASE_URL}/updateEtatDesLieux`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(etatDesLieuxData),
+      credentials: "include", 
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.message || 'Error updating etat des lieux');
+    }
+
+    return response;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
 
 // GESTION DES PRESTATIONS
 

@@ -18,3 +18,18 @@
   transform: translate(-50%, -50%);
   z-index: 1000; 
  }
+
+
+
+ /* Add these styles to your CSS file or style block */
+.card-status-en-attente {
+  border: 1px solid #ced4da; /* Example of basic color */
+}
+
+.card-status-valide {
+  border: 1px solid #007bff; /* Blue touches */
+}
+
+.card-status-conteste {
+  border: 1px solid #dc3545; /* Red touches */
+}

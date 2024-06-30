@@ -9,11 +9,8 @@ const sequelize = require('./database');
 const router = require('./routes/myroutes');
 const auth = require('./routes/auth');
 const abonnement = require('./routes/abonnementRoute');
-const allowedOrigins = [
-  'http://localhost:3000',
-  'http://localhost:8080',
-  process.env.PCS_URL
-];
+require('dotenv').config();
+const allowedOrigins = process.env.PCS_URL;
 
 const port = 3001;
 
