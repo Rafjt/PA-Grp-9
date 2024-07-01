@@ -12,7 +12,7 @@ const { Console } = require("console");
 router.use("/mail", mailRoute);
 const { STRIPE_PUBLIC_KEY, STRIPE_SECRET_KEY } = require('../credsStripe.js');
 const stripe = require('stripe')(STRIPE_SECRET_KEY);
-const URL = process.env.PCS_URL;
+const URL = `http://localhost:3000`;
 
 // stripe.products.list(
 //   { limit: 10 },

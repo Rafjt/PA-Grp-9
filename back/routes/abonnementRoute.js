@@ -5,7 +5,7 @@ const stripe = require('stripe')(STRIPE_SECRET_KEY);
 const bodyParser = require('body-parser');
 const nodemailer = require("nodemailer");
 const sequelize = require("../database"); // Ensure you import your database instance
-const URL = process.env.PCS_URL;
+const URL = 'http://localhost:3000';
 
 async function sendEmail(email, nom, prenom) {
     // Create a transporter using SMTP
