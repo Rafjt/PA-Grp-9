@@ -17,6 +17,9 @@ const backOffice = () => {
     const toStats = () => {
         window.location.replace('./statistiques');
     }
+    const toPresta = () => {
+        window.location.replace('./gestionPrestataire');
+    }
 
     return (
         <div className="backoffice">
@@ -27,6 +30,7 @@ const backOffice = () => {
             <div className="buttons">
                 <button onClick={toAnnonce}>Gestion des Annonces</button>
                 <button onClick={toUser}>Gestion des Utilisateurs</button>
+                <button onClick={toPresta}>Gestion et validations Prestataires</button>
                 <button onClick={toRes}>Gestion des Réservations</button>
                 <button onClick={toPaiement}>Gestion des Paiements</button>
                 <button onClick={toStats}>Statistiques et rapports</button>

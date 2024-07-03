@@ -311,6 +311,17 @@ router.get("/users/infos", async (req, res) => {
   }
 });
 
+router.get("/users/nonValide", async (req, res) => {
+  try {
+    const [nonValide] = await sequelize.query("SELECT * FROM prestataires WHERE valide = 0");
+    res.json(nonValide);
+  } catch (error) {
+    console.error("Error fetching nonValide:", error);
+    res.status(500).json({ error: "Failed to fetch nonValide" });
+  }
+}
+);
+
 router.get("/users/verifyValidationPresta", async (req, res) => {
   const { user } = req.session;
   let prestataire;
@@ -329,6 +340,7 @@ router.get("/users/verifyValidationPresta", async (req, res) => {
   }
 });
 
+
 router.put("/users/:id/:type/:valide", async (req, res) => {
   const { id, type, valide } = req.params;
   try {
@@ -341,6 +353,18 @@ router.put("/users/:id/:type/:valide", async (req, res) => {
     res.status(500).send("Error updating user status");
   }
 });
+
+router.get("/Domaines", async (req, res) => {
+  const { user } = req.session;
+  try {
+    const [domaines] = await sequelize.query(`SELECT domaine FROM prestataires WHERE valide = 1 and id = ${user.id} ;`);
+    res.json(domaines);
+  } catch (error) {
+    console.error("Error fetching domaines:", error);
+    res.status(500).json({ error: "Failed to fetch domaines" });
+  }
+});
+
 
 // GESTION DES BIENS/ANNONCES
 
@@ -1718,6 +1742,18 @@ router.post('/createPrestation', async (req, res) => {
 });
 
 router.get('/prestationsEnAttente', async (req, res) => {
+  const { user } = req.session;
+  let domaine;
+
+  try {
+    [domaine] = await sequelize.query(`SELECT Domaine FROM prestataires WHERE id = ${user.id}`); 
+  }
+  catch (error) {
+    console.error('Error fetching prestation:', error);
+    res.status(500).send('An error occurred while fetching the data.');
+    return; // Return to stop execution if an error occurred
+  }
+
   try {
     const today = new Date();
     today.setUTCHours(0, 0, 0, 0); // Set the time to 00:00:00 UTC
@@ -1726,7 +1762,7 @@ router.get('/prestationsEnAttente', async (req, res) => {
       SELECT * 
       FROM prestation 
       WHERE statut = 'EN ATTENTE' 
-      AND date >= '${today.toISOString().split('T')[0]}' 
+      AND date >= '${today.toISOString().split('T')[0]}' AND typeIntervention = '${domaine[0].Domaine}'
     `);
 
     res.send(prestations);
@@ -2239,3 +2275,113 @@ router.post('/signalement', async (req, res) => {
         return res.status(500).send('Error creating signalement');
     }
 });
+
+router.post('/demandeDomaine', upload.single('file'), async (req, res) => {
+  console.log('req.body:', req.body);
+  console.log('req.file:', req.file);
+
+  const { user } = req.session;
+  const { domaine } = req.body;
+  const ID_Prestataire = user.id;
+  const cheminDoc = req.file ? req.file.path : null;
+
+  try {
+    if (!ID_Prestataire || !domaine) {
+      throw new Error('Missing required fields: ID_Prestataire or domaine');
+    }
+
+    const [result] = await sequelize.query(
+      `INSERT INTO demandeDomaine (ID_Prestataire, domaine, cheminDoc) VALUES (?, ?, ?)`,
+      {
+        replacements: [ID_Prestataire, domaine, cheminDoc],
+        type: sequelize.QueryTypes.INSERT
+      }
+    );
+
+    res.status(200).json({ message: 'Demande created successfully', demandeDomaineId: result });
+  } catch (error) {
+    console.error('Error creating demande:', error.message);
+    res.status(500).json({ message: 'Error creating demande', error: error.message });
+  }
+});
+
+router.get('/demandeDomaine', async (req, res) => {
+  try {
+    const [demandes] = await sequelize.query('SELECT * FROM demandeDomaine');
+    res.json(demandes);
+  } catch (error) {
+    console.error('Error fetching demandes:', error);
+    res.status(500).json({ error: 'Failed to fetch demandes' });
+  }
+}
+);
+
+
+router.post('/handleDemandeDomaine', async (req, res) => {
+  const { id, statut } = req.body;
+  console.log('Handling demandeDomaine:', req.body);
+
+  try {
+      // Fetch the demandeDomaine from the database
+      const demandeDomaineResult = await sequelize.query(
+          `SELECT * FROM demandeDomaine WHERE ID = ${id}`,
+          { type: sequelize.QueryTypes.SELECT }
+      );
+
+      if (demandeDomaineResult.length === 0) {
+          return res.status(404).send("Demande not found");
+      }
+
+      const demandeDomaine = demandeDomaineResult[0];
+      const { ID_Prestataire, domaine } = demandeDomaine;
+
+      // If the statut is 'valider', assign the domaine to the prestataire
+      if (statut === 'valider') {
+          const prestataireResult = await sequelize.query(
+              `SELECT * FROM prestataires WHERE id = ${ID_Prestataire}`,
+              { type: sequelize.QueryTypes.SELECT }
+          );
+
+          if (prestataireResult.length === 0) {
+              return res.status(404).send("Prestataire not found");
+          }
+
+          const prestataire = prestataireResult[0];
+          let updatedDomaines = [];
+
+          // Check if the domaine is already a valid JSON array
+          if (prestataire.domaine) {
+              try {
+                  updatedDomaines = JSON.parse(prestataire.domaine);
+                  if (!Array.isArray(updatedDomaines)) {
+                      updatedDomaines = [];
+                  }
+              } catch (error) {
+                  updatedDomaines = [];
+              }
+          }
+
+          // Add the new domaine to the list if it's not already present
+          if (!updatedDomaines.includes(domaine)) {
+              updatedDomaines.push(domaine);
+          }
+
+          await sequelize.query(
+              `UPDATE prestataires SET domaine = '${JSON.stringify(updatedDomaines)}' WHERE id = ${ID_Prestataire}`
+          );
+      }
+
+      // Delete the demandeDomaine
+      await sequelize.query(
+          `DELETE FROM demandeDomaine WHERE ID = ${id}`
+      );
+
+      res.send("Demande handled successfully");
+  } catch (error) {
+      console.error("Error handling demandeDomaine:", error);
+      res.status(500).send("Error handling demandeDomaine");
+  }
+});
+
+
+
