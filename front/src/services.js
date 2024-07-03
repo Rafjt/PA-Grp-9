@@ -8,7 +8,7 @@ export const URL_ENVOI_MAIL = `${BASE_URL}/mail`;
 export const URL_ABONNEMENT = `${BACK_URL}/abonnement`;
 export const URL_RESERVATION = `${BASE_URL}/reservation`;
 export const URL_AUTH = `${BACK_URL}/auth`;
-// proutcacchoiassemerde
+
 export const fetchUsers = async () => {
   try {
     const response = await fetch(URL_USERS);
@@ -44,6 +44,19 @@ export const fetchPrestataires = async () => {
     const response = await fetch(`${URL_USERS}/prestataires`);
     const data = await response.json();
     return data;
+    console.log("domaines:",data);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const fetchDomaines = async () => {
+  try {
+    const response = await fetch(`${BASE_URL}/Domaines`, {
+      credentials: 'include',
+    });
+    const data = await response.json();
+    return data;
   } catch (error) {
     console.log(error);
   }
@@ -58,6 +71,18 @@ export const fetchUserById = async (userId, userType) => {
     console.log(error);
   }
 };
+
+
+export const fetchNonValidatedPrestataires = async () => {
+  try {
+    const response = await fetch(`${URL_USERS}/nonValide`);
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 
 export const validatePrestataire = async (userId) => {
   try {
@@ -1070,3 +1095,38 @@ export const createSignalements = async (sujet) => {
     console.log(error);
   }
 }
+
+// GESTION DES DOMAINES DE PRESTATION
+
+export const createDemandeCertification = async (formData) => {
+  try {
+    const response = await fetch(`${BASE_URL}/demandeDomaine`, {
+      method: 'POST',
+      body: formData,
+      credentials: 'include',
+    });
+    if (response.ok) {
+      const data = await response.json();
+      return data;
+    } else {
+      throw new Error('Failed to create certification request');
+    }
+  } catch (error) {
+    console.error('Error creating certification request:', error);
+    throw error;
+  }
+}
+
+export const fetchDemandesCertification = async () => {
+  try {
+    const response = await fetch(`${BASE_URL}/demandeDomaine`, {
+      credentials: 'include',
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching certification requests:', error);
+    throw error;
+  }
+}
+

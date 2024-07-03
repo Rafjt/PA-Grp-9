@@ -57,6 +57,10 @@ function EspacePrestataire() {
         window.location.replace("/mesDocuments");
       }
 
+    const toMesDomaines = () => {
+        window.location.href = "/mesDomaines";
+    }
+
     return (
         <div>
             <img
@@ -70,7 +74,7 @@ function EspacePrestataire() {
                 <button className="grid-button" onClick={toMesPerformances}>MES PERFORMANCES</button>
                 <button className="grid-button" onClick={toMesDoc}>MES DOCUMENTS ADMINISTRATIF ET PAIEMENTS</button>
                 <button className="grid-button" onClick={toMePlacer}>ME PLACER SUR UNE PRESTATIONS</button>
-                <button className="grid-button">MES SECTEURS D'ACTIVITÉ</button>
+                <button className="grid-button" onClick={toMesDomaines}>MES SECTEURS D'ACTIVITÉ</button>
                 <button className="grid-button" onClick={toMyPrestations}>MES PRESTATIONS</button>
                 <button className="grid-button" onClick={toReport}>SIGNALER UN PROBLÈME</button>
             </div>

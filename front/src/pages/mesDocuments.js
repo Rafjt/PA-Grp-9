@@ -19,6 +19,7 @@ function MesDocuments() {
 
     const handleDownload = (finance) => {
         const url = `${BASE_URL}/download/${finance.nomDocument}`;
+        console.log(url);
     
         fetch(url)
             .then(response => {

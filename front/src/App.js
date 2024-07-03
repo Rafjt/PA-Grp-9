@@ -49,6 +49,8 @@ import MesDocuments from "./pages/mesDocuments.js";
 import PaiementAbonnement from "./pages/paiementAbonnement.js";
 import Report from "./pages/report.js";
 import EtatDesLieux from "./pages/etatDesLieux.js";
+import MesDomaines from "./pages/mesDomaines.js";
+import GestionPrestataire from "./pages/gestionPrestataire.js";
 // import { use } from "../../back/routes/auth.js";
 
 function ProtectedRoute({ component: Component }) {
@@ -177,6 +179,7 @@ function App() {
           <Route path="/MePlacer" element={<ProtectedAuthRoute path="/MePlacer" component={TakePrestation} authType="prestataires" />} />
           <Route path="/myPrestations" element={<ProtectedAuthRoute path="/myPrestations" component={MyPrestations} authType="prestataires" />} />
           <Route path="/perfPresta" element={<ProtectedAuthRoute path="/perfPresta" component={PerfPresta} authType="prestataires" />} />
+          <Route path="/mesDomaines" element={<ProtectedAuthRoute path="/mesDomaines" component={MesDomaines} authType="prestataires" />} />
           {/* Routes admin */}
           <Route path="/backOffice" element={<ProtectedRoute component={BackOffice} />} />
           <Route path="/update/:id/:type" element={<ProtectedRoute component={Update} />} />
@@ -187,6 +190,7 @@ function App() {
           <Route path="/statistiques" element={<ProtectedRoute component={Statistiques} />} />
           <Route path="/gestionPaiement" element={<ProtectedRoute component={GestionPaiement} />} />
           <Route path="/update/:id/bien" element={<ProtectedRoute component={UpdateAnnonce} />} />
+          <Route path="/gestionPrestataire" element={<ProtectedRoute component={GestionPrestataire} />} />
           {/* Route erreur 404 */}
           <Route path="*" element={<NotFound />} />
         </Routes>
