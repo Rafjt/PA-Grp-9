@@ -13,8 +13,9 @@ const PageBien = () => {
   const [filtres, setFiltres] = useState({
     ville: "",
     arrivee: new Date().toISOString().split("T")[0],
-    depart: new Date().toISOString().split("T")[0],
+    depart: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split("T")[0],
   });
+  const [showAlert, setShowAlert] = useState(false);
 
   useEffect(() => {
     fetchUsers().then((response) => {
@@ -26,7 +27,7 @@ const PageBien = () => {
       id: "",
       ville: "",
       arrivee: new Date().toISOString().split("T")[0],
-      depart: new Date().toISOString().split("T")[0],
+      depart: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split("T")[0],
       typeDePropriete: "",
       nombreChambres: "",
       nombreLits: "",
@@ -67,20 +68,40 @@ const PageBien = () => {
   };
 
   const handleInputChange = (event) => {
-    const value =
-      event.target.type === "checkbox"
-        ? event.target.checked
-          ? 1
-          : 0
-        : event.target.value;
-    setFiltres({
-      ...filtres,
-      [event.target.name]: value,
-    });
+    const { name, value, type, checked } = event.target;
+    let newValue = type === "checkbox" ? (checked ? 1 : 0) : value;
+
+    // Automatically set the departure date to the next day when the arrival date is changed
+    if (name === "arrivee") {
+      const arriveeDate = new Date(newValue);
+      const nextDay = new Date(arriveeDate.getTime() + 24 * 60 * 60 * 1000);
+      const formattedNextDay = nextDay.toISOString().split("T")[0];
+      setFiltres({
+        ...filtres,
+        arrivee: newValue,
+        depart: formattedNextDay,
+      });
+    } else {
+      setFiltres({
+        ...filtres,
+        [name]: newValue,
+      });
+    }
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    // Convert the dates to Date objects for comparison
+    const arriveeDate = new Date(filtres.arrivee);
+    const departDate = new Date(filtres.depart);
+
+    // Check if the depart date is earlier than the arrivee date
+    if (departDate < arriveeDate) {
+      setShowAlert(true);
+      return;
+    }
+
     console.log(filtres);
     const newData = await fetchBienDispo(filtres);
     setData(newData);
@@ -107,15 +128,25 @@ const PageBien = () => {
           min={new Date().toISOString().split("T")[0]}
           value={filtres.arrivee}
           onChange={handleInputChange}
+          onKeyPress={(e) => e.preventDefault()}
         />
         <input
           type="date"
           name="depart"
-          min={filtres.arrivee}
+          min={new Date(new Date(filtres.arrivee).getTime() + 1000 * 60 * 60 * 24).toISOString().split("T")[0]}
           value={filtres.depart}
           onChange={handleInputChange}
+          onKeyPress={(e) => e.preventDefault()}
         />
       </div>
+      {showAlert && (
+        <div className="alert alert-danger" role="alert">
+          La date de départ doit être postérieure à la date d'arrivée.
+          <button type="button" className="close" onClick={() => setShowAlert(false)}>
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      )}
       <form onSubmit={handleSubmit}>
         <div className="filters">
           <div className="filter-section">
