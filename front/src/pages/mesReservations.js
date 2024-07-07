@@ -13,6 +13,7 @@ const MesReservations = () => {
   const { t } = useTranslation();
   const [reservations, setReservations] = useState([]); // Initialize with an empty array
   const [showDetails, setShowDetails] = useState([]); // State to control showing details for each reservation
+  const [triggerEffect, setTriggerEffect] = useState(false);
 
   useEffect(() => {
     getCredentials()
@@ -38,7 +39,7 @@ const MesReservations = () => {
       .catch((error) => {
         console.error("Error fetching user data:", error);
       });
-  }, []);
+  }, [triggerEffect]);
 
   // Function to toggle showing details for a specific reservation
   const toggleDetails = (index) => {
@@ -56,6 +57,8 @@ const MesReservations = () => {
         prevReservations.filter((reservation) => reservation.id !== reservationId)
       );
       console.log(`Reservation ${reservationId} cancelled`);
+
+      setTriggerEffect(prev => !prev);
     } catch (error) {
       console.error(`Error cancelling reservation ${reservationId}:`, error);
     }
@@ -166,7 +169,7 @@ const MesReservations = () => {
                       {t("chatWithLandlord")}
                     </button>
                     <button
-                      onClick={() => handleCancel(reservation.id)}
+                      onClick={() => handleCancel(reservation.id_Reservation)}
                       className="btn btn-danger mt-2"
                     >
                       {t("cancelReservation")}
