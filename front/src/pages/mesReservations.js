@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import {
   fetchReservationByIdVoyageur,
   getCredentials,
+  deleteReservation,
   BACK_URL,
 } from "../services";
 import { Link } from "react-router-dom";
@@ -46,6 +47,18 @@ const MesReservations = () => {
       updatedDetails[index] = !updatedDetails[index]; // Toggle details for the clicked reservation
       return updatedDetails;
     });
+  };
+
+  const handleCancel = async (reservationId) => {
+    try {
+      await deleteReservation(reservationId);
+      setReservations((prevReservations) =>
+        prevReservations.filter((reservation) => reservation.id !== reservationId)
+      );
+      console.log(`Reservation ${reservationId} cancelled`);
+    } catch (error) {
+      console.error(`Error cancelling reservation ${reservationId}:`, error);
+    }
   };
 
   function formatDate(dateString) {
@@ -151,6 +164,12 @@ const MesReservations = () => {
                       onClick={goToDiscussion}
                     >
                       {t("chatWithLandlord")}
+                    </button>
+                    <button
+                      onClick={() => handleCancel(reservation.id)}
+                      className="btn btn-danger mt-2"
+                    >
+                      {t("cancelReservation")}
                     </button>
                   </div>
 

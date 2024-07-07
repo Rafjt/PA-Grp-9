@@ -36,3 +36,17 @@ button:hover {
 p {
     margin: 5px 0;
 }
+
+button.btn-danger {
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  
+  button.btn-danger:hover {
+    background-color: #c82333;
+  }

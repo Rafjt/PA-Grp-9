@@ -459,36 +459,57 @@ router.delete('/bienImo/:id', async (req, res) => {
     // Delete the images from the filesystem
     for (const imgPath of imagePaths) {
       const fullPath = path.join(__dirname, '..', imgPath);
-      fs.unlink(fullPath, (err) => {
-        if (err) {
-          console.error(`Error deleting image ${fullPath}:`, err);
-        } else {
-          console.log(`Deleted image ${fullPath}`);
-        }
-      });
+      try {
+        await fs.unlink(fullPath);
+        console.log(`Deleted image ${fullPath}`);
+      } catch (err) {
+        console.error(`Error deleting image ${fullPath}:`, err);
+      }
     }
 
-    // Delete entries from bienImoImages
+    // Level 2 tables
+    await sequelize.query(
+      `DELETE FROM contrat WHERE id_Reservation IN (SELECT id FROM reservation WHERE id_BienImmobilier = ${id})`
+    );
+    await sequelize.query(
+      `DELETE FROM contrat WHERE id_Prestation IN (SELECT id FROM prestation WHERE id_BienImmobilier = ${id})`
+    );
+    await sequelize.query(
+      `DELETE FROM etatDesLieux WHERE id_Reservation IN (SELECT id FROM reservation WHERE id_BienImmobilier = ${id})`
+    );
+    await sequelize.query(
+      `DELETE FROM evaluationPrestation WHERE id_Prestation IN (SELECT id FROM prestation WHERE id_BienImmobilier = ${id})`
+    );
+    await sequelize.query(
+      `DELETE FROM facture WHERE id_Reservation IN (SELECT id FROM reservation WHERE id_BienImmobilier = ${id})`
+    );
+    await sequelize.query(
+      `DELETE FROM paiement WHERE id_Reservation IN (SELECT id FROM reservation WHERE id_BienImmobilier = ${id})`
+    );
+
+    // Level 1 tables
     await sequelize.query(
       `DELETE FROM bienImoImages WHERE bienImoId = ${id}`
     );
-
-    console.log('Deleted bienImoImages entries for bien:', id);
-
-    // Delete entries from reservation
+    await sequelize.query(
+      `DELETE FROM etatDesLieux WHERE id_BienImmobilier = ${id}`
+    );
+    await sequelize.query(
+      `DELETE FROM evaluationPrestation WHERE id_BienImmobilier = ${id}`
+    );
+    await sequelize.query(
+      `DELETE FROM prestation WHERE id_BienImmobilier = ${id}`
+    );
     await sequelize.query(
       `DELETE FROM reservation WHERE id_BienImmobilier = ${id}`
     );
 
-    console.log('Deleted reservations for bien:', id);
-
-    // Delete the bienImo entry
+    // Finally, delete the bienImo record
     await sequelize.query(
       `DELETE FROM bienImo WHERE id = ${id}`
     );
 
-    console.log('Deleted bienImo entry for bien:', id);
-
+    console.log('Deleted bienImo and related entries for bien:', id);
     res.send("Bien deleted");
   } catch (error) {
     console.error('Error deleting bien:', error);
