@@ -1246,7 +1246,7 @@ router.get("/reservation/:idVoyageur/voyageur", async (req, res) => {
   const idVoyageur = req.params.idVoyageur;
   try {
     const results = await sequelize.query(`
-      SELECT r.*, bi.*, cb.nom as bailleurNom, cb.prenom as bailleurPrenom, cb.adresseMail as bailleurMail, i.imagePath
+      SELECT r.*, r.id AS Id_reservation, bi.*, cb.nom as bailleurNom, cb.prenom as bailleurPrenom, cb.adresseMail as bailleurMail, i.imagePath
       FROM reservation r
       JOIN bienImo bi ON r.id_BienImmobilier = bi.id 
       JOIN clientsBailleurs cb on bi.id_ClientBailleur = cb.id
@@ -1260,6 +1260,7 @@ router.get("/reservation/:idVoyageur/voyageur", async (req, res) => {
     for (const result of results[0]) {
       if (!currentReservation || currentReservation.id !== result.id) {
         currentReservation = {
+          id_Reservation: result.Id_reservation,
           id: result.id,
           ville: result.ville,
           adresse: result.adresse,
