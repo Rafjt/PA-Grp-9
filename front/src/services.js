@@ -431,6 +431,22 @@ export const fetchAnnonceByBailleur = async () => {
   }
 };
 
+export const fetchAnnonceByBailleurId = async (bailleurId) => {
+  try {
+    const response = await fetch(`${URL_ANNONCE}/bienByBailleurId`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id: bailleurId }),
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 export const fetchBienDispo = async (defaultFilters) => {
   try {
     const response = await fetch(`${BACK_URL}/api/bienDispo`, {
@@ -557,22 +573,27 @@ export const deleteReservation = async (reservationId) => {
   }
 };
 
-export const updateReservation = async (reservationId, reservationData) => {
+export const updateReservation = async (reservationData) => {
   try {
-    const response = await fetch(`${URL_RESERVATION}/${reservationId}`, {
+    const response = await fetch(`${BASE_URL}/reservation`, { // Assuming BACK_URL is already defined
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(reservationData),
     });
+
     const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to update reservation');
+    }
     return data;
   } catch (error) {
-    console.log(error);
-    console.log(`${URL_RESERVATION}/${reservationId}`);
+    console.error('Error updating reservation:', error);
+    throw error;
   }
 };
+
 
 export const fetchReservationByBailleur = async () => {
   console.log("Callin fetchReservationByBailleur");

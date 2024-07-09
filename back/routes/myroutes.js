@@ -977,6 +977,58 @@ router.get('/biens', async (req, res) => {
   res.send(biens);
 });
 
+router.post('/bienImo/bienByBailleurId', async (req, res) => {
+  const userId = req.body.id;
+  const results = await sequelize.query(`
+    SELECT b.*, i.imagePath
+    FROM bienImo b
+    LEFT JOIN bienImoImages i ON b.id = i.bienImoId
+    WHERE b.id_ClientBailleur = ${userId}
+  `);
+
+  const biens = [];
+  let currentBien = null;
+
+  for (const result of results[0]) {
+    if (!currentBien || currentBien.id !== result.id) {
+      currentBien = {
+        id: result.id,
+        ville: result.ville,
+        adresse: result.adresse,
+        id_ClientBailleur: result.id_ClientBailleur,
+        prix: result.prix,
+        nomBien: result.nomBien,
+        description: result.description,
+        statutValidation: result.statutValidation,
+        disponible: result.disponible,
+        typeDePropriete: result.typeDePropriete,
+        nombreChambres: result.nombreChambres,
+        nombreLits: result.nombreLits,
+        nombreSallesDeBain: result.nombreSallesDeBain,
+        wifi: result.wifi,
+        cuisine: result.cuisine,
+        balcon: result.balcon,
+        jardin: result.jardin,
+        parking: result.parking,
+        piscine: result.piscine,
+        jaccuzzi: result.jaccuzzi,
+        salleDeSport: result.salleDeSport,
+        climatisation: result.climatisation,
+        productId: result.productId,
+        images: []
+      };
+      biens.push(currentBien);
+    }
+
+    if (result.imagePath) {
+      currentBien.images.push(result.imagePath);
+    }
+  }
+
+  res.send(biens);
+});
+
+
 router.get('/getBienReserve', async (req, res) => {
   const { user } = req.session;
   const today = new Date().toISOString().split('T')[0]; // Get today's date in 'YYYY-MM-DD' format
@@ -1070,25 +1122,34 @@ router.get('/MyCalendar', async (req, res) => {
 router.get('/reservation', async (req, res) => {
   try {
     const results = await sequelize.query(`
-      SELECT r.*, bi.*, cb.nom as bailleurNom, cb.prenom as bailleurPrenom, cb.adresseMail as bailleurMail, i.imagePath
+      SELECT r.*, r.id AS resId, bi.*, cb.nom AS bailleurNom, cb.prenom AS bailleurPrenom, cb.adresseMail AS bailleurMail, 
+             v.nom AS voyageurNom, v.prenom AS voyageurPrenom, v.adresseMail AS voyageurMail, i.imagePath
       FROM reservation r
       JOIN bienImo bi ON r.id_BienImmobilier = bi.id 
-      JOIN clientsBailleurs cb on bi.id_ClientBailleur = cb.id
+      JOIN clientsBailleurs cb ON bi.id_ClientBailleur = cb.id
+      JOIN voyageurs v ON r.id_ClientVoyageur = v.id
       LEFT JOIN bienImoImages i ON bi.id = i.bienImoId
     `);
 
     const reservations = [];
-    let currentReservation = null;
+    const reservationMap = new Map();
 
     for (const result of results[0]) {
-      if (!currentReservation || currentReservation.id !== result.id) {
-        currentReservation = {
-          id: result.id,
+      if (!reservationMap.has(result.resId)) {
+        const newReservation = {
+          id: result.resId,
+          id_BienImmobilier: result.id_BienImmobilier,
+          id_ClientVoyageur: result.id_ClientVoyageur,
+          dateDebut: result.dateDebut,
+          dateFin: result.dateFin,
+          statut: result.statut,
+          nomBien: result.nomBien,
+          prix: result.prix,
+          cheminImg: result.cheminImg,
+          id_servicesupp: result.id_servicesupp,
           ville: result.ville,
           adresse: result.adresse,
           id_ClientBailleur: result.id_ClientBailleur,
-          prix: result.prix,
-          nomBien: result.nomBien,
           description: result.description,
           statutValidation: result.statutValidation,
           disponible: result.disponible,
@@ -1108,35 +1169,118 @@ router.get('/reservation', async (req, res) => {
           bailleurNom: result.bailleurNom,
           bailleurPrenom: result.bailleurPrenom,
           bailleurMail: result.bailleurMail,
+          voyageurNom: result.voyageurNom,
+          voyageurPrenom: result.voyageurPrenom,
+          voyageurMail: result.voyageurMail,
           images: []
         };
-        reservations.push(currentReservation);
+        reservationMap.set(result.resId, newReservation);
+        reservations.push(newReservation);
       }
 
       if (result.imagePath) {
-        currentReservation.images.push(result.imagePath);
+        reservationMap.get(result.resId).images.push(result.imagePath);
       }
     }
 
     console.log(reservations);
-    res.send(reservations); // Return the array of reservations
+    res.send(reservations);
   } catch (error) {
     console.error("Error fetching reservations:", error);
     res.status(500).send("Internal server error");
   }
 });
 
+
+router.get('/reservationFiltered', async (req, res) => {
+  try {
+    const results = await sequelize.query(`
+      SELECT r.*, r.id AS resId, bi.*, cb.nom AS bailleurNom, cb.prenom AS bailleurPrenom, cb.adresseMail AS bailleurMail, 
+             v.nom AS voyageurNom, v.prenom AS voyageurPrenom, v.adresseMail AS voyageurMail, i.imagePath
+      FROM reservation r
+      JOIN bienImo bi ON r.id_BienImmobilier = bi.id 
+      JOIN clientsBailleurs cb ON bi.id_ClientBailleur = cb.id
+      JOIN voyageurs v ON r.id_ClientVoyageur = v.id
+      LEFT JOIN bienImoImages i ON bi.id = i.bienImoId
+    `);
+
+    const reservations = [];
+    const reservationMap = new Map();
+
+    for (const result of results[0]) {
+      if (!reservationMap.has(result.resId)) {
+        const newReservation = {
+          id: result.resId,
+          id_BienImmobilier: result.id_BienImmobilier,
+          id_ClientVoyageur: result.id_ClientVoyageur,
+          dateDebut: result.dateDebut,
+          dateFin: result.dateFin,
+          statut: result.statut,
+          nomBien: result.nomBien,
+          prix: result.prix,
+          cheminImg: result.cheminImg,
+          id_servicesupp: result.id_servicesupp,
+          ville: result.ville,
+          adresse: result.adresse,
+          id_ClientBailleur: result.id_ClientBailleur,
+          description: result.description,
+          statutValidation: result.statutValidation,
+          disponible: result.disponible,
+          typeDePropriete: result.typeDePropriete,
+          nombreChambres: result.nombreChambres,
+          nombreLits: result.nombreLits,
+          nombreSallesDeBain: result.nombreSallesDeBain,
+          wifi: result.wifi,
+          cuisine: result.cuisine,
+          balcon: result.balcon,
+          jardin: result.jardin,
+          parking: result.parking,
+          piscine: result.piscine,
+          jaccuzzi: result.jaccuzzi,
+          salleDeSport: result.salleDeSport,
+          climatisation: result.climatisation,
+          bailleurNom: result.bailleurNom,
+          bailleurPrenom: result.bailleurPrenom,
+          bailleurMail: result.bailleurMail,
+          voyageurNom: result.voyageurNom,
+          voyageurPrenom: result.voyageurPrenom,
+          voyageurMail: result.voyageurMail,
+          images: []
+        };
+        reservationMap.set(result.resId, newReservation);
+        reservations.push(newReservation);
+      }
+
+      if (result.imagePath) {
+        reservationMap.get(result.resId).images.push(result.imagePath);
+      }
+    }
+
+    console.log(reservations);
+    res.send(reservations);
+  } catch (error) {
+    console.error("Error fetching reservations:", error);
+    res.status(500).send("Internal server error");
+  }
+});
+
+
 router.delete('/reservation/:id', async (req, res) => {
   const { id } = req.params;
 
-  console.log('trying to delete bien:', id);
+  console.log('trying to delete reservation:', id);
 
   try {
+    // Delete the associated payment
+    await sequelize.query(`DELETE FROM paiement WHERE id_Reservation = ${id}`);
+
+    // Delete the reservation
     await sequelize.query(`DELETE FROM reservation WHERE id = ${id}`);
-    res.send('Reservation deleted');
+
+    res.send('Reservation and associated payment deleted');
   } catch (error) {
-    console.error('Error deleting reservation:', error);
-    res.status(500).send('Failed to delete reservation');
+    console.error('Error deleting reservation and associated payment:', error);
+    res.status(500).send('Failed to delete reservation and associated payment');
   }
 });
 
@@ -1217,28 +1361,50 @@ router.put("/reservation/:id", async (req, res) => {
 
 */
 
-router.put('/reservation/:id', async (req, res) => {
-  const { id } = req.params;
-  const { dateDebut, dateFin } = req.body;
+router.put('/reservation', async (req, res) => {
+    const { id, dateDebut, dateFin } = req.body;
 
-  try {
-    await sequelize.query(`
-          UPDATE reservation SET
-          dateDebut = ${dateDebut},
-          dateFin = ${dateFin}
-          WHERE id = ${id}
-      `, {
-      replacements: {
-        id,
-        dateDebut,
-        dateFin,
-      }
-    });
-    res.json({ success: true, message: 'Reservation updated successfully' });
-  } catch (error) {
-    console.error('Failed to update reservation', error);
-    res.status(500).json({ success: false, message: 'Internal server error' });
-  }
+    const dateDebutFormatted = new Date(dateDebut).toISOString().substring(0, 10);
+    const dateFinFormatted = new Date(dateFin).toISOString().substring(0, 10);
+
+    try {
+        // Get the id_BienImmobilier for the reservation being updated
+        const [[{ id_BienImmobilier }]] = await sequelize.query(`SELECT id_BienImmobilier FROM reservation WHERE id = ${id}`);
+
+        // Check if there are any overlapping reservations
+        const [overlappingReservations] = await sequelize.query(`
+            SELECT * FROM reservation
+            WHERE id_BienImmobilier = ${id_BienImmobilier}
+            AND id <> ${id}
+            AND (
+                (dateDebut <= '${dateDebutFormatted}' AND dateFin >= '${dateDebutFormatted}')
+                OR (dateDebut <= '${dateFinFormatted}' AND dateFin >= '${dateFinFormatted}')
+                OR (dateDebut >= '${dateDebutFormatted}' AND dateFin <= '${dateFinFormatted}')
+            )
+        `);
+
+        if (overlappingReservations.length > 0) {
+            return res.status(400).json({ success: false, message: 'There is already a reservation for that time period' });
+        }
+
+        await sequelize.query(`
+            UPDATE reservation SET
+            dateDebut = '${dateDebutFormatted}',
+            dateFin = '${dateFinFormatted}'
+            WHERE id = ${id}
+        `, {
+            replacements: {
+                id,
+                dateDebut: dateDebutFormatted,
+                dateFin: dateFinFormatted,
+            }
+        });
+
+        res.json({ success: true, message: 'Reservation updated successfully' });
+    } catch (error) {
+        console.error('Failed to update reservation', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
 });
 
 router.get("/reservation/:idVoyageur/voyageur", async (req, res) => {
@@ -1810,6 +1976,18 @@ router.put('/acceptPrestation/:prestationId', async (req, res) => {
   } catch (error) {
     console.error('Error accepting prestation:', error);
     res.status(500).send('Failed to accept prestation');
+  }
+});
+
+router.put('/updatePrestation', async (req, res) => {
+  const { id, statut } = req.body;
+
+  try {
+    await sequelize.query(`UPDATE prestation SET statut = '${statut}' WHERE id = ${id}`);
+    res.send('Prestation updated');
+  } catch (error) {
+    console.error('Error updating prestation:', error);
+    res.status(500).send('Failed to update prestation');
   }
 });
 
