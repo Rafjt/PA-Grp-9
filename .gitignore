@@ -4,7 +4,6 @@ dist
 # /back/uploads/*
 *.log
 .env
-App_ticketing/
 myenv/
 ssl/
 build/
