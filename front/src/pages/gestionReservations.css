@@ -1,4 +1,4 @@
-.equipments {
+/* .equipments {
     margin: 30px;
     background-color: black;
     color: white;
@@ -32,4 +32,50 @@
     font-size: 16px;   
     font-weight: bold; 
     margin-top: 20px;  
+} */
+
+.gestionReservations {
+    padding: 2rem;
+    background-color: #f9f9f9;
+}
+
+.greet {
+    margin-bottom: 2rem;
+}
+
+.reservationCreate {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.reservationDetails {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.errorMessage {
+    margin-top: 1rem;
+}
+
+.equipments {
+    margin-top: 1rem;
+}
+
+.equipments ul {
+    list-style: none;
+    padding: 0;
+}
+
+.equipments li {
+    margin-bottom: 0.5rem;
+}
+
+.photoDuBien {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
 }
