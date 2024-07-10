@@ -25,7 +25,7 @@
   "modifInfo": "Modifier mes informations",
   "suppCompte": "Supprimer mon compte",
   "consulterOffre": "Consulter les offres d'abonnements",
-  "gererAbo": "Gérer mon abonnement",
+  "gererAbo": "Résilier mon abonnement",
   "logout": "Se déconnecter",
   "Nom": "Nom",
   "Prénom": "Prénom",
@@ -169,5 +169,6 @@
   "soutienAdministratif": "Soutien administratif",
   "demenagement": "Déménagement",
   "chauffeur": "Chauffeur",
-  "securite": "Sécurité"
+  "securite": "Sécurité",
+  "confirmAbonnementCancellation": "Cette action est irreversible, êtes vous sûrs de vouloir supprimer votre abonnement ?"
 }

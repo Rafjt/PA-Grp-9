@@ -25,7 +25,7 @@
   "modifInfo": "Modify my informations",
   "suppCompte": "Delete my account",
   "consulterOffre": "Display subscription offers",
-  "gererAbo": "Manage my subscription",
+  "gererAbo": "Cancel my subscription",
   "logout": "Logout",
   "Nom": "Last Name",
   "Prénom": "First Name",
@@ -169,5 +169,6 @@
   "soutienAdministratif": "Administrative support",
   "demenagement": "Moving",
   "chauffeur": "Driver",
-  "securite": "Security"
+  "securite": "Security",
+  "confirmAbonnementCancellation": "This action is irreversible, are you sure you want to cancel your subscription?"
 }
