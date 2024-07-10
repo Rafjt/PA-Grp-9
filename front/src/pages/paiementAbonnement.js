@@ -62,8 +62,7 @@ const PaiementAbonnement = () => {
     if (!user) {
       fetchData();
     }
-  }, [paymentSuccess, user, navigate, paymentCanceled]); // Added navigate to the dependency array
-
+  }, [paymentSuccess, user, navigate, paymentCanceled]);
   return (
     <div className="container mt-4">
       <div className="order-status shadow p-4 shadow mt-5">

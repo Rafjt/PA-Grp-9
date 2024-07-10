@@ -4,31 +4,29 @@ const sequelize = require("../database");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const router = express.Router();
-// const mailCodeRouter = express.Router();
 
-// Function to generate a random 6-digit number
 function generateRandomNumber() {
-  return Math.floor(100000 + Math.random() * 900000); // Generates a random number between 100000 and 999999
+  return Math.floor(100000 + Math.random() * 900000); 
 }
 
-// Function to send email
+
 async function sendEmail(email, randomNumber) {
-  // Create a transporter using SMTP
+
   let transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 465,
-    secure: true, // Use SSL
+    secure: true, 
     auth: {
       user: "pcsnoreply75@gmail.com",
       pass: "bzurcpscdivqgaik",
     },
   });
 
-  // Send mail with defined transport object
+ 
   let info = await transporter.sendMail({
-    from: '"Paris Caretaker Services" <pcsnoreply75@gmail.com>', // Sender address
-    to: email, // List of recipients
-    subject: "Code de Confirmation", // Subject line
+    from: '"Paris Caretaker Services" <pcsnoreply75@gmail.com>', 
+    to: email, 
+    subject: "Code de Confirmation", 
     html: `
     <div style="text-align: center;">
     <img src="cid:logopcsmail" alt="Image" style="max-width: 50%; height: auto; margin-bottom: 20px; margin-top: 50px;" />
@@ -43,7 +41,7 @@ async function sendEmail(email, randomNumber) {
         path: __dirname + "/logopcsmail.png",
         cid: "logopcsmail",
       },
-    ], // HTML body
+    ], 
   });
 
   console.log("Message sent: %s", info.messageId);
@@ -74,14 +72,11 @@ router.post("/sendCode", async (req, res) => {
       return res.status(403).send("User is banned");
     }
 
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(motDePasse, 10); // 10 is the number of salt rounds
+    const hashedPassword = await bcrypt.hash(motDePasse, 10); 
 
-    // Generate a random 6-digit number
     const randomNumber = generateRandomNumber();
     console.log(randomNumber);
 
-    // Create a temporary table with the random number as the table name
     await sequelize.query(
       `CREATE TABLE IF NOT EXISTS \`${randomNumber}\` (
         nom             VARCHAR(255) NULL,
@@ -95,7 +90,6 @@ router.post("/sendCode", async (req, res) => {
     );`
     );
 
-    // Insert the user data into the temporary table using parameterized query
     await sequelize.query(
       `INSERT INTO \`${randomNumber}\` (nom, prenom, adresseMail, motDePasse, admin, dateDeNaissance, type, code) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       {
@@ -103,14 +97,12 @@ router.post("/sendCode", async (req, res) => {
       }
     );
 
-    // Send email with the confirmation code
     await sendEmail(adresseMail, randomNumber);
 
-    // Schedule dropping of the temporary table after 10 minutes
     setTimeout(async () => {
       await sequelize.query(`DROP TABLE IF EXISTS \`${randomNumber}\``);
       console.log(`Temporary table ${randomNumber} dropped after 10 minutes`);
-    }, 10 * 60 * 1000); // 10 seconds in milliseconds
+    }, 10 * 60 * 1000); 
   } catch (error) {
     console.error("Error creating temp table", error);
     return res.status(500).send("Error creating temp table");

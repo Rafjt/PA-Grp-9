@@ -71,7 +71,6 @@ const PageBien = () => {
     const { name, value, type, checked } = event.target;
     let newValue = type === "checkbox" ? (checked ? 1 : 0) : value;
 
-    // Automatically set the departure date to the next day when the arrival date is changed
     if (name === "arrivee") {
       const arriveeDate = new Date(newValue);
       const nextDay = new Date(arriveeDate.getTime() + 24 * 60 * 60 * 1000);
@@ -92,11 +91,9 @@ const PageBien = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    // Convert the dates to Date objects for comparison
     const arriveeDate = new Date(filtres.arrivee);
     const departDate = new Date(filtres.depart);
 
-    // Check if the depart date is earlier than the arrivee date
     if (departDate < arriveeDate) {
       setShowAlert(true);
       return;

@@ -29,7 +29,7 @@ function Prestations() {
 
   const today = new Date();
   const dd = String(today.getDate()).padStart(2, "0");
-  const mm = String(today.getMonth() + 1).padStart(2, "0"); // January is 0!
+  const mm = String(today.getMonth() + 1).padStart(2, "0"); 
   const yyyy = today.getFullYear();
 
   const todayFormatted = yyyy + "-" + mm + "-" + dd;
@@ -47,7 +47,7 @@ function Prestations() {
       await archiverPresta(selectedPrestationId);
     }
     setShowPrompt(false);
-    fetchData(); // Call fetchData to refresh the data
+    fetchData(); 
   };
 
   const cancelDelete = () => {
@@ -127,7 +127,6 @@ function Prestations() {
         window.location.href = "/espaceVoyageur";
         break;
       default:
-        // Handle any other user types or redirect to a default location
         window.location.href = "/";
     }
   };
@@ -271,8 +270,8 @@ function Prestations() {
             validationSchema={validationSchema}
             onSubmit={async (values, { setSubmitting, resetForm }) => {
               await createPrestation(values);
-              fetchData(); // Call fetchData to refresh the data
-              resetForm(); // Reset the form fields
+              fetchData(); 
+              resetForm(); 
               setSubmitting(false);
             }}
           >

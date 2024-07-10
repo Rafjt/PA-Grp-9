@@ -90,7 +90,7 @@ const UpdateAnnonce = () => {
         [name]: value,
       });
     }
-    console.log(values); // Log the entire form
+    console.log(values); 
   }
   
 

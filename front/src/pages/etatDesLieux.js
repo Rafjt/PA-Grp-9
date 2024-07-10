@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { getCredentials, createEtatDesLieux, fetchBienReserve, fetchEtatDesLieux, UpdateEtatDesLieux } from "../services.js";
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
-// import "./EtatDesLieux.css"; // Assuming you've placed your CSS styles in EtatDesLieux.css
 
 function EtatDesLieux() {
     const [user, setUser] = useState(null);
@@ -18,7 +17,7 @@ function EtatDesLieux() {
         signatureBailleur: false,
         signatureLocataire: false,
         dateEtat: new Date().toISOString().split('T')[0],
-        status: "en attente"  // Set default status
+        status: "en attente" 
     });
     const [biens, setBiens] = useState([]);
 
@@ -47,7 +46,7 @@ function EtatDesLieux() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        setErrorMessage("");  // Clear any previous error message
+        setErrorMessage("");  
         createEtatDesLieux(form)
             .then(response => {
                 if (response.status === 200) {
@@ -57,7 +56,7 @@ function EtatDesLieux() {
                         setEtatDesLieuxData(data);
                         console.log('Updated Etat des lieux data:', data);
                     });
-                    // Reset form if needed
+
                     setForm({
                         typeEtat: "arrivee",
                         id_BienImmobilier: "",
@@ -68,7 +67,7 @@ function EtatDesLieux() {
                         signatureBailleur: false,
                         signatureLocataire: false,
                         dateEtat: new Date().toISOString().split('T')[0],
-                        status: "en attente"  // Reset status to default
+                        status: "en attente" 
                     });
                 } else {
                     throw new Error(`Server responded with status code ${response.status}`);

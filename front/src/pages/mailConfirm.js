@@ -17,11 +17,9 @@ const MailConfirm = () => {
       console.log(data);
       if (Object.keys(data).length === 0) {
         setSuccessMessage("Vous avez bien été inscrits");
-        // Delay the redirection by 3 seconds
         setTimeout(() => {
-          // Redirect to login page using window.location
           window.location.href = "/login";
-        }, 3000); // 3 seconds
+        }, 3000);
       }
     } catch (error) {
       if (error.message === "TableTempIntrouvable") {
@@ -47,8 +45,8 @@ const MailConfirm = () => {
           })}
           onSubmit={(values, { setSubmitting, resetForm }) => {
             handleCode(values.code);
-            setSubmitting(false); // Mark submitting as false after form submission
-            resetForm(); // Reset the form fields
+            setSubmitting(false); 
+            resetForm(); 
           }}
         >
           {({ isSubmitting }) => (

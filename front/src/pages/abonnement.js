@@ -51,7 +51,7 @@ const Abonnement = () => {
 
   const handleSelection = async (option) => {
     const typeAbonnement = `${selectedPlan}_${option}`;
-    const price = getPrice(typeAbonnement, option); // Use getPrice to determine the price
+    const price = getPrice(typeAbonnement, option); 
     console.log(`Selected ${option} plan for ${selectedPlan} with type: ${typeAbonnement}`);
     console.log(`Price for ${option} plan: ${price}`);
 

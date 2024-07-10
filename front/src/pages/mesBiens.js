@@ -25,7 +25,7 @@ const MesBiens = () => {
 
   const handleClick = (annonceId) => {
     sessionStorage.setItem("elementId", annonceId);
-    window.location.href = "/modifyBien"; // Navigate to the modify page
+    window.location.href = "/modifyBien"; 
   };
 
   const toggleDetails = (id) => {

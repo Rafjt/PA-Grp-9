@@ -11,13 +11,12 @@ const EventComponent = ({ event }) => (
         <strong>{event.title}</strong>
         <p>{event.statut}</p>
         <p>{event.prix}</p>
-        {/* Add more information as needed */}
     </div>
 );
 
 const MyCalendar = () => {
     const [events, setEvents] = useState([]);
-    const [selectedEvent, setSelectedEvent] = useState(null); // Add this line
+    const [selectedEvent, setSelectedEvent] = useState(null); 
 
     useEffect(() => {
         const fetchEvents = async () => {
@@ -47,12 +46,12 @@ const MyCalendar = () => {
                 events={events}
                 startAccessor="start"
                 endAccessor="end"
-                onSelectEvent={event => setSelectedEvent(event)} // Add this line
+                onSelectEvent={event => setSelectedEvent(event)}
                 components={{
                     event: EventComponent,
                 }}
             />
-            {selectedEvent && ( // Add this block
+            {selectedEvent && ( 
                 <div>
                     <strong>{selectedEvent.title}</strong>
                     <p>{selectedEvent.statut}</p>

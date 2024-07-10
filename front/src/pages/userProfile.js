@@ -39,7 +39,7 @@ const UserProfile = () => {
         const userData = await getCredentials();
         if (userData) {
           setUser(userData);
-          setUserType(userData.type); // Assuming `type` is available in user data
+          setUserType(userData.type); 
 
           if (userData.type === "voyageurs") {
             const { abonnements } = await checkAbonnement(userData.id);
@@ -63,7 +63,7 @@ const UserProfile = () => {
       case "prestataires":
         return "Prestataire";
       default:
-        return type; // Return the type as is if it doesn't match any specific rule
+        return type;
     }
   };
 
@@ -114,13 +114,12 @@ const UserProfile = () => {
 
   const handleEditMode = () => {
     if (!editMode) {
-      // Entering edit mode, save current user data to inputValues state
+
       setInputValues(user);
     }
     setEditMode(!editMode);
   };
 
-  // Separate state to hold input values
   const [inputValues, setInputValues] = useState({
     nom: "",
     prenom: "",
@@ -135,7 +134,6 @@ const UserProfile = () => {
     adresseMail: "",
   });
 
-  // Function to update input values
   const handleInputChange = (e, field) => {
     const newValue = e.target.value;
     setInputValues((prevInputValues) => ({
@@ -144,15 +142,15 @@ const UserProfile = () => {
     }));
   };
 
-  // Function to handle saving changes
+
   const handleSaveChanges = () => {
     validationSchema
       .validate(inputValues, { abortEarly: false })
       .then(() => {
-        // If validation succeeds, update user state with input values and disable edit mode
+
         setUser(inputValues);
         setEditMode(false);
-        // Clear validation errors
+
         setValidationErrors({
           nom: "",
           prenom: "",
@@ -160,13 +158,13 @@ const UserProfile = () => {
           adresseMail: "",
         });
 
-        // Call the updateUser service
+
         updateUser(user.id, user.type, inputValues)
           .then((userData) => {
             console.log("User updated:", userData);
             document.cookie =
               "connect.sid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-            // After updating the user, call the updateCookie service
+
             updateCookie(user.id, user.type, inputValues)
               .then((cookieData) => {
                 console.log("Cookie updated:", cookieData);
@@ -180,7 +178,7 @@ const UserProfile = () => {
           });
       })
       .catch((error) => {
-        // If validation fails, update the validation errors state
+
         const errors = {};
         error.inner.forEach((err) => {
           errors[err.path] = err.message;
@@ -189,10 +187,8 @@ const UserProfile = () => {
       });
   };
 
-  // Function to handle canceling edit mode
   const handleCancelEditMode = () => {
     setEditMode(false);
-    // Reset input values to current user state
     setInputValues(user);
     setValidationErrors({
       nom: "",
@@ -283,7 +279,6 @@ const UserProfile = () => {
         <p>
           {t("renouvellementDate")} {formatDate(abonnement.dateRenouvellement)}
         </p>
-        {/* Render other abonnement fields as needed */}
       </div>
     );
   };
@@ -339,34 +334,33 @@ const UserProfile = () => {
                 <div className="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
                   <h6 className="mb-2 text-primary">{t("compteDetail")}</h6>
                 </div>
-                {/* Render input fields with validation errors */}
                 {renderInputField(
                   t("Nom"),
                   user ? user.nom : "",
                   "nom",
                   (e) => handleInputChange(e, "nom"),
-                  validationErrors.nom // Pass the validation error for the field
+                  validationErrors.nom 
                 )}
                 {renderInputField(
                   t("Prénom"),
                   user ? user.prenom : "",
                   "prenom",
                   (e) => handleInputChange(e, "prenom"),
-                  validationErrors.prenom // Pass the validation error for the field
+                  validationErrors.prenom 
                 )}
                 {renderInputField(
                   "Email",
                   user ? user.adresseMail : "",
                   "adresseMail",
                   (e) => handleInputChange(e, "adresseMail"),
-                  validationErrors.adresseMail // Pass the validation error for the field
+                  validationErrors.adresseMail 
                 )}
                 {renderInputField(
                   t("Date de Naissance"),
                   user ? user.dateDeNaissance : "",
                   "dateNaissance",
                   (e) => handleInputChange(e, "dateDeNaissance"),
-                  validationErrors.dateDeNaissance // Pass the validation error for the field
+                  validationErrors.dateDeNaissance 
                 )}
               </div>
               <div className="row gutters"></div>

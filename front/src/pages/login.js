@@ -35,11 +35,11 @@ function Login() {
     } catch (error) {
       console.error(error);
       if (error.message === "Unauthorized") {
-        setErrorMessage(t("compteIntrouvable")); // Use translation for "Compte introuvable"
+        setErrorMessage(t("compteIntrouvable")); 
       } else if (error.message === "UserBanned") {
-        setErrorMessage(t("compteBanni")); // Use translation for "Votre compte est banni"
+        setErrorMessage(t("compteBanni")); 
       } else if (error.message === "WrongPWD") {
-        setErrorMessage(t("motDePasseErrone")); // Use translation for "Mot de passe erroné"
+        setErrorMessage(t("motDePasseErrone")); 
       }
     }
   };

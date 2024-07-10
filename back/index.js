@@ -42,13 +42,12 @@ app.use(session({
   secret: 'your-secret-key',
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false, sameSite: 'lax', httpOnly: false, maxAge: 60*60000 } // Set secure to true if you're using HTTPS
+  cookie: { secure: false, sameSite: 'lax', httpOnly: false, maxAge: 60*60000 } 
 }));
 
 app.use('/api', router);
 app.use('/auth', auth);
 app.use('/abonnement', abonnement);
-
 app.use('/uploads', express.static('uploads'));
 
 io.on('connection', (socket) => {

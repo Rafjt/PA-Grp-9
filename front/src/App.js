@@ -14,7 +14,6 @@ import Update from "./pages/update.js";
 import UpdateAnnonce from "./pages/updateAnnonce.js";
 import GestionAnnonce from "./pages/gestionAnnonce.js";
 import GestionReservations from "./pages/gestionReservations.js";
-import UpdateReservation from "./pages/updateReservation.js";
 import Statistiques from "./pages/statistiques.js";
 import PageBien from "./pages/pageBien.js";
 import MailConfirm from "./pages/mailConfirm.js";
@@ -51,7 +50,7 @@ import Report from "./pages/report.js";
 import EtatDesLieux from "./pages/etatDesLieux.js";
 import MesDomaines from "./pages/mesDomaines.js";
 import GestionPrestataire from "./pages/gestionPrestataire.js";
-// import { use } from "../../back/routes/auth.js";
+
 
 function ProtectedRoute({ component: Component }) {
   const [user, setUser] = useState(null);
@@ -66,7 +65,7 @@ function ProtectedRoute({ component: Component }) {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>; // Replace this with your loading indicator
+    return <div>Loading...</div>; 
   }
 
   const isAdmin = user && user.admin === 1;
@@ -91,7 +90,7 @@ function ProtectedAuthRoute({ component: Component, authType }) {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>; // Replace this with your loading indicator
+    return <div>Loading...</div>; 
   }
 
   let isAuthenticated = false;
@@ -113,7 +112,7 @@ function ProtectedAuthRoute({ component: Component, authType }) {
       case "bailleurEtVoyageurs":
         isAuthenticated = user.type === "voyageurs" || user.type === "clientsBailleurs";
         break;
-      case "all": // New case for "all" authentication type
+      case "all": 
         isAuthenticated = true;
         break;
       default:
@@ -185,7 +184,6 @@ function App() {
           <Route path="/update/:id/:type" element={<ProtectedRoute component={Update} />} />
           <Route path="/gestionUtilisateur" element={<ProtectedRoute component={GestionUtilisateur} />} />
           <Route path="/gestionReservations" element={<ProtectedRoute component={GestionReservations} />} />
-          <Route path="/update/:id/reservation" element={<ProtectedRoute component={UpdateReservation} />} />
           <Route path="/gestionAnnonce" element={<ProtectedRoute component={GestionAnnonce} />} />
           <Route path="/statistiques" element={<ProtectedRoute component={Statistiques} />} />
           <Route path="/gestionPaiement" element={<ProtectedRoute component={GestionPaiement} />} />

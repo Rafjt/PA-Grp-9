@@ -2,7 +2,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./signup.css";
 import { useState } from "react";
 import { useFormik } from "formik";
-import * as Yup from "yup"; // Import Yup for validation
+import * as Yup from "yup"; 
 import { createUser } from "../services";
 import { FadeLoader } from "react-spinners";
 import { useTranslation } from "react-i18next";
@@ -94,7 +94,7 @@ const Signup = () => {
         })
         .finally(() => {
           button.disabled = false;
-          setLoading(false); // Set loading to false after the request completes
+          setLoading(false);
         });
     },
   });
@@ -232,12 +232,12 @@ const Signup = () => {
           id="boutonload"
           className="btn btn-dark btn-lg mt-4 position-relative"
           type="submit"
-          disabled={loading} // Disable button when loading is true
+          disabled={loading} 
         >
           {loading ? (
             <FadeLoader color="#ffffff" size={20} className="spinner" />
           ) : (
-            t("creerCompte") // Translated button text
+            t("creerCompte")
           )}
         </button>
       </form>

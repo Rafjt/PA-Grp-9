@@ -24,7 +24,7 @@ router.post("/login", async (req, res) => {
       console.log("hashedPasswordFromDB", hashedPasswordFromDB);
       console.log("password", password);
 
-      const match = await bcrypt.compare(password, hashedPasswordFromDB); // Use bcrypt.compare()
+      const match = await bcrypt.compare(password, hashedPasswordFromDB);
 
       if (match) {
 
@@ -67,7 +67,6 @@ router.put("/updateCookie", async (req, res) => {
     console.log("updating the cookie");
   
     try {
-      // Update the session or cookie data with the new user data
       req.session.user = {
         id: userId,
         nom: userData.nom,
@@ -77,7 +76,6 @@ router.put("/updateCookie", async (req, res) => {
         admin: userData.admin,
         type: userType,
       };
-      // Respond with success message
       res.status(200).json({ message: "Cookie updated successfully" });
     } catch (error) {
       console.error("Error updating cookie:", error);

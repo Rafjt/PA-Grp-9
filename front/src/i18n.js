@@ -5,7 +5,6 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import en from './langues/en.json';
 import fr from './langues/fr.json';
 
-// Initialize i18next
 i18n
   .use(HttpApi)
   .use(LanguageDetector)

@@ -6,12 +6,11 @@ const PieChart = ({ counts }) => {
   const chartInstance = useRef(null);
 
   useEffect(() => {
-    // Destroy the previous chart instance if it exists
+
     if (chartInstance.current) {
       chartInstance.current.destroy();
     }
 
-    // Create a new chart instance
     const ctx = chartRef.current.getContext("2d");
     chartInstance.current = new Chart(ctx, {
       type: "pie",
@@ -35,7 +34,6 @@ const PieChart = ({ counts }) => {
       },
     });
 
-    // Clean up: Destroy the chart instance when the component unmounts or when the counts array changes
     return () => {
       if (chartInstance.current) {
         chartInstance.current.destroy();
