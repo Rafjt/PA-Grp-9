@@ -9,12 +9,14 @@ import {
 } from "../services";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const PerfPresta = () => {
   const [loading, setLoading] = useState(true);
   const [generalInfo, setGeneralInfo] = useState({});
   const [evaluations, setEvaluations] = useState([]);
   const [isValid, setIsValid] = useState(0);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -83,10 +85,10 @@ const PerfPresta = () => {
         }}
       >
         <h1 style={{ fontSize: "1.5em", margin: "0" }}>
-          Votre compte n'est pas encore validé.
+          {t("compteNonValide")}
         </h1>
         <h2 style={{ fontSize: "1.2em", margin: "0" }}>
-          Veuillez attendre que l'administrateur valide votre compte.
+          {t("attendreValidation")}
         </h2>
         <img
           src="/Lock.png"
@@ -99,97 +101,65 @@ const PerfPresta = () => {
 
   return (
     <>
-      <div
-        className="loader-overlay"
-        style={{ display: loading ? "block" : "none" }}
-      >
+      <div className="loader-overlay" style={{ display: loading ? "block" : "none" }}>
         <FadeLoader color="#2f3636" size={50} />
       </div>
       <div className="container mt-5">
-        <h1 className="mb-4">Performances et avis sur les prestations</h1>
-        <button
-          onClick={() => (window.location.href = "/espacePrestataire")}
-          className="back-button"
-        >
-          Retour
+        <h1 className="mb-4">{t('performancesTitle')}</h1>
+        <button onClick={() => (window.location.href = "/espacePrestataire")} className="back-button">
+          {t('back')}
         </button>
         {evaluations.length === 0 ? (
           <div className="no-evaluations">
-            <h2>Vous n'avez pas encore d'évaluation</h2>
-            <button
-              onClick={() => (window.location.href = "/espacePrestataire")}
-              className="back-button"
-            >
-              Retour
+            <h2>{t('noEvaluations')}</h2>
+            <button onClick={() => (window.location.href = "/espacePrestataire")} className="back-button">
+              {t('back')}
             </button>
-            <p>
-              Pour commencer à travailler, allez <a href="/MePlacer">ici</a>.
-            </p>
+            <p>{t('startWorking')} <a href="/MePlacer">{t('here')}</a>.</p>
           </div>
         ) : (
           <div className="row">
             <div className="col-md-4">
               <div className="rounded p-3 shadow mb-4">
-                <h3>Informations</h3>
+                <h3>{t('information')}</h3>
                 <ul className="list-unstyled">
-                  <li>
-                    <strong>Nom complet: </strong> {generalInfo.prestaPrenom}{" "}
-                    {generalInfo.prestaNom}
-                  </li>
-                  <li>
-                    <strong>Adresse Email: </strong> {generalInfo.adresseMail}
-                  </li>
-                  <li>
-                    <strong>Date de naissance: </strong>{" "}
-                    {formatDate(generalInfo.dateDeNaissance)}{" "}
-                  </li>
+                  <li><strong>{t('fullName')}: </strong> {generalInfo.prestaPrenom} {generalInfo.prestaNom}</li>
+                  <li><strong>{t('email')}: </strong> {generalInfo.adresseMail}</li>
+                  <li><strong>{t('dob')}: </strong> {formatDate(generalInfo.dateDeNaissance)}</li>
                 </ul>
               </div>
               <div className="rounded p-3 shadow">
-                <h3>Prestations réalisées</h3>
+                <h3>{t('completedServices')}</h3>
                 <ul className="list-unstyled">
-                  <li>
-                    <strong>Nombre de prestations: </strong>
-                    {generalInfo.nombrePresta}
-                  </li>
-                  <li>
-                    <strong>Note moyenne: </strong> {getTrimmedNoteMoy()}⭐
-                  </li>
+                  <li><strong>{t('numberOfServices')}: </strong>{generalInfo.nombrePresta}</li>
+                  <li><strong>{t('averageRating')}: </strong> {getTrimmedNoteMoy()}⭐</li>
                 </ul>
               </div>
             </div>
             <div className="col-md-8">
-              <div
-                className="rounded p-3 shadow"
-                style={{ minHeight: "500px", overflowX: "auto" }}
-              >
-                <h3>Évaluations</h3>
+              <div className="rounded p-3 shadow" style={{ minHeight: "500px", overflowX: "auto" }}>
+                <h3>{t('evaluations')}</h3>
                 <div className="table-responsive rounded shadow">
                   <table className="table table-bordered table-hover custom-table">
                     <thead>
                       <tr className="sticky-header">
-                        <th>Demandeur</th>
-                        <th>Nom</th>
-                        <th>Type d'intervention</th>
-                        <th className="narrow-column">Ville</th>
-                        <th className="narrow-column">Note</th>
-                        <th className="long-column">Commentaire</th>
+                        <th>{t('requester')}</th>
+                        <th>{t('name')}</th>
+                        <th>{t('interventionType')}</th>
+                        <th className="narrow-column">{t('city2')}</th>
+                        <th className="narrow-column">{t('rating')}</th>
+                        <th className="long-column">{t('comment')}</th>
                       </tr>
                     </thead>
                     <tbody>
                       {evaluations.map((evaluation, index) => (
                         <tr key={index}>
-                          <td>
-                            {evaluation.demandeurPrenom}{" "}
-                            {evaluation.demandeurNom}
-                          </td>
+                          <td>{evaluation.demandeurPrenom} {evaluation.demandeurNom}</td>
                           <td>{evaluation.nom}</td>
                           <td>{evaluation.typeIntervention}</td>
                           <td>{evaluation.ville}</td>
                           <td>{evaluation.note}⭐</td>
-                          <td className="long-column">
-                            {evaluation.commentaire}
-                          </td>
+                          <td className="long-column">{evaluation.commentaire}</td>
                         </tr>
                       ))}
                     </tbody>

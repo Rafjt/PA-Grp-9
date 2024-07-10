@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { fetchDomaines, createDemandeCertification } from "../services.js";
 import { Form, Row, Col, Button } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 
 function MesDomaines() {
+    const { t } = useTranslation();
     const [domaines, setDomaines] = useState([]);
     const [selectedFile, setSelectedFile] = useState(null);
     const [selectedDomaine, setSelectedDomaine] = useState('');
@@ -14,7 +16,6 @@ function MesDomaines() {
             console.log(data);
             setDomaines(data);
         });
-        // Retrieve and display submission status from localStorage
         const status = localStorage.getItem('submissionStatus');
         if (status) {
             setSubmissionStatus(status);
@@ -30,49 +31,26 @@ function MesDomaines() {
         const selectedValue = event.target.value;
         setSelectedDomaine(selectedValue);
 
-        let message = '';
-        switch (selectedValue) {
-            case 'Conciergerie':
-                message = 'Exemple de document requis: Attestation de formation en conciergerie.';
-                break;
-            case 'Entretien ménager':
-                message = 'Exemple de document requis: Certificat de formation en entretien ménager.';
-                break;
-            case 'Maintenance':
-                message = 'Exemple de document requis: Diplôme de maintenance ou expérience équivalente.';
-                break;
-            case 'Jardinage et entretien extérieur':
-                message = 'Exemple de document requis: Certificat en horticulture ou expérience prouvée.';
-                break;
-            case 'Livraison':
-                message = 'Exemple de document requis: Permis de conduire.';
-                break;
-            case 'Gestion des déchets':
-                message = 'Exemple de document requis: Certification en gestion des déchets.';
-                break;
-            case 'Soutien administratif':
-                message = 'Exemple de document requis: Diplôme en administration ou secrétariat.';
-                break;
-            case 'Déménagement':
-                message = 'Exemple de document requis: Expérience en déménagement.';
-                break;
-            case 'Chauffeur':
-                message = 'Exemple de document requis: Permis de conduire et historique de conduite.';
-                break;
-            case 'Sécurité':
-                message = 'Exemple de document requis: Certificat de formation en sécurité.';
-                break;
-            default:
-                message = '';
-                break;
-        }
-        setDocumentMessage(message);
+        const messages = {
+            'Conciergerie': t('conciergerieMessage'),
+            'Entretien ménager': t('entretienMessage'),
+            'Maintenance': t('maintenanceMessage'),
+            'Jardinage et entretien extérieur': t('jardinageMessage'),
+            'Livraison': t('livraisonMessage'),
+            'Gestion des déchets': t('dechetsMessage'),
+            'Soutien administratif': t('soutienMessage'),
+            'Déménagement': t('demenagementMessage'),
+            'Chauffeur': t('chauffeurMessage'),
+            'Sécurité': t('securiteMessage'),
+        };
+
+        setDocumentMessage(messages[selectedValue] || '');
     };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
         if (!selectedDomaine || !selectedFile) {
-            setSubmissionStatus('Veuillez remplir tous les champs.');
+            setSubmissionStatus(t('fillAllFields'));
             return;
         }
 
@@ -82,13 +60,13 @@ function MesDomaines() {
 
         try {
             await createDemandeCertification(formData);
-            localStorage.setItem('submissionStatus', 'Votre demande a été soumise avec succès.');
+            localStorage.setItem('submissionStatus', t('submissionSuccess'));
             setSelectedDomaine('');
             setSelectedFile(null);
             setDocumentMessage('');
         }
         catch (error) {
-            localStorage.setItem('submissionStatus', 'Une erreur s\'est produite lors de la soumission de votre demande.');
+            localStorage.setItem('submissionStatus', t('submissionError'));
         }
 
         window.location.reload();
@@ -96,48 +74,48 @@ function MesDomaines() {
 
     return (
         <div>
-            <h1>Mes Domaines</h1>
+            <h1>{t('mesDomaines')}</h1>
             <hr />
-            <h2>Votre domaine de certification</h2>
+            <h2>{t('domaineCertification')}</h2>
             {domaines.length === 0 ? (
-                <p>Vous n'êtes certifié dans aucun domaine, c'est le moment de devenir un prestataire certifié par PCS !</p>
+                <p>{t('noCertification')}</p>
             ) : (
-                <p>Vous êtes certifié dans le domaine suivant: {domaines.map((domaine, index) => (
-                    <strong><span key={index}>{domaine.domaine}</span></strong>
+                <p>{t('currentCertification')} {domaines.map((domaine, index) => (
+                    <strong key={index}>{domaine.domaine}</strong>
                 ))}</p>
             )}
-            <p>Notez que, une fois certifié dans un domaine, faire une nouvelle demande signifie changer de domaine. Vous ne pouvez pas exercer dans deux domaines à la fois.</p>
+            <p>{t('certificationNote')}</p>
             
             <Form onSubmit={handleSubmit}>
-                <h3>Demander à être certifié</h3>
+                <h3>{t('requestCertification')}</h3>
                 <Row className="mb-3">
                     <Form.Group as={Col} controlId="formDomaine">
-                        <Form.Label>Domaine</Form.Label>
+                        <Form.Label>{t('domaine')}</Form.Label>
                         <Form.Control as="select" value={selectedDomaine} onChange={handleSelectChange} required>
-                            <option value="">Sélectionnez</option>
-                            <option value="Conciergerie">Conciergerie</option>
-                            <option value="Entretien ménager">Entretien ménager</option>
-                            <option value="Maintenance">Maintenance</option>
-                            <option value="Jardinage et entretien extérieur">Jardinage et entretien extérieur</option>
-                            <option value="Livraison">Livraison</option>
-                            <option value="Gestion des déchets">Gestion des déchets</option>
-                            <option value="Soutien administratif">Soutien administratif</option>
-                            <option value="Déménagement">Déménagement</option>
-                            <option value="Chauffeur">Chauffeur</option>
-                            <option value="Sécurité">Sécurité</option>
+                            <option value="">{t('select')}</option>
+                            <option value="Conciergerie">{t('conciergerie')}</option>
+                            <option value="Entretien ménager">{t('entretien')}</option>
+                            <option value="Maintenance">{t('maintenance')}</option>
+                            <option value="Jardinage et entretien extérieur">{t('jardinage')}</option>
+                            <option value="Livraison">{t('livraison')}</option>
+                            <option value="Gestion des déchets">{t('dechets')}</option>
+                            <option value="Soutien administratif">{t('soutien')}</option>
+                            <option value="Déménagement">{t('demenagement')}</option>
+                            <option value="Chauffeur">{t('chauffeur')}</option>
+                            <option value="Sécurité">{t('securite')}</option>
                         </Form.Control>
                     </Form.Group>
                 </Row>
                 {documentMessage && (
                     <div className="mb-3">
-                        <p><strong>Documents requis:</strong> {documentMessage}</p>
+                        <p><strong>{t('requiredDocuments')}</strong> {documentMessage}</p>
                     </div>
                 )}
                 <Form.Group controlId="formFile" className="mb-3">
-                    <Form.Label>Fichier</Form.Label>
+                    <Form.Label>{t('file')}</Form.Label>
                     <Form.Control type="file" accept=".pdf" onChange={handleFileChange} required />
                 </Form.Group>
-                <Button variant="primary" type="submit">Soumettre</Button>
+                <Button variant="primary" type="submit">{t('submit')}</Button>
                 {submissionStatus && (
                     <div className="mt-3">
                         <p>{submissionStatus}</p>
