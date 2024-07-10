@@ -51,7 +51,12 @@ async function sendEmail(email, randomNumber) {
 
 router.post("/sendCode", async (req, res) => {
   console.log("Creating user and sending code:", req.body);
-  const { nom, prenom, adresseMail, motDePasse, admin, dateDeNaissance, type } = req.body;
+  let { nom, prenom, adresseMail, motDePasse, admin, dateDeNaissance, type } = req.body;
+
+  nom = nom.trim().toLowerCase();
+  prenom = prenom.trim().toLowerCase();
+  nom = nom.charAt(0).toUpperCase() + nom.slice(1);
+  prenom = prenom.charAt(0).toUpperCase() + prenom.slice(1);
 
   try {
     const existingUser = await sequelize.query(
