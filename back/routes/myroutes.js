@@ -273,32 +273,28 @@ router.post("/users/code/:code", async (req, res) => {
 router.put("/users/:id/:type", async (req, res) => {
   console.log("Modifying user:", req.body);
   const { id, type } = req.params;
-  const { nom, prenom, adresseMail, motDePasse, dateDeNaissance, admin } = req.body;
 
   try {
-    // Create an array to hold the fields and their corresponding values
-    const fieldsToUpdate = {
-      nom,
-      prenom,
-      adresseMail,
-      dateDeNaissance,
-      admin
-    };
 
-    // Conditionally include the password field in the update query
-    if (motDePasse !== undefined) {
-      const hashedPassword = await bcrypt.hash(motDePasse, 10); // Hash the password
+    const fieldsToUpdate = {};
+
+    if (req.body.nom !== undefined) fieldsToUpdate.nom = req.body.nom;
+    if (req.body.prenom !== undefined) fieldsToUpdate.prenom = req.body.prenom;
+    if (req.body.adresseMail !== undefined) fieldsToUpdate.adresseMail = req.body.adresseMail;
+    if (req.body.dateDeNaissance !== undefined) fieldsToUpdate.dateDeNaissance = req.body.dateDeNaissance;
+    if (req.body.admin !== undefined) fieldsToUpdate.admin = req.body.admin;
+
+    if (req.body.motDePasse !== undefined) {
+      const hashedPassword = await bcrypt.hash(req.body.motDePasse, 10); 
       fieldsToUpdate.motDePasse = hashedPassword;
     }
 
-    // Construct the SET clause and the values array for the prepared statement
     const setClause = Object.keys(fieldsToUpdate)
       .map(field => `${field} = ?`)
       .join(', ');
     const values = Object.values(fieldsToUpdate);
     values.push(id);
 
-    // Perform the update operation using a parameterized query
     await sequelize.query(
       `UPDATE ${type} SET ${setClause} WHERE id = ?`,
       { replacements: values }
