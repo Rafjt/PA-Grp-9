@@ -14,10 +14,11 @@ import { useNavigate } from "react-router-dom";
 const ViewBien = () => {
   const navigate = useNavigate();
   const [arrivee, setArrivee] = useState(new Date());
-  const [depart, setDepart] = useState(new Date());
+  const [depart, setDepart] = useState(new Date(new Date().setDate(new Date().getDate() + 1))); // Set default depart date to one day after arrival
   const [disabledDates, setDisabledDates] = useState([]);
   const today = new Date().toISOString().split("T")[0];
   const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const [showAllImages, setShowAllImages] = useState(false);
 
   const { id } = useParams();
   const [data, setData] = useState(null);
@@ -30,6 +31,15 @@ const ViewBien = () => {
   }, [id]);
 
   const handleReserve = () => {
+    const dateDiff = Math.ceil(
+      Math.abs(depart - arrivee) / (1000 * 60 * 60 * 24)
+    );
+
+    if (dateDiff < 1) {
+      setShowErrorMessage(true);
+      return;
+    }
+
     sessionStorage.setItem("price", data.prix);
     sessionStorage.setItem("pId", data.productId);
     navigate("/reservation", {
@@ -74,8 +84,7 @@ const ViewBien = () => {
     return <div>Loading...</div>;
   }
 
-  const imagesToDisplay = data.images ? data.images.slice(0,5) : [];
-
+  const imagesToDisplay = data.images ? (showAllImages ? data.images : data.images.slice(0, 5)) : [];
 
   return (
     <div className="container">
@@ -91,15 +100,16 @@ const ViewBien = () => {
                   <h1 className="nomDuBien">{data.nomBien}</h1>
                 </div>
                 <div className="gallery-container">
-      {imagesToDisplay.map((image, index) => (
-        <img
-          key={index}
-          className={`gallery-item item-${index + 1}`}
-          src={`${BACK_URL}/${image}`}
-          alt={data.nomBien}
-        />
-      ))}
-    </div>
+                  {imagesToDisplay.map((image, index) => (
+                    <img
+                      key={index}
+                      className={`gallery-item item-${index + 1}`}
+                      src={`${BACK_URL}/${image}`}
+                      alt={data.nomBien}
+                      onClick={() => setShowAllImages(!showAllImages)}
+                    />
+                  ))}
+                </div>
                 <p>
                   {data.typeDePropriete} - {data.ville},{data.adresse}
                 </p>
@@ -126,16 +136,18 @@ const ViewBien = () => {
                   <DatePicker
                     selected={arrivee}
                     onChange={(date) => {
-                      if (date <= depart) {
+                      if (date < depart) {
                         setArrivee(date);
                       } else {
-                        setArrivee(depart);
+                        setArrivee(date);
+                        setDepart(new Date(date.getTime() + 86400000)); 
                       }
                     }}
                     onBlur={(e) => {
                       const date = new Date(e.target.value);
-                      if (date > depart) {
-                        setArrivee(depart);
+                      if (date >= depart) {
+                        setArrivee(date);
+                        setDepart(new Date(date.getTime() + 86400000));
                       }
                     }}
                     shouldCloseOnSelect={true}
@@ -146,7 +158,7 @@ const ViewBien = () => {
                   <DatePicker
                     selected={depart}
                     onChange={(date) => {
-                      if (date >= arrivee) {
+                      if (date > arrivee) {
                         const rangeIncludesDisabledDate = disabledDates.some(
                           (disabledDate) => {
                             return (
@@ -161,17 +173,17 @@ const ViewBien = () => {
                           setShowErrorMessage(true);
                         }
                       } else {
-                        setDepart(arrivee);
+                        setDepart(new Date(arrivee.getTime() + 86400000)); // Ensure depart date is at least one day after arrival
                       }
                     }}
                     onBlur={(e) => {
                       const date = new Date(e.target.value);
-                      if (date < arrivee) {
-                        setDepart(arrivee);
+                      if (date <= arrivee) {
+                        setDepart(new Date(arrivee.getTime() + 86400000));
                       }
                     }}
                     shouldCloseOnSelect={true}
-                    minDate={arrivee} // Change this line
+                    minDate={new Date(arrivee.getTime() + 86400000)} // Ensure minimum date is one day after arrival
                     excludeDates={disabledDates}
                   />
                   {showErrorMessage && (
@@ -180,7 +192,11 @@ const ViewBien = () => {
                       sélectionner une date déjà réservée.
                     </div>
                   )}
-                  <button className="btn btn-dark" onClick={handleReserve}>
+                  <button
+                    type="button"
+                    className="btn btn-dark"
+                    onClick={handleReserve}
+                  >
                     Réserver
                   </button>
                 </form>
@@ -239,7 +255,8 @@ const ViewBien = () => {
           </div>
         </div>
       </div>
-    </div >
+    </div>
   );
 };
+
 export default ViewBien;

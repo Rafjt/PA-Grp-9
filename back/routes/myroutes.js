@@ -1322,21 +1322,62 @@ router.post('/reservation', async (req, res) => {
     return res.status(500).send('Failed to fetch bien');
   }
 
+  let reservationId;
   try {
-    await sequelize.query(
+    const result = await sequelize.query(
       'INSERT INTO reservation (id_BienImmobilier, id_ClientVoyageur, dateDebut, dateFin, prix, nomBien) VALUES (?, ?, ?, ?, ?, ?)',
       {
         replacements: [id_BienImmobilier, id_Voyageur, dateDebut, dateFin, prixTotal, nomBien],
         type: sequelize.QueryTypes.INSERT
       }
     );
+    reservationId = result[0]; // Assuming the ID of the inserted reservation is returned
   } catch (error) {
     console.error('Error creating reservation:', error);
     return res.status(500).send('Error creating reservation');
   }
 
-  res.send('Reservation created');
+  let user;
+  try {
+    const result = await sequelize.query(
+      'SELECT nom, prenom FROM voyageurs WHERE id = ?',
+      {
+        replacements: [id_Voyageur],
+        type: sequelize.QueryTypes.SELECT
+      }
+    );
+    if (result.length === 0) {
+      return res.status(404).send('User not found');
+    }
+    user = result[0]; // Extract user details from the result set
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    return res.status(500).send('Failed to fetch user');
+  }
+
+  const datePaiement = new Date().toISOString().split('T')[0]; 
+  const methodePaiement = 'Stripe'; 
+  const statut = 'validé'; 
+  const nom = `${user.nom} ${user.prenom}`; 
+  const id_Utilisateur = id_Voyageur; 
+  const typeUtilisateur = 'voyageurs'; 
+
+  try {
+    await sequelize.query(
+      'INSERT INTO paiement (id_Reservation, montant, datePaiement, methodePaiement, statut, nom, id_Utilisateur, typeUtilisateur) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      {
+        replacements: [reservationId, prixTotal, datePaiement, methodePaiement, statut, nom, id_Utilisateur, typeUtilisateur],
+        type: sequelize.QueryTypes.INSERT
+      }
+    );
+  } catch (error) {
+    console.error('Error creating payment:', error);
+    return res.status(500).send('Error creating payment');
+  }
+
+  res.send('Reservation and payment created');
 });
+
 
 /*
 router.put("/reservation/:id", async (req, res) => {
