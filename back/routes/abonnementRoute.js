@@ -231,6 +231,20 @@ router.get("/check-abonnement", async (req, res) => {
   
     res.json({ received: true });
   });
+
+  router.put("/resilierAbonnement", async (req, res) => {
+    const { userId } = req.body;
+  
+    console.log("Resiliation abonnement:", userId);
+  
+    try {
+      await sequelize.query(`Update abonnement set statut = "inactif" where id_Voyageur = ${userId}`);
+      res.json.send("Abonnement résilié");
+    } catch (error) {
+      console.error("Error dans la résiliation", error);
+      res.status(500).send("Erreur 500");
+    }
+  });
   
 
 module.exports = router;

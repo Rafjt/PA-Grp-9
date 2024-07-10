@@ -3,7 +3,12 @@ import "./userProfile.css";
 import { getCredentials, deleteUser } from "../services";
 import Prompt from "../components/prompt.js";
 import * as Yup from "yup";
-import { updateUser, updateCookie, checkAbonnement } from "../services";
+import {
+  updateUser,
+  updateCookie,
+  checkAbonnement,
+  resilierAbonnement,
+} from "../services";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
@@ -25,8 +30,9 @@ const UserProfile = () => {
   const [user, setUser] = useState(null);
   const [userType, setUserType] = useState(null);
   const [abonnements, setAbonnements] = useState([]);
-
+  const [showAbonnementPrompt, setShowAbonnementPrompt] = useState(false);
   const { t } = useTranslation();
+
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -48,7 +54,6 @@ const UserProfile = () => {
 
     fetchUserData();
   }, []);
-
   const formatUserType = (type) => {
     switch (type) {
       case "voyageurs":
@@ -238,6 +243,21 @@ const UserProfile = () => {
     );
   };
 
+  const handleResilitation = () => {
+    setShowAbonnementPrompt(true);
+  };
+
+  const confirmResilitation = async () => {
+    try {
+      await resilierAbonnement(user.id);
+      const newAbonnementData = await checkAbonnement(user.id);
+      setAbonnements(newAbonnementData.abonnements); 
+      setShowAbonnementPrompt(false); 
+    } catch (error) {
+      console.error("Error en resiliant l'abonnement", error);
+    }
+  };
+
   const renderAbonnement = (abonnement) => {
     if (
       abonnement.type === "Bag_Packer_annual" ||
@@ -397,7 +417,7 @@ const UserProfile = () => {
                 </div>
                 {userType === "voyageurs" ? (
                   <div>
-                    {abonnements ? (
+                    {abonnements !== null ? (
                       abonnements.length < 1 ? (
                         <Link
                           to="/abonnement"
@@ -406,14 +426,12 @@ const UserProfile = () => {
                           <span>{t("consulterOffre")}</span>
                         </Link>
                       ) : (
-                        <a
-                          href="https://billing.stripe.com/p/login/test_dR65ljg3K4y22Ag144"
-                          target="_blank"
-                          rel="noopener noreferrer"
+                        <button
                           className="btn btn-primary custom-link"
+                          onClick={handleResilitation}
                         >
                           <span>{t("gererAbo")}</span>
-                        </a>
+                        </button>
                       )
                     ) : (
                       <span>Loading...</span>
@@ -423,6 +441,13 @@ const UserProfile = () => {
                   <span></span>
                 )}
               </div>
+              {showAbonnementPrompt && (
+                <Prompt
+                  message={t("confirmAbonnementCancellation")}
+                  onConfirm={confirmResilitation}
+                  onCancel={() => setShowAbonnementPrompt(false)}
+                />
+              )}
             </div>
           </div>
         </div>

@@ -1064,6 +1064,23 @@ export const createAbonnementSession = async (typeAbonnement, userId) => {
   }
 };
 
+export const resilierAbonnement = async (userId) => {
+  const response = await fetch(`${URL_ABONNEMENT}/resilierAbonnement`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ userId })
+  });
+
+  if (response.ok) {
+    const data = await response.json();
+    return data;
+  } else {
+    console.error('Failed access the resilierAbonnement API');
+  }
+};
+
 export const insertAbonnementInfos = async (typeAbonnement, userId, userType, price) => {
   const response = await fetch(`${URL_ABONNEMENT}/insert-abonnement-info`, {
     method: 'POST',
