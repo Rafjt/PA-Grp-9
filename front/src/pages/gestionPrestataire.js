@@ -51,6 +51,7 @@ function GestionPrestataire() {
             setDemandesCertification(prevState => prevState.filter(demande => demande.ID !== id));
         }).catch(error => {
             console.error("Error validating demande:", error);
+            setDemandesCertification(prevState => prevState.filter(demande => demande.ID !== id));
         });
     };
 
@@ -67,6 +68,7 @@ function GestionPrestataire() {
             setDemandesCertification(prevState => prevState.filter(demande => demande.ID !== id));
         }).catch(error => {
             console.error("Error refusing demande:", error);
+            setDemandesCertification(prevState => prevState.filter(demande => demande.ID !== id));
         });
     };
 
