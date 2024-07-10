@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import "./reserverBien.css";
-import { fetchAnnonceById, createCheckoutSession } from "../services.js";
+import { fetchAnnonceById, createCheckoutSession, checkAbonnement,getCredentials } from "../services.js";
 import { BACK_URL, BASE_URL } from "../services.js";
 
 const ReserverBien = () => {
@@ -19,18 +19,30 @@ const ReserverBien = () => {
     const departDate = new Date(depart);
 
     const numberOfNights = Math.ceil(Math.abs(departDate - arriveeDate) / (1000 * 60 * 60 * 24));
-    const totalCost = numberOfNights * price;
-    console.log(numberOfNights);
     const [isChecked, setIsChecked] = useState(false);
     const [fetchedData, setFetchedData] = useState(null);
+    const [discount, setDiscount] = useState(0);
 
     useEffect(() => {
         fetchAnnonceById(id)
             .then((data) => {
-                // Store the fetched data in the state variable
                 setFetchedData(data);
             });
+
+        getCredentials()
+            .then((result) => {
+                checkAbonnement(result.id)
+                    .then((data) => {
+                        console.log(data);
+                        if (data.abonnementExists && data.abonnements.length > 0) {
+                            setDiscount(0.05); // 5% discount
+                        }
+                    });
+            });
     }, [id]);
+
+    const totalCost = numberOfNights * price * (1 - discount);
+    console.log(numberOfNights);
 
     const handleSubmit = async () => {
         if (!isChecked) {
@@ -50,7 +62,7 @@ const ReserverBien = () => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ pId, numberOfNights })
+                body: JSON.stringify({ pId, numberOfNights, totalCost }) // Include totalCost in the body
             });
 
             if (response.ok) {
@@ -83,7 +95,8 @@ const ReserverBien = () => {
                         <p>Arrivee: {arriveeString}</p>
                         <p>Depart: {departString}</p>
                         <p>Total a payer: {totalCost}€ pour {numberOfNights} nuits</p>
-                        <label>
+                        {discount > 0 && <p>Vous avez une réduction de  {discount * 100}% grâce à votre abonnement</p>}
+                        <label>                 
                             <input type="checkbox" onChange={(e) => setIsChecked(e.target.checked)} />
                             J'ai lu et accepte les termes et conditions du bailleurs
                             <div>
