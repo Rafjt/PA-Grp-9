@@ -26,6 +26,10 @@ function EspaceVoyageur() {
     window.location.replace("/report");
   }
 
+  const toEspaceDiscussion = () => {
+    window.location.href = "/espaceDiscussion";
+}
+
   return (
     <div>
       <img
@@ -47,6 +51,7 @@ function EspaceVoyageur() {
         </button>
         <button className="grid-button" onClick={toPrestations}>{t("louerSuivreService")}</button>
         <button className="grid-button" onClick={toReport}>{t("signalerProb")}</button>
+        <button className="grid-button" onClick={toEspaceDiscussion}>MON ESPACE DISCUSSION</button>
       </div>
     </div>
   );

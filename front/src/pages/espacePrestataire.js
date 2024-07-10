@@ -61,6 +61,10 @@ function EspacePrestataire() {
         window.location.href = "/mesDomaines";
     }
 
+    const toEspaceDiscussion = () => {
+        window.location.href = "/espaceDiscussion";
+    }
+
     return (
         <div>
             <img
@@ -77,6 +81,7 @@ function EspacePrestataire() {
                 <button className="grid-button" onClick={toMesDomaines}>MES SECTEURS D'ACTIVITÉ</button>
                 <button className="grid-button" onClick={toMyPrestations}>MES PRESTATIONS</button>
                 <button className="grid-button" onClick={toReport}>SIGNALER UN PROBLÈME</button>
+                <button className="grid-button" onClick={toEspaceDiscussion}>MON ESPACE DISCUSSION</button>
             </div>
         </div>
     );

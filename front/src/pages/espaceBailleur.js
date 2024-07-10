@@ -45,6 +45,10 @@ function EspaceBailleur() {
         window.location.href = "/etatDesLieux";
     }
 
+    const toEspaceDiscussion = () => {
+        window.location.href = "/espaceDiscussion";
+    }
+
     return (
         <div>
             <img src="/paris-tour-eiffel.jpg" alt="bailleur" className="banBailleur" />
@@ -65,6 +69,7 @@ function EspaceBailleur() {
                 </button>
                 <button className="grid-button" onClick={toReport}>SIGNALER UN PROBLÈME</button>
                 <button className="grid-button" onClick={toEtatDesLieux}>GESTION ÉTAT DES LIEUX</button>
+                <button className="grid-button" onClick={toEspaceDiscussion}>MON ESPACE DISCUSSION</button>
             </div>
         </div>
     );
