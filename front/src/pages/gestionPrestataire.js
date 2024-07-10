@@ -21,7 +21,6 @@ function GestionPrestataire() {
     const handleValidatePrestataire = (id) => {
         changeUserStatus(id, "prestataires", 1).then(response => {
             console.log("Validate prestataire with id:", id);
-            // Optionally refresh the list of prestataires
             setPrestataires(prevState => prevState.filter(prestataire => prestataire.id !== id));
         }).catch(error => {
             console.error("Error validating prestataire:", error);
@@ -31,7 +30,6 @@ function GestionPrestataire() {
     const handleRefusePrestataire = (id) => {
         changeUserStatus(id, "prestataires", 0).then(response => {
             console.log("Refuse prestataire with id:", id);
-            // Optionally refresh the list of prestataires
             setPrestataires(prevState => prevState.filter(prestataire => prestataire.id !== id));
         }).catch(error => {
             console.error("Error refusing prestataire:", error);
@@ -47,7 +45,6 @@ function GestionPrestataire() {
             body: JSON.stringify({ id, statut: 'valider' })
         }).then(response => response.json()).then(data => {
             console.log("Validate demande with id:", id);
-            // Optionally refresh the list of demandesCertification
             setDemandesCertification(prevState => prevState.filter(demande => demande.ID !== id));
         }).catch(error => {
             console.error("Error validating demande:", error);
@@ -64,7 +61,6 @@ function GestionPrestataire() {
             body: JSON.stringify({ id, statut: 'refuser' })
         }).then(response => response.json()).then(data => {
             console.log("Refuse demande with id:", id);
-            // Optionally refresh the list of demandesCertification
             setDemandesCertification(prevState => prevState.filter(demande => demande.ID !== id));
         }).catch(error => {
             console.error("Error refusing demande:", error);
@@ -73,7 +69,7 @@ function GestionPrestataire() {
     };
 
     const handleDownload = (cheminDoc) => {
-        cheminDoc = cheminDoc.replace('uploads/', ''); // Remove "uploads/" from the path
+        cheminDoc = cheminDoc.replace('uploads/', '');
         const url = `${BASE_URL}/download/${cheminDoc}`;
         
         fetch(url)
@@ -87,7 +83,7 @@ function GestionPrestataire() {
                 const blobUrl = window.URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.href = blobUrl;
-                link.download = cheminDoc.split('/').pop(); // Extract the filename from the path
+                link.download = cheminDoc.split('/').pop(); 
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);

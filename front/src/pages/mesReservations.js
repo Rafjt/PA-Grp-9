@@ -11,8 +11,8 @@ import "./mesReservations.css";
 
 const MesReservations = () => {
   const { t } = useTranslation();
-  const [reservations, setReservations] = useState([]); // Initialize with an empty array
-  const [showDetails, setShowDetails] = useState([]); // State to control showing details for each reservation
+  const [reservations, setReservations] = useState([]); 
+  const [showDetails, setShowDetails] = useState([]); 
   const [triggerEffect, setTriggerEffect] = useState(false);
 
   useEffect(() => {
@@ -24,7 +24,7 @@ const MesReservations = () => {
           fetchReservationByIdVoyageur(voyageurId)
             .then((data) => {
               if (Array.isArray(data)) {
-                setReservations(data); // Set reservations array
+                setReservations(data); 
                 console.log(data);
                 setShowDetails(Array(data.length).fill(false));
               } else {
@@ -41,11 +41,11 @@ const MesReservations = () => {
       });
   }, [triggerEffect]);
 
-  // Function to toggle showing details for a specific reservation
+
   const toggleDetails = (index) => {
     setShowDetails((prevDetails) => {
       const updatedDetails = [...prevDetails];
-      updatedDetails[index] = !updatedDetails[index]; // Toggle details for the clicked reservation
+      updatedDetails[index] = !updatedDetails[index]; 
       return updatedDetails;
     });
   };
@@ -104,7 +104,7 @@ const MesReservations = () => {
               </h2>
               <h3>{reservation.adresse}</h3>
               <p>{t("pricePerNight")}: {reservation.prix}€</p>
-              {/* Button to toggle showing details for the current reservation */}
+
               <button
                 onClick={() => toggleDetails(index)}
                 className="boutondetail"
@@ -113,10 +113,10 @@ const MesReservations = () => {
                   ? t("hideDetails")
                   : t("showDetails")}
               </button>
-              {/* Reservation details */}
+
               {showDetails[index] && (
                 <div className="reservation-details d-flex justify-content-between" style={{ maxWidth: "1000px", margin: "0 auto" }}>
-                  {/* Div for general information */}
+
                   <div
                     className="p-3 rounded shadow"
                     style={{ border: "2px solid #ccc" }}
@@ -147,7 +147,6 @@ const MesReservations = () => {
                     </p>
                   </div>
 
-                  {/* Div for bailleur information */}
                   <div
                     className="p-3 rounded shadow"
                     style={{ border: "2px solid #ccc" }}
@@ -176,7 +175,6 @@ const MesReservations = () => {
                     </button>
                   </div>
 
-                  {/* Div for options */}
                   <div
                     className="p-3 rounded shadow"
                     style={{ border: "2px solid #ccc" }}

@@ -17,7 +17,7 @@ function CreeBien() {
     prix: "",
     ville: "Paris",
     adresse: "",
-    pictures: [], // Change to array to handle multiple files
+    pictures: [],
     disponible: "1",
     typeDePropriete: "Maison",
     nombreChambres: "",
@@ -50,9 +50,9 @@ function CreeBien() {
       const files = Array.from(e.target.files);
       setForm({
         ...form,
-        pictures: files, // Update state with array of files
+        pictures: files, 
       });
-      console.log('File changed:', files); // Print the changed files
+      console.log('File changed:', files); 
     } else {
       const value = e.target.type === "checkbox" ? (e.target.checked ? 1 : 0) : e.target.value;
       setForm({
@@ -65,7 +65,6 @@ function CreeBien() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Form validation
     if (!form.nomBien.trim()) {
       setModalMessage("Veuillez entrer le nom de la propriété.");
       setShowModal(true);
@@ -125,7 +124,6 @@ function CreeBien() {
       }
     }
 
-    // Log the FormData object to verify its contents
     for (let [key, value] of formData.entries()) {
       console.log(`ICIIIIIIII ${key}: ${value}`);
     }
@@ -219,7 +217,7 @@ function CreeBien() {
             type="file"
             name="pictures"
             accept="image/*"
-            multiple // Enable multiple file selection
+            multiple 
             onChange={handleChange}
           />
 

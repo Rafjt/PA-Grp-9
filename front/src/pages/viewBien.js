@@ -52,15 +52,12 @@ const ViewBien = () => {
     setArrivee(new Date(params.get("arrivee")));
     setDepart(new Date(params.get("depart")));
 
-    // Fetch disabled dates from your API and set them in the state
     fetchDisabledDates(id).then((dates) => {
       if (Array.isArray(dates)) {
-        // Create an array of Date objects from the dateDebut and dateFin properties
         const disabledDatesArray = dates.reduce((acc, curr) => {
           let startDate = new Date(curr.dateDebut);
           let endDate = new Date(curr.dateFin);
 
-          // Set the time to the start of the day
           startDate.setHours(0, 0, 0, 0);
           endDate.setHours(0, 0, 0, 0);
 
@@ -173,7 +170,7 @@ const ViewBien = () => {
                           setShowErrorMessage(true);
                         }
                       } else {
-                        setDepart(new Date(arrivee.getTime() + 86400000)); // Ensure depart date is at least one day after arrival
+                        setDepart(new Date(arrivee.getTime() + 86400000)); 
                       }
                     }}
                     onBlur={(e) => {
@@ -183,7 +180,7 @@ const ViewBien = () => {
                       }
                     }}
                     shouldCloseOnSelect={true}
-                    minDate={new Date(arrivee.getTime() + 86400000)} // Ensure minimum date is one day after arrival
+                    minDate={new Date(arrivee.getTime() + 86400000)} 
                     excludeDates={disabledDates}
                   />
                   {showErrorMessage && (

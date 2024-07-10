@@ -73,33 +73,27 @@ const PagePaiement = () => {
                                         console.log(data);
                                     });
 
-                                // Create a new PDF
                                 const doc = new jsPDF();
                                 const imgData = './logopcsnobg.png';
-                                // Add an image (logo)
                                 doc.addImage(imgData, 'PNG', 165, 10, 30, 30);
 
-                                // Title
                                 doc.setFontSize(26);
                                 doc.setFont("helvetica", "bold");
                                 doc.setTextColor(0, 0, 0);
                                 doc.text("Facture", 105, 20, null, null, 'center');
 
-                                // Horizontal Line
                                 doc.setLineWidth(0.5);
                                 doc.line(20, 40, 190, 40);
 
-                                // Subtitles
                                 doc.setFontSize(20);
                                 doc.setFont("helvetica", "bold");
                                 doc.setTextColor(0, 0, 0);
                                 doc.text("Informations sur la facture", 20, 50);
 
-                                // Text
                                 doc.setFontSize(16);
                                 doc.setFont("helvetica", "normal");
                                 doc.setTextColor(50);
-                                const yOffset = 10; // Vertical space between lines
+                                const yOffset = 10; 
 
                                 doc.text(`Réservation passé le : ${new Date().toLocaleDateString('fr-FR')}`, 20, 70);
                                 doc.text(`Client: ${data.prenom} ${data.nom}`, 20, 70 + yOffset);
@@ -107,15 +101,13 @@ const PagePaiement = () => {
                                 doc.text(`Nombre de nuits: ${numberOfNights}`, 20, 70 + 3 * yOffset);
                                 doc.text(`Prix par nuit: ${price.toLocaleString('fr-FR')} €`, 20, 70 + 4 * yOffset);
 
-                                // Footer
                                 doc.setLineWidth(0.5);
-                                doc.line(20, 270, 190, 270); // Footer line
+                                doc.line(20, 270, 190, 270); 
                                 doc.setFontSize(12);
                                 doc.setFont("helvetica", "italic");
                                 doc.setTextColor(100);
                                 doc.text("Merci pour votre réservation!", 105, 280, null, null, 'center');
 
-                                // Save the PDF
                                 const timestamp = Date.now();
                                 const pdfFileName = `facture_${timestamp}_${data.id}.pdf`;
                                 const pdfBlob = doc.output('blob');
@@ -129,7 +121,6 @@ const PagePaiement = () => {
                                     },
                                 })
                                     .then(() => {
-                                        // Create financeData object
                                         const financeData = {
                                             id_ClientBailleur: dataF.id_ClientBailleur,
                                             id_Prestataire: null,
@@ -140,7 +131,6 @@ const PagePaiement = () => {
                                             nomDocument: pdfFileName,
                                         };
 
-                                        // Call createFinance function
                                         createFinance(financeData)
                                             .then(financeResponse => {
                                                 console.log('Finance created:', financeResponse);
@@ -156,17 +146,14 @@ const PagePaiement = () => {
                         console.error('Error creating reservation:', error);
                     });
 
-                // Redirect after a delay, regardless of success or cancellation
                 setTimeout(() => {
                     navigate('/mesReservations');
                 }, 2000);
             } else if (canceled === 'true') {
-                // Handle canceled payment
                 setTimeout(() => {
                     navigate('/mesReservations');
                 }, 2000);
             } else {
-                // Create checkout session only if not redirected from success or canceled
                 fetch(`${BACK_URL}/api/create-checkout-session`, {
                     method: 'POST',
                     headers: {

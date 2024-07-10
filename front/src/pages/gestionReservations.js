@@ -26,10 +26,10 @@ const GestionReservations = () => {
   const [voyageurId, setVoyageurId] = useState(null);
   const [bienImoId, setBienImoId] = useState(null);
   const [editingReservationId, setEditingReservationId] = useState(null);
-  const [searchTerm, setSearchTerm] = useState(''); // New state for search term
-  const [filterPast, setFilterPast] = useState(false); // State for past reservations
-  const [filterOngoing, setFilterOngoing] = useState(false); // State for ongoing reservations
-  const [filterUpcoming, setFilterUpcoming] = useState(false); // State for upcoming reservations
+  const [searchTerm, setSearchTerm] = useState(''); 
+  const [filterPast, setFilterPast] = useState(false); 
+  const [filterOngoing, setFilterOngoing] = useState(false); 
+  const [filterUpcoming, setFilterUpcoming] = useState(false); 
 
   useEffect(() => {
     fetchReservation()
@@ -66,7 +66,7 @@ const GestionReservations = () => {
   };
 
   const handleCreateReservation = async (event) => {
-    event.preventDefault(); // Prevent the default form submission
+    event.preventDefault(); 
 
     if (!bienImoId || !arrivee || !depart || !voyageurId) {
       setMessage("Veuillez compléter tous les champs requis.");
@@ -74,26 +74,24 @@ const GestionReservations = () => {
     }
 
     const reservationData = {
-      id_BienImmobilier: bienImoId, // Assuming BienImoId is the selected bien immobilier's id
-      id_Voyageur: voyageurId, // Assuming voyageurId is the selected voyageur's id
-      dateDebut: arrivee.toISOString().substring(0, 10), // format YYYY-MM-DD
-      dateFin: depart.toISOString().substring(0, 10), // format YYYY-MM-DD
+      id_BienImmobilier: bienImoId,
+      id_Voyageur: voyageurId, 
+      dateDebut: arrivee.toISOString().substring(0, 10), 
+      dateFin: depart.toISOString().substring(0, 10), 
       prixTotal: calculateTotalPrice(annonces.find(a => a.id === bienImoId)?.prix || 0, arrivee, depart)
     };
 
     try {
       console.log('Création de la réservation avec les données:', reservationData);
-      const data = await createReservation(reservationData); // Use createReservation here
+      const data = await createReservation(reservationData); 
 
       console.log('Réponse de la création de réservation:', data);
       setMessage("Réservation créée avec succès!");
 
-      // Fetch the updated list of reservations
       fetchReservation()
         .then(data => setReservations(data))
         .catch(error => console.error('Error fetching reservations:', error));
 
-      // Optionally reset the form fields after successful creation
       setArrivee(new Date());
       setDepart(new Date());
       setVoyageurId(null);
@@ -112,9 +110,9 @@ const GestionReservations = () => {
 
   const handleSaveReservation = async (reservation) => {
     const updatedReservation = {
-      id: reservation.id, // Include the reservation ID for the update
-      dateDebut: arrivee.toISOString().substring(0, 10), // format YYYY-MM-DD
-      dateFin: depart.toISOString().substring(0, 10), // format YYYY-MM-DD
+      id: reservation.id, 
+      dateDebut: arrivee.toISOString().substring(0, 10), 
+      dateFin: depart.toISOString().substring(0, 10), 
     };
 
     try {
@@ -138,7 +136,6 @@ const GestionReservations = () => {
     return price * diffDays;
   };
 
-  // Filter reservations based on search term and checkboxes
   const filteredReservations = reservations.filter(reservation => {
     const reservationDateDebut = new Date(reservation.dateDebut);
     const reservationDateFin = new Date(reservation.dateFin);

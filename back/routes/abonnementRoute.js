@@ -4,26 +4,25 @@ const { STRIPE_SECRET_KEY } = require('../credsStripe.js');
 const stripe = require('stripe')(STRIPE_SECRET_KEY);
 const bodyParser = require('body-parser');
 const nodemailer = require("nodemailer");
-const sequelize = require("../database"); // Ensure you import your database instance
+const sequelize = require("../database");
 const URL = process.env.PCS_URL;
 
 async function sendEmail(email, nom, prenom) {
-    // Create a transporter using SMTP
+
     let transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 465,
-      secure: true, // Use SSL
+      secure: true, 
       auth: {
         user: "pcsnoreply75@gmail.com",
         pass: "bzurcpscdivqgaik",
       },
     });
   
-    // Send mail with defined transport object
     let info = await transporter.sendMail({
-      from: '"Paris Caretaker Services" <pcsnoreply75@gmail.com>', // Sender address
-      to: email, // List of recipients
-      subject: "Confirmation d'inscription", // Subject line
+      from: '"Paris Caretaker Services" <pcsnoreply75@gmail.com>', 
+      to: email, 
+      subject: "Confirmation d'inscription", 
       html: `
       <div style="text-align: center;">
       <p style="font-size: 18px;">${prenom} ${nom}, vous avez choisi de vous abonnez à nos services, et nous vous remercions.</p>
@@ -113,7 +112,7 @@ router.post("/insert-abonnement-info", async (req, res) => {
   }
 
   try {
-    // Fetch user details
+
     const [user] = await sequelize.query(
       'SELECT nom, prenom, adresseMail FROM voyageurs WHERE id = ?',
       {
@@ -129,7 +128,7 @@ router.post("/insert-abonnement-info", async (req, res) => {
     const { nom, prenom, adresseMail } = user;
     const userNomComplet = `${prenom} ${nom}`;
     const datePaiement = formatDate(new Date());
-    const methodePaiement = 'Stripe';  // Assuming the payment method is Stripe
+    const methodePaiement = 'Stripe';  
 
     await sequelize.query(
       'INSERT INTO paiement (id_Utilisateur, typeUtilisateur, nom, datePaiement, methodePaiement, montant, statut) VALUES (?, ?, ?, ?, ?, ?, ?)',
@@ -152,7 +151,7 @@ router.post("/insert-abonnement-info", async (req, res) => {
 });
 
 router.get("/check-abonnement", async (req, res) => {
-    const { userId } = req.query; // Changed to req.query to work with GET request
+    const { userId } = req.query; 
     try {
       const abonnement = await sequelize.query(
         `SELECT v.nom, v.prenom, v.adresseMail, a.* 
@@ -197,39 +196,6 @@ router.get("/check-abonnement", async (req, res) => {
       console.error('Error fetching abonnement info', error);
       res.status(500).send({ error: 'Failed to fetch abonnement info' });
     }
-  });
-
-
-  router.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
-    const sig = req.headers['stripe-signature'];
-  
-    let event;
-    try {
-      event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
-    } catch (err) {
-      console.log(`Webhook signature verification failed: ${err.message}`);
-      return res.status(400).send(`Webhook Error: ${err.message}`);
-    }
-  
-    // Handle the event
-    switch (event.type) {
-      case 'checkout.session.completed':
-        const session = event.data.object;
-  
-        // Fulfill the purchase and update the subscription status in your database
-        const userId = session.metadata.userId;
-        const typeAbonnement = session.metadata.typeAbonnement;
-        
-        // Add your logic to handle the successful subscription here
-        // Example: Update the user subscription status in the database
-  
-        break;
-      // Handle other event types as needed
-      default:
-        console.log(`Unhandled event type ${event.type}`);
-    }
-  
-    res.json({ received: true });
   });
 
   router.put("/resilierAbonnement", async (req, res) => {

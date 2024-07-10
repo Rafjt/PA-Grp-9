@@ -87,7 +87,7 @@ function MyPrestations() {
             <th>Lieux</th>
             <th>Ville</th>
             <th>Type d'intervention</th>
-            <th>Action</th> {/* New cell */}
+            <th>Action</th>
           </tr>
         </thead>
         <tbody>

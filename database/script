@@ -1,170 +1,530 @@
--- Table clientsBailleurs
-CREATE TABLE clientsBailleurs (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  nom VARCHAR(255),
-  prenom VARCHAR(255),
-  adresseMail VARCHAR(255),
-  motDePasse VARCHAR(255),
-  dateDeNaissance DATE,
-  admin BOOLEAN
+RAF
+raf0888
+En ligne
+
+RAF — Aujourd’hui à 16:20
+Yes yes
+polack — Aujourd’hui à 16:21
+c'est bon
+je suis la PR 101
+c'est une dinguerie Ines elle a fait genre 3 PR
+RAF — Aujourd’hui à 16:21
+3 ???
+gros elle est Officielement à 0 je crois t'es pas au courant
+polack — Aujourd’hui à 16:21
+j'en ai fait 39 t'en a fait 58
+RAF — Aujourd’hui à 16:21
+on a tout merge à sa place $
+polack — Aujourd’hui à 16:22
+pas fau
+x
+RAF — Aujourd’hui à 16:22
+bah oe frr trop efficace nous
+ça marche bien ton truc effectivement 👍
+polack — Aujourd’hui à 16:26
+youpi
+toi t'as rajouté quoi j'ai pas vu
+RAF — Aujourd’hui à 16:26
+Au fait petite question est-ce que quand tu t'inscrit le formatage de données il met les non et les prenom avec la première lettre en majuscule et le reste en minuscule
+polack — Aujourd’hui à 16:27
+non il fait pas
+tu peux le rajouter
+RAF — Aujourd’hui à 16:27
+g sécure tout les petis calendrier de con la
+polack — Aujourd’hui à 16:27
+y'a la fonction trim() en js
+qui efface les espace automatiquement
+les espaces avant et après
+RAF — Aujourd’hui à 16:27
+j'ai rajouter l'affichage de discount si ta un abonnement
+polack — Aujourd’hui à 16:28
+sur quelle page ?
+RAF — Aujourd’hui à 16:28
+reserverBien
+tsais celle juste avant stripe
+et aussi un autre truc va sur un bien et clique sur les images tu verras 
+polack — Aujourd’hui à 16:29
+déploie le site on vérifie si tout marche ?
+RAF — Aujourd’hui à 16:30
+yes att 2 sec juste j'apelle la daronne en balle
+polack — Aujourd’hui à 16:30
+ah c'est carré de fou
+vasy
+la madre
+je vais manger un peu j'ai rien mangé aujourd'hui
+RAF — Aujourd’hui à 16:31
+azy bonne ap chef
+RAF — Aujourd’hui à 17:04
+Okay c bon ça marche
+polack — Aujourd’hui à 17:10
+quoi marche ?
+RAF — Aujourd’hui à 17:10
+le bail des blazes
+polack — Aujourd’hui à 17:11
+mama miaaaa
+polack — Aujourd’hui à 17:11
+on fait ça ?
+RAF — Aujourd’hui à 17:11
+az
+RAF
+ a commencé un appel qui a duré 3 heures.
+ — Aujourd’hui à 17:11
+RAF — Aujourd’hui à 17:33
+SELECT 
+    TABLE_SCHEMA AS referencing_schema,
+    TABLE_NAME AS referencing_table,
+    COLUMN_NAME AS referencing_column,
+    CONSTRAINT_NAME,
+    REFERENCED_TABLE_SCHEMA AS referenced_schema,
+    REFERENCED_TABLE_NAME AS referenced_table,
+    REFERENCED_COLUMN_NAME AS referenced_column
+FROM
+    INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+WHERE
+    REFERENCED_TABLE_NAME IN ('voyageur', 'prestataires', 'clientsBailleurs')
+    AND REFERENCED_COLUMN_NAME = 'id'
+ORDER BY
+    TABLE_SCHEMA,
+    TABLE_NAME;
+RAF — Aujourd’hui à 18:13
+git reset HEAD~ 
+polack — Aujourd’hui à 18:58
+https://github.com/torvalds/linux/graphs/contributors
+GitHub
+Contributors to torvalds/linux
+Linux kernel source tree. Contribute to torvalds/linux development by creating an account on GitHub.
+Contributors to torvalds/linux
+que des têtes de winers
+RAF
+ a commencé un appel qui a duré quelques secondes.
+ — Aujourd’hui à 20:07
+polack — Aujourd’hui à 20:07
+lorsque le
+RAF — Aujourd’hui à 20:07
+ah tu es partie
+polack — Aujourd’hui à 20:07
+non
+RAF — Aujourd’hui à 20:07
+lorsque le ?
+RAF
+ a commencé un appel qui a duré 11 minutes.
+ — Aujourd’hui à 20:07
+RAF — Aujourd’hui à 21:35
+Romaing ?
+je te propoe un truc
+étant donnée qu'il faut qu'on retire les commentaires je te propose que on le fasse en même temps comme ça si jamais y'a un bout du code qu'on comprends plus on peut se le remettre en tête
+genre je me met en partage
+polack — Aujourd’hui à 21:46
+ou alors on fait chacun une partie
+on coupe le dossier pages au milieu
+polack
+ a commencé un appel.
+ — Aujourd’hui à 21:47
+polack — Aujourd’hui à 22:58
+create table clientsBailleurs
+(
+    id              int auto_increment
+        primary key,
+    nom             varchar(255) null,
+    prenom          varchar(255) null,
+Afficher plus
+message.txt
+14 Ko
+﻿
+create table clientsBailleurs
+(
+    id              int auto_increment
+        primary key,
+    nom             varchar(255) null,
+    prenom          varchar(255) null,
+    adresseMail     varchar(255) null,
+    motDePasse      varchar(255) null,
+    dateDeNaissance date         null,
+    admin           tinyint(1)   null
 );
 
--- Table voyageurs
-CREATE TABLE voyageurs (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  nom VARCHAR(255),
-  prenom VARCHAR(255),
-  adresseMail VARCHAR(255),
-  motDePasse VARCHAR(255),
-  dateDeNaissance DATE,
-  admin BOOLEAN
+create table bienImo
+(
+    id                 int auto_increment
+        primary key,
+    cheminImg          varchar(255)   null,
+    ville              varchar(255)   null,
+    adresse            varchar(255)   null,
+    id_ClientBailleur  int            null,
+    prix               decimal(10, 2) null,
+    nomBien            varchar(255)   null,
+    description        text           null,
+    statutValidation   int            null,
+    disponible         int            null,
+    typeDePropriete    varchar(255)   null,
+    nombreChambres     int            null,
+    nombreLits         int            null,
+    nombreSallesDeBain int            null,
+    wifi               tinyint(1)     null,
+    cuisine            tinyint(1)     null,
+    balcon             tinyint(1)     null,
+    jardin             tinyint(1)     null,
+    parking            tinyint(1)     null,
+    piscine            tinyint(1)     null,
+    jaccuzzi           tinyint(1)     null,
+    salleDeSport       tinyint(1)     null,
+    climatisation      tinyint(1)     null,
+    productId          varchar(255)   null,
+    constraint bienImo_ibfk_1
+        foreign key (id_ClientBailleur) references clientsBailleurs (id)
 );
 
--- Table prestataires
-CREATE TABLE prestataires (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  nom VARCHAR(255),
-  prenom VARCHAR(255),
-  adresseMail VARCHAR(255),
-  motDePasse VARCHAR(255),
-  dateDeNaissance DATE,
-  admin BOOLEAN
+create index id_ClientBailleur
+    on bienImo (id_ClientBailleur);
+
+create table bienImoImages
+(
+    id        int auto_increment
+        primary key,
+    bienImoId int          null,
+    imagePath varchar(255) null,
+    constraint bienImoImages_ibfk_1
+        foreign key (bienImoId) references bienImo (id)
+            on delete cascade
 );
 
--- Table bienImo
-CREATE TABLE bienImo (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  cheminImg VARCHAR(255),
-  id_ClientBailleur INT,
-  prix DECIMAL(10, 2),
-  nomBien VARCHAR(255),
-  description TEXT,
-  statutValidation INT,
-  disponible INT,
-  FOREIGN KEY (id_ClientBailleur) REFERENCES clientsBailleurs(id)
+create index bienImoId
+    on bienImoImages (bienImoId);
+
+create table discussion
+(
+    discussion_id int not null
+        primary key
 );
 
--- Table reservation
-CREATE TABLE reservation (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  id_BienImmobilier INT,
-  id_ClientVoyageur INT,
-  nomBien VARCHAR(255),
-  prix DECIMAL(10,2),
-  dateDebut DATE,
-  dateFin DATE,
-  cheminImg VARCHAR(255),
-  statut VARCHAR(50),
-  FOREIGN KEY (cheminImg) REFERENCES bienImo(id),
-  FOREIGN KEY (id_BienImmobilier) REFERENCES bienImo(id),
-  FOREIGN KEY (id_ClientVoyageur) REFERENCES voyageurs(id),
-  FOREIGN KEY (nomBien) REFERENCES bienImo(id),
-  FOREIGN KEY (prix) REFERENCES bienImo(id)
+create table messages
+(
+    id            int auto_increment
+        primary key,
+    id_sender     int                                 null,
+    id_receiver   int                                 null,
+    type_sender   varchar(35)                         null,
+    type_receiver varchar(35)                         null,
+    content       text                                null,
+    timestamp     timestamp default CURRENT_TIMESTAMP null
 );
 
--- Table finances
-CREATE TABLE finances (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  id_ClientBailleur INT,
-  id_Prestataire INT,
-  id_Voyageur INT, -- New column
-  montant DECIMAL(10, 2),
-  type VARCHAR(50),
-  dateTransaction DATE,
-  FOREIGN KEY (id_ClientBailleur) REFERENCES clientsBailleurs(id),
-  FOREIGN KEY (id_Prestataire) REFERENCES prestataires(id),
-  FOREIGN KEY (id_Voyageur) REFERENCES voyageurs(id) -- New foreign key constraint
+create table prestataires
+(
+    id              int auto_increment
+        primary key,
+    nom             varchar(255)         null,
+    prenom          varchar(255)         null,
+    adresseMail     varchar(255)         null,
+    motDePasse      varchar(255)         null,
+    dateDeNaissance date                 null,
+    admin           tinyint(1)           null,
+    valide          tinyint(1) default 0 null,
+    domaine         json                 null
 );
 
--- Table abonnement
-CREATE TABLE abonnement (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  id_ClientBailleur INT,
-  id_Voyageur INT,
-  nom VARCHAR(255),
-  FOREIGN KEY (id_ClientBailleur) REFERENCES clientsBailleurs(id),
-  FOREIGN KEY (id_Voyageur) REFERENCES voyageurs(id),
-  CHECK (
-    (id_ClientBailleur IS NOT NULL AND id_Voyageur IS NULL) OR
-    (id_ClientBailleur IS NULL AND id_Voyageur IS NOT NULL)
-  )
-); 
-
--- Table évaluationPrestation
-CREATE TABLE evaluationPrestation (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  id_BienImmobilier INT,
-  id_Prestataire INT,
-  typeIntervention VARCHAR(50),
-  FOREIGN KEY (id_BienImmobilier) REFERENCES bienImo(id),
-  FOREIGN KEY (id_Prestataire) REFERENCES prestataires(id)
+create table demandeDomaine
+(
+    ID             int auto_increment
+        primary key,
+    ID_Prestataire int          not null,
+    domaine        varchar(50)  not null,
+    cheminDoc      varchar(255) null,
+    constraint demandeDomaine_ibfk_1
+        foreign key (ID_Prestataire) references prestataires (id)
 );
 
--- Table prestation
-CREATE TABLE prestation (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  id_BienImmobilier INT,
-  id_Prestataire INT,
-  typeIntervention VARCHAR(50),
-  FOREIGN KEY (id_BienImmobilier) REFERENCES bienImo(id),
-  FOREIGN KEY (id_Prestataire) REFERENCES prestataires(id)
+create index ID_Prestataire
+    on demandeDomaine (ID_Prestataire);
+
+create table userBannis
+(
+    id              int auto_increment
+        primary key,
+    nom             varchar(100) null,
+    prenom          varchar(100) null,
+    adresseMail     varchar(100) null,
+    dateBanissement datetime     null
 );
 
--- Table contrat
-CREATE TABLE contrat (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  id_Reservation INT,
-  id_Prestation INT,
-  id_Prestataire INT,
-  id_Bailleur INT,
-  id_Voyageur INT,
-  typeContrat VARCHAR(50),
-  typeIntervention VARCHAR(50),
-  dateDebutContrat DATE,
-  dateFinContrat DATE,
-  statut VARCHAR(50),
-  FOREIGN KEY (id_Reservation) REFERENCES reservation(id),
-  FOREIGN KEY (id_Prestation) REFERENCES prestation(id),
-  FOREIGN KEY (id_Prestataire) REFERENCES prestataires(id),
-  FOREIGN KEY (id_Bailleur) REFERENCES clientsBailleurs(id),
-  FOREIGN KEY (id_Voyageur) REFERENCES voyageurs(id)
+create table voyageurs
+(
+    id              int auto_increment
+        primary key,
+    nom             varchar(255) null,
+    prenom          varchar(255) null,
+    adresseMail     varchar(255) null,
+    motDePasse      varchar(255) null,
+    dateDeNaissance date         null,
+    admin           tinyint(1)   null,
+    customerId      varchar(50)  null
 );
 
--- Table paiement
-CREATE TABLE paiement (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  id_Reservation INT,
-  montant DECIMAL(10, 2),
-  datePaiement DATE,
-  methodePaiement VARCHAR(50),
-  statut VARCHAR(50),
-  FOREIGN KEY (id_Reservation) REFERENCES reservation(id)
+create table abonnement
+(
+    id                 int auto_increment
+        primary key,
+    id_Voyageur        int          null,
+    type               varchar(255) null,
+    dateDebut          date         null,
+    dateRenouvellement date         null,
+    dateFin            date         null,
+    idProduitStripe    varchar(255) null,
+    typeEcheance       varchar(25)  null,
+    statut             varchar(25)  null,
+    constraint abonnement_ibfk_2
+        foreign key (id_Voyageur) references voyageurs (id)
 );
 
--- Table facture
-CREATE TABLE facture (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  id_Reservation INT,
-  id_ClientBailleur INT,
-  montantTotal DECIMAL(10, 2),
-  dateEmission DATE,
-  FOREIGN KEY (id_Reservation) REFERENCES reservation(id),
-  FOREIGN KEY (id_ClientBailleur) REFERENCES clientsBailleurs(id)
+create index id_Voyageur
+    on abonnement (id_Voyageur);
+
+create table finances
+(
+    id                int auto_increment
+        primary key,
+    id_ClientBailleur int            null,
+    id_Prestataire    int            null,
+    montant           decimal(10, 2) null,
+    type              varchar(50)    null,
+    dateTransaction   date           null,
+    id_Voyageur       int            null,
+    nomDocument       varchar(255)   null,
+    constraint finances_ibfk_1
+        foreign key (id_ClientBailleur) references clientsBailleurs (id),
+    constraint finances_ibfk_2
+        foreign key (id_Prestataire) references prestataires (id),
+    constraint fk_finances_voyageurs
+        foreign key (id_Voyageur) references voyageurs (id)
 );
 
--- Table messages
-CREATE TABLE messages (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  id_sender INT,
-  id_receiver INT,
-  type_sender ENUM('clientsBailleurs', 'voyageurs', 'prestataires'),
-  type_receiver ENUM('clientsBailleurs', 'voyageurs', 'prestataires'),
-  content TEXT,
-  timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (id_sender) REFERENCES clientsBailleurs(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  FOREIGN KEY (id_sender) REFERENCES voyageurs(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  FOREIGN KEY (id_sender) REFERENCES prestataires(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  FOREIGN KEY (id_receiver) REFERENCES clientsBailleurs(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  FOREIGN KEY (id_receiver) REFERENCES voyageurs(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  FOREIGN KEY (id_receiver) REFERENCES prestataires(id) ON DELETE CASCADE ON UPDATE CASCADE
+create index id_ClientBailleur
+    on finances (id_ClientBailleur);
+
+create index id_Prestataire
+    on finances (id_Prestataire);
+
+create table prestation
+(
+    id                int auto_increment
+        primary key,
+    id_BienImmobilier int            null,
+    id_Prestataire    int            null,
+    typeIntervention  varchar(50)    null,
+    id_Voyageur       int            null,
+    prix              decimal(10, 2) null,
+    date              date           null,
+    statut            varchar(50)    null,
+    nom               varchar(255)   null,
+    description       text           null,
+    id_ClientBailleur int            null,
+    ville             varchar(255)   null,
+    lieux             varchar(255)   null,
+    constraint fk_id_ClientBailleur
+        foreign key (id_ClientBailleur) references clientsBailleurs (id),
+    constraint fk_id_Voyageur
+        foreign key (id_Voyageur) references voyageurs (id),
+    constraint prestation_ibfk_1
+        foreign key (id_BienImmobilier) references bienImo (id),
+    constraint prestation_ibfk_2
+        foreign key (id_Prestataire) references prestataires (id)
 );
+
+create table evaluationPrestation
+(
+    id                int auto_increment
+        primary key,
+    id_BienImmobilier int         null,
+    id_Prestataire    int         null,
+    typeIntervention  varchar(50) null,
+    note              int         null,
+    commentaire       text        null,
+    id_Prestation     int         null,
+    constraint evaluationPrestation_ibfk_1
+        foreign key (id_BienImmobilier) references bienImo (id),
+    constraint evaluationPrestation_ibfk_2
+        foreign key (id_Prestataire) references prestataires (id),
+    constraint fk_id_Prestation
+        foreign key (id_Prestation) references prestation (id),
+    check (`note` between 1 and 5)
+);
+
+create index id_BienImmobilier
+    on evaluationPrestation (id_BienImmobilier);
+
+create index id_Prestataire
+    on evaluationPrestation (id_Prestataire);
+
+create index id_BienImmobilier
+    on prestation (id_BienImmobilier);
+
+create index id_Prestataire
+    on prestation (id_Prestataire);
+
+create table reservation
+(
+    id                int auto_increment
+        primary key,
+    id_BienImmobilier int            null,
+    id_ClientVoyageur int            null,
+    dateDebut         date           null,
+    dateFin           date           null,
+    statut            varchar(50)    null,
+    nomBien           varchar(255)   null,
+    prix              decimal(10, 2) null,
+    cheminImg         varchar(255)   null,
+    id_servicesupp    int            null,
+    constraint reservation_ibfk_1
+        foreign key (id_BienImmobilier) references bienImo (id),
+    constraint reservation_ibfk_2
+        foreign key (id_ClientVoyageur) references voyageurs (id)
+);
+
+create table contrat
+(
+    id               int auto_increment
+        primary key,
+    id_Reservation   int         null,
+    id_Prestation    int         null,
+    id_Prestataire   int         null,
+    id_Bailleur      int         null,
+    id_Voyageur      int         null,
+    typeContrat      varchar(50) null,
+    typeIntervention varchar(50) null,
+    dateDebutContrat date        null,
+    dateFinContrat   date        null,
+    statut           varchar(50) null,
+    constraint contrat_ibfk_1
+        foreign key (id_Reservation) references reservation (id),
+    constraint contrat_ibfk_2
+        foreign key (id_Prestation) references prestation (id),
+    constraint contrat_ibfk_3
+        foreign key (id_Prestataire) references prestataires (id),
+    constraint contrat_ibfk_4
+        foreign key (id_Bailleur) references clientsBailleurs (id),
+    constraint contrat_ibfk_5
+        foreign key (id_Voyageur) references voyageurs (id)
+);
+
+create index id_Bailleur
+    on contrat (id_Bailleur);
+
+create index id_Prestataire
+    on contrat (id_Prestataire);
+
+create index id_Prestation
+    on contrat (id_Prestation);
+
+create index id_Reservation
+    on contrat (id_Reservation);
+
+create index id_Voyageur
+    on contrat (id_Voyageur);
+
+create table etatDesLieux
+(
+    id                 int auto_increment
+        primary key,
+    id_BienImmobilier  int                                       null,
+    id_Bailleur        int                                       null,
+    id_Reservation     int                                       null,
+    typeEtat           enum ('arrivee', 'depart')                null,
+    dateEtat           date                                      null,
+    etatGeneral        varchar(255)                              null,
+    piecesManquantes   text                                      null,
+    dommagesConstates  text                                      null,
+    signatureBailleur  tinyint(1)                                null,
+    signatureLocataire tinyint(1)                                null,
+    status             enum ('en attente', 'valide', 'conteste') null,
+    constraint etatDesLieux_ibfk_1
+        foreign key (id_BienImmobilier) references bienImo (id),
+    constraint etatDesLieux_ibfk_2
+        foreign key (id_Bailleur) references clientsBailleurs (id),
+    constraint etatDesLieux_ibfk_3
+        foreign key (id_Reservation) references reservation (id)
+);
+
+create index id_Bailleur
+    on etatDesLieux (id_Bailleur);
+
+create index id_BienImmobilier
+    on etatDesLieux (id_BienImmobilier);
+
+create index id_Reservation
+    on etatDesLieux (id_Reservation);
+
+create table facture
+(
+    id                int auto_increment
+        primary key,
+    id_Reservation    int            null,
+    id_ClientBailleur int            null,
+    montantTotal      decimal(10, 2) null,
+    dateEmission      date           null,
+    constraint facture_ibfk_1
+        foreign key (id_Reservation) references reservation (id),
+    constraint facture_ibfk_2
+        foreign key (id_ClientBailleur) references clientsBailleurs (id)
+);
+
+create index id_ClientBailleur
+    on facture (id_ClientBailleur);
+
+create index id_Reservation
+    on facture (id_Reservation);
+
+create table paiement
+(
+    id              int auto_increment
+        primary key,
+    id_Reservation  int            null,
+    montant         decimal(10, 2) null,
+    datePaiement    date           null,
+    methodePaiement varchar(50)    null,
+    statut          varchar(50)    null,
+    nom             varchar(255)   null,
+    id_Utilisateur  int            null,
+    typeUtilisateur varchar(50)    null,
+    constraint paiement_ibfk_1
+        foreign key (id_Reservation) references reservation (id)
+);
+
+create index id_Reservation
+    on paiement (id_Reservation);
+
+create index id_BienImmobilier
+    on reservation (id_BienImmobilier);
+
+create index id_ClientVoyageur
+    on reservation (id_ClientVoyageur);
+
+create table signalement
+(
+    id                int auto_increment
+        primary key,
+    id_ClientBailleur int         null,
+    id_Voyageur       int         null,
+    id_Prestataire    int         null,
+    sujet             text        null,
+    statut            tinyint     null,
+    commentaire       text        null,
+    responsable       varchar(10) null,
+    constraint signalement_ibfk_1
+        foreign key (id_ClientBailleur) references clientsBailleurs (id),
+    constraint signalement_ibfk_2
+        foreign key (id_Voyageur) references voyageurs (id),
+    constraint signalement_ibfk_3
+        foreign key (id_Prestataire) references prestataires (id)
+);
+
+create index id_ClientBailleur
+    on signalement (id_ClientBailleur);
+
+create index id_Prestataire
+    on signalement (id_Prestataire);
+
+create index id_Voyageur
+    on signalement (id_Voyageur);
+
+message.txt
+14 Ko

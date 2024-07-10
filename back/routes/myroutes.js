@@ -1,7 +1,5 @@
 const express = require("express");
 const sequelize = require("../database");
-// const {fs} = require('fs');
-// const path = require('path');
 const { QueryTypes } = require("sequelize");
 const bcrypt = require("bcrypt");
 const multer = require('multer');
@@ -15,22 +13,10 @@ const stripe = require('stripe')(STRIPE_SECRET_KEY);
 const xss = require('xss');
 const URL = process.env.PCS_URL;
 
-// stripe.products.list(
-//   { limit: 10 },
-//   function(err, products) {
-//     // asynchronously called
-//     if (err) {
-//       console.error('Error fetching products:', err);
-//     } else {
-//       console.log('Fetched products:', products);
-//     }
-//   }
-// );
 
 
 router.get('/users/mean-age', async (req, res) => {
   try {
-    // SQL query to calculate mean age
     const query = `
         SELECT AVG(age) AS mean_age FROM (
             SELECT TIMESTAMPDIFF(YEAR, dateDeNaissance, CURDATE()) AS age FROM voyageurs
@@ -41,10 +27,8 @@ router.get('/users/mean-age', async (req, res) => {
         ) AS all_users;
         `;
 
-    // Execute the query
     const [result] = await sequelize.query(query, { type: QueryTypes.SELECT });
 
-    // Send the result as a response
     res.json(result);
   } catch (error) {
     console.error('Error fetching mean age:', error);
@@ -52,20 +36,18 @@ router.get('/users/mean-age', async (req, res) => {
   }
 });
 
-// Multer configuration
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/'); // Directory to store uploaded files
+    cb(null, 'uploads/');
   },
   filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname)); // Appends current timestamp to original file name
+    cb(null, Date.now() + path.extname(file.originalname)); 
   }
 });
 
 const upload = multer({ storage: storage });
 
-
-//
 
 
 router.delete("/users/:id/debannis", async (req, res) => {
@@ -118,7 +100,6 @@ router.delete("/users/:userType/:id", async (req, res) => {
 
   try {
     await sequelize.transaction(async (t) => {
-      // Handle foreign key dependencies
       if (userType in dependencies) {
         for (const { table, foreignKey } of dependencies[userType]) {
           await sequelize.query(`DELETE FROM ${table} WHERE ${foreignKey} = :id`, {
@@ -128,7 +109,6 @@ router.delete("/users/:userType/:id", async (req, res) => {
         }
       }
 
-      // Delete the user
       await sequelize.query(`DELETE FROM ${userType} WHERE id = :id`, {
         replacements: { id },
         transaction: t
@@ -142,23 +122,20 @@ router.delete("/users/:userType/:id", async (req, res) => {
   }
 });
 
+// ROUTES TEST
 
-// Home route
 router.get("/", (req, res) => {
   res.send("Home Page Route");
 });
 
-// About route
 router.get("/about", (req, res) => {
   res.send("About Page Route");
 });
 
-// Portfolio route
 router.get("/portfolio", (req, res) => {
   res.send("Portfolio Page Route");
 });
 
-// Services route
 router.get("/services", (req, res) => {
   res.send("Services Page Route");
 });
@@ -215,7 +192,6 @@ router.get("/users/:id/:type", async (req, res) => {
     `SELECT * FROM ${type} WHERE id = ${id}`
   );
   console.log(users);
-  console.log("APPELER");
   res.send(users[0]);
 });
 
@@ -224,7 +200,7 @@ router.post("/users/code/:code", async (req, res) => {
   console.log("Verifying code...", code);
 
   try {
-    // Check if the temporary table exists
+
     const tableExists = await sequelize.query(`SHOW TABLES LIKE '${code}'`, {
       type: QueryTypes.SELECT,
     });
@@ -232,7 +208,7 @@ router.post("/users/code/:code", async (req, res) => {
     if (tableExists.length === 0) {
       return res.status(404).send("Table temporaire introuvable");
     } else {
-      // Get data from the temporary table
+
       const tempTableData = await sequelize.query(`SELECT * FROM \`${code}\``, {
         type: QueryTypes.SELECT,
       });
@@ -241,7 +217,6 @@ router.post("/users/code/:code", async (req, res) => {
         return res.status(404).send("La table temporaire est vide");
       }
 
-      // Insert data into the permanent table using parameterized queries
       for (const row of tempTableData) {
         await sequelize.query(
           `INSERT INTO ${row.type} (nom, prenom, adresseMail, motDePasse, admin, dateDeNaissance) 
@@ -259,7 +234,6 @@ router.post("/users/code/:code", async (req, res) => {
         );
       }
 
-      // Drop the temporary table
       await sequelize.query(`DROP TABLE \`${code}\``);
     }
 
@@ -311,7 +285,6 @@ router.post("/users/bannir/ausecours/:id/:type", async (req, res) => {
   const { id, type } = req.params;
   const { nom, prenom, adresseMail } = req.body;
 
-  // Object to map user types to their related table dependencies
   const dependencies = {
     clientsBailleurs: [
       { table: "bienImo", foreignKey: "id_ClientBailleur" },
@@ -342,7 +315,7 @@ router.post("/users/bannir/ausecours/:id/:type", async (req, res) => {
 
   try {
     await sequelize.transaction(async (t) => {
-      // Insert banned user data
+
       await sequelize.query(
         `INSERT INTO userBannis (nom, prenom, adresseMail, dateBanissement) VALUES (:nom, :prenom, :adresseMail, NOW());`,
         {
@@ -351,7 +324,7 @@ router.post("/users/bannir/ausecours/:id/:type", async (req, res) => {
         }
       );
 
-      // Remove foreign key constraints dynamically
+
       if (type in dependencies) {
         for (const { table, foreignKey } of dependencies[type]) {
           await sequelize.query(`DELETE FROM ${table} WHERE ${foreignKey} = :id`, {
@@ -361,7 +334,7 @@ router.post("/users/bannir/ausecours/:id/:type", async (req, res) => {
         }
       }
 
-      // Delete user from specific table
+
       await sequelize.query(`DELETE FROM ${type} WHERE id = :id`, {
         replacements: { id },
         transaction: t
@@ -472,7 +445,7 @@ router.get('/bienImo/prixMoy', async (req, res) => {
     const result = await sequelize.query(`
       SELECT AVG(prix) AS prixMoy FROM bienImo;
     `);
-    const prixMoy = result[0][0].prixMoy; // Extracting the average price from the result
+    const prixMoy = result[0][0].prixMoy; 
     res.json({ prixMoy });
   } catch (error) {
     console.error('Error fetching prixMoy:', error);
@@ -534,7 +507,7 @@ router.delete('/bienImo/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
-    // Get the paths of the associated images
+
     const [results] = await sequelize.query(
       `SELECT imagePath FROM bienImoImages WHERE bienImoId = ${id}`
     );
@@ -542,7 +515,6 @@ router.delete('/bienImo/:id', async (req, res) => {
     const imagePaths = results.map(row => row.imagePath);
     console.log('imagePaths:', imagePaths);
 
-    // Delete the images from the filesystem
     for (const imgPath of imagePaths) {
       const fullPath = path.join(__dirname, '..', imgPath);
       try {
@@ -553,7 +525,6 @@ router.delete('/bienImo/:id', async (req, res) => {
       }
     }
 
-    // Level 2 tables
     await sequelize.query(
       `DELETE FROM contrat WHERE id_Reservation IN (SELECT id FROM reservation WHERE id_BienImmobilier = ${id})`
     );
@@ -573,7 +544,6 @@ router.delete('/bienImo/:id', async (req, res) => {
       `DELETE FROM paiement WHERE id_Reservation IN (SELECT id FROM reservation WHERE id_BienImmobilier = ${id})`
     );
 
-    // Level 1 tables
     await sequelize.query(
       `DELETE FROM bienImoImages WHERE bienImoId = ${id}`
     );
@@ -590,7 +560,6 @@ router.delete('/bienImo/:id', async (req, res) => {
       `DELETE FROM reservation WHERE id_BienImmobilier = ${id}`
     );
 
-    // Finally, delete the bienImo record
     await sequelize.query(
       `DELETE FROM bienImo WHERE id = ${id}`
     );
@@ -609,7 +578,6 @@ router.post('/bienImo', upload.array('pictures', 10), async (req, res) => {
 
   const formData = req.body;
 
-  // Function to log the FormData contents
   const logFormData = (formData) => {
     for (let [key, value] of Object.entries(formData)) {
       console.log(`${key}: ${value}`);
@@ -618,7 +586,6 @@ router.post('/bienImo', upload.array('pictures', 10), async (req, res) => {
 
   logFormData(formData);
 
-  // Extracting values from the request body
   const {
     nomBien,
     description,
@@ -654,9 +621,9 @@ router.post('/bienImo', upload.array('pictures', 10), async (req, res) => {
 
     const stripePrice = await stripe.prices.create({
 
-      unit_amount: prix * 100, // The price in cents
-      currency: 'eur', // The currency of the price
-      product: product.id, // The ID of the product this price is associated with
+      unit_amount: prix * 100, 
+      currency: 'eur', 
+      product: product.id, 
 
     });
 
@@ -699,7 +666,6 @@ router.post('/bienImo', upload.array('pictures', 10), async (req, res) => {
 });
 
 
-
 router.get("/bienImo/:id", async (req, res) => {
   console.log("route /bienImo/:id called");
   const id = req.params.id;
@@ -716,7 +682,6 @@ router.get("/bienImo/:id", async (req, res) => {
       return res.status(404).json({ message: 'Bien not found' });
     }
 
-    // Extract the main details from the first result
     const bienImo = {
       id: results[0].id,
       ville: results[0].ville,
@@ -744,7 +709,6 @@ router.get("/bienImo/:id", async (req, res) => {
       images: []
     };
 
-    // Add image paths to the images array
     for (const result of results) {
       if (result.imagePath) {
         bienImo.images.push(result.imagePath);
@@ -786,14 +750,13 @@ router.put('/bienImo/:id', upload.array('cheminImg', 10), async (req, res) => {
     adresse,
   } = req.body;
 
-  // Escape single quotes in text fields to prevent SQL injection
   const newDescription = description.replace(/'/g, "''");
   const newNomBien = nomBien.replace(/'/g, "''");
   const newAdresse = adresse.replace(/'/g, "''");
   const newTypeDePropriete = typeDePropriete.replace(/'/g, "''");
 
   try {
-    // Update the bienImo entry
+
     await sequelize.query(
       `UPDATE bienImo SET 
         nomBien = '${newNomBien}', 
@@ -819,18 +782,15 @@ router.put('/bienImo/:id', upload.array('cheminImg', 10), async (req, res) => {
       WHERE id = ${id}`
     );
 
-    // Handle image update if new images are uploaded
     if (req.files && req.files.length > 0) {
       const imagePaths = req.files.map(file => 'uploads/' + file.filename);
 
-      // Insert the new image paths into bienImoImages table
       for (const imagePath of imagePaths) {
         await sequelize.query(
           `INSERT INTO bienImoImages (bienImoId, imagePath) VALUES (${id}, '${imagePath}')`
         );
       }
 
-      // Optionally: Remove old images from filesystem if they are not needed
       const [results] = await sequelize.query(
         `SELECT imagePath FROM bienImoImages WHERE bienImoId = ${id} AND imagePath NOT IN ('${imagePaths.join("','")}')`
       );
@@ -846,7 +806,6 @@ router.put('/bienImo/:id', upload.array('cheminImg', 10), async (req, res) => {
         });
       }
 
-      // Delete old image paths from bienImoImages table
       await sequelize.query(
         `DELETE FROM bienImoImages WHERE bienImoId = ${id} AND imagePath NOT IN ('${imagePaths.join("','")}')`
       );
@@ -935,7 +894,6 @@ router.post('/bienImo/filter', async (req, res) => {
     }
   }
 
-  // Add price range filter
   if (prixMin) {
     if (whereClause === '') {
       whereClause = ' WHERE';
@@ -1117,7 +1075,7 @@ router.post('/bienImo/bienByBailleurId', async (req, res) => {
 
 router.get('/getBienReserve', async (req, res) => {
   const { user } = req.session;
-  const today = new Date().toISOString().split('T')[0]; // Get today's date in 'YYYY-MM-DD' format
+  const today = new Date().toISOString().split('T')[0]; 
 
   try {
     const results = await sequelize.query(`
@@ -1188,13 +1146,11 @@ router.get('/getBienReserve', async (req, res) => {
 router.get('/MyCalendar', async (req, res) => {
   const { user } = req.session;
   try {
-    // Fetch all bienImo associated with the user
+
     const [bienImos] = await sequelize.query(`SELECT * FROM bienImo WHERE id_ClientBailleur = ${user.id}`);
 
-    // Extract the ids of the bienImos
     const bienImoIds = bienImos.map(bienImo => bienImo.id);
 
-    // Fetch all reservations associated with these bienImo
     const [reservations] = await sequelize.query(`SELECT * FROM reservation WHERE id_BienImmobilier IN (${bienImoIds.join(',')})`);
 
     res.json(reservations);
@@ -1357,10 +1313,9 @@ router.delete('/reservation/:id', async (req, res) => {
   console.log('trying to delete reservation:', id);
 
   try {
-    // Delete the associated payment
+
     await sequelize.query(`DELETE FROM paiement WHERE id_Reservation = ${id}`);
 
-    // Delete the reservation
     await sequelize.query(`DELETE FROM reservation WHERE id = ${id}`);
 
     res.send('Reservation and associated payment deleted');
@@ -1402,7 +1357,7 @@ router.post('/reservation', async (req, res) => {
     if (result.length === 0) {
       return res.status(404).send('Bien not found');
     }
-    nomBien = result[0].nomBien; // Extract nomBien from the result set
+    nomBien = result[0].nomBien; 
   } catch (error) {
     console.error('Error fetching bien:', error);
     return res.status(500).send('Failed to fetch bien');
@@ -1417,7 +1372,7 @@ router.post('/reservation', async (req, res) => {
         type: sequelize.QueryTypes.INSERT
       }
     );
-    reservationId = result[0]; // Assuming the ID of the inserted reservation is returned
+    reservationId = result[0];
   } catch (error) {
     console.error('Error creating reservation:', error);
     return res.status(500).send('Error creating reservation');
@@ -1465,29 +1420,6 @@ router.post('/reservation', async (req, res) => {
 });
 
 
-/*
-router.put("/reservation/:id", async (req, res) => {
-  console.log("Modifying reservation :", req.body);
-  const { id } = req.params;
-  const {
-    dateDebut,
-    dateFin,
-    statut,
-  } = req.body;
-
-  try {
-    await sequelize.query(
-      `UPDATE reservation SET dateDebut = '${dateDebut}', dateFin = '${dateFin}', statut = '${statut}' WHERE id = ${id}`
-    );
-  } catch (error) {
-    console.error("Error modifying reservation :", error);
-  }
-
-  res.send("Reservation successfully updated");
-});
-
-*/
-
 router.put('/reservation', async (req, res) => {
     const { id, dateDebut, dateFin } = req.body;
 
@@ -1495,10 +1427,9 @@ router.put('/reservation', async (req, res) => {
     const dateFinFormatted = new Date(dateFin).toISOString().substring(0, 10);
 
     try {
-        // Get the id_BienImmobilier for the reservation being updated
+
         const [[{ id_BienImmobilier }]] = await sequelize.query(`SELECT id_BienImmobilier FROM reservation WHERE id = ${id}`);
 
-        // Check if there are any overlapping reservations
         const [overlappingReservations] = await sequelize.query(`
             SELECT * FROM reservation
             WHERE id_BienImmobilier = ${id_BienImmobilier}
@@ -1592,7 +1523,7 @@ router.get("/reservation/:idVoyageur/voyageur", async (req, res) => {
     }
 
     console.log(reservations);
-    res.send(reservations); // Return the array of reservations
+    res.send(reservations); 
   } catch (error) {
     console.error("Error fetching reservations:", error);
     res.status(500).send("Internal server error");
@@ -1612,14 +1543,12 @@ router.post("/createEtatDesLieux", async (req, res) => {
     status } = req.body;
   const { user } = req.session;
 
-  // Convert signatures to 1 if they are true
   const signatureBailleurValue = signatureBailleur === true ? 1 : signatureBailleur;
   const signatureLocataireValue = signatureLocataire === true ? 1 : signatureLocataire;
 
-  // Sanitize the input data
   const sanitizedData = [
     xss(id_BienImmobilier),
-    xss(user.id), // Use the ID of the currently logged-in user as id_Bailleur
+    xss(user.id), 
     xss(typeEtat),
     xss(dateEtat),
     xss(etatGeneral),
@@ -1632,7 +1561,6 @@ router.post("/createEtatDesLieux", async (req, res) => {
 
   console.log("Sanitized data:", sanitizedData);
 
-  // Check if there is an ongoing reservation for the given id_BienImmobilier
   const [reservation] = await sequelize.query(
     `SELECT * FROM reservation WHERE id_BienImmobilier = ? AND dateDebut <= NOW() AND dateFin >= NOW()`,
     {
@@ -1645,7 +1573,6 @@ router.post("/createEtatDesLieux", async (req, res) => {
     return res.status(400).send("No ongoing reservation found for this property");
   }
 
-  // Add the reservation ID to the sanitized data
   sanitizedData.splice(2, 0, reservation.id);
 
   try {
@@ -1656,10 +1583,10 @@ router.post("/createEtatDesLieux", async (req, res) => {
         type: sequelize.QueryTypes.INSERT
       }
     );
-    res.sendStatus(200); // Send a 200 status code when the operation is successful
+    res.sendStatus(200); 
   } catch (error) {
     console.error("Error creating etat des lieux:", error);
-    res.status(500).send("Error creating etat des lieux"); // Send a 500 status code and an error message when an error occurs
+    res.status(500).send("Error creating etat des lieux"); 
   }
 });
 
@@ -1837,7 +1764,6 @@ router.put("/paiement/:id", async (req, res) => {
   if (montant) query += `montant = '${montant}', `;
   if (statut) query += `statut = '${statut}', `;
 
-  // Remove the last comma and space
   query = query.slice(0, -2);
 
   query += ` WHERE id = ${id}`;
@@ -2034,10 +1960,10 @@ router.get('/prestationsById', async (req, res) => {
 });
 
 router.get('/prestationsByIdPrestation', async (req, res) => {
-  const { idPrestation } = req.query; // Use req.query to get query parameters
+  const { idPrestation } = req.query; 
 
   try {
-    // Fetch the prestation to determine the type of user
+
     const [prestation] = await sequelize.query(
       'SELECT * FROM prestation WHERE id = :idPrestation',
       {
@@ -2050,7 +1976,7 @@ router.get('/prestationsByIdPrestation', async (req, res) => {
       return res.status(404).send('Prestation not found');
     }
 
-    // Determine the type of user and construct the appropriate query
+
     let query = '';
     let replacements = { idPrestation };
 
@@ -2070,7 +1996,6 @@ router.get('/prestationsByIdPrestation', async (req, res) => {
       return res.status(400).send('Prestation does not have a valid user type');
     }
 
-    // Execute the query
     const [result] = await sequelize.query(query, {
       replacements,
       type: sequelize.QueryTypes.SELECT,
@@ -2082,6 +2007,8 @@ router.get('/prestationsByIdPrestation', async (req, res) => {
     res.status(500).send('Error fetching prestation');
   }
 });
+
+
 router.post('/createPrestation', async (req, res) => {
   const { user } = req.session;
   const { id_BienImmobilier, date, lieux, ville, typeIntervention, nom, description } = req.body; // Extract description from req.body
@@ -2118,7 +2045,7 @@ router.get('/prestationsEnAttente', async (req, res) => {
   catch (error) {
     console.error('Error fetching prestation:', error);
     res.status(500).send('An error occurred while fetching the data.');
-    return; // Return to stop execution if an error occurred
+    return; 
   }
 
   try {
@@ -2147,7 +2074,6 @@ router.put('/acceptPrestation/:prestationId', async (req, res) => {
   try {
     await sequelize.query(`UPDATE prestation SET statut = 'ACCEPTEE', id_Prestataire = ${user.id} WHERE id = ${prestationId}`);
 
-    // Fetch the updated prestation record
     const [results] = await sequelize.query(`SELECT * FROM prestation WHERE id = ${prestationId}`);
     const updatedPrestation = results[0];
 
@@ -2192,7 +2118,6 @@ router.put('/archiverPrestation/:prestationId', async (req, res) => {
   try {
     await sequelize.query(`UPDATE prestation SET statut = 'TERMINEE' WHERE id = ${prestationId}`);
 
-    // Fetch the updated prestation record
     const [results] = await sequelize.query(`SELECT * FROM prestation WHERE id = ${prestationId}`);
     const updatedPrestation = results[0];
 
@@ -2209,14 +2134,12 @@ router.post('/upload/avis/:prestationId/:prestataireId', async (req, res) => {
   try {
     const { id_BienImmobilier, id_Prestataire, typeIntervention, note, commentaire, id_Prestation } = req.body;
 
-    // Check if all required fields are provided, except id_BienImmobilier which is optional
     if (!id_Prestataire || !typeIntervention || !note || !commentaire || !id_Prestation) {
       return res.status(400).json({ error: 'All fields except id_BienImmobilier are required' });
     }
 
     let query, replacements;
 
-    // Construct query and replacements based on the presence of id_BienImmobilier
     if (id_BienImmobilier) {
       query = 'INSERT INTO evaluationPrestation (id_BienImmobilier, id_Prestataire, typeIntervention, note, commentaire, id_Prestation) VALUES (?, ?, ?, ?, ?, ?)';
       replacements = [id_BienImmobilier, id_Prestataire, typeIntervention, note, commentaire, id_Prestation];
@@ -2225,13 +2148,11 @@ router.post('/upload/avis/:prestationId/:prestataireId', async (req, res) => {
       replacements = [id_Prestataire, typeIntervention, note, commentaire, id_Prestation];
     }
 
-    // Insert into database
     const result = await sequelize.query(query, {
       replacements: replacements,
       type: QueryTypes.INSERT
     });
 
-    // Send success response
     res.status(201).json({ message: 'Evaluation inserted successfully', evaluationId: result[0] }); // result[0] contains the inserted id
   } catch (error) {
     console.error('Error inserting evaluation:', error);
@@ -2277,13 +2198,12 @@ router.get('/avis/general/:prestataireId', async (req, res) => {
   }
 });
 
-// Evaluations Route
 router.get('/evaluations/avis/:prestataireId', async (req, res) => {
   console.log('Route /avis/evaluations/:prestataireId called');
   const { prestataireId } = req.params;
 
   try {
-    // Query for evaluations with id_ClientBailleur
+
     const clientBailleurEvaluations = await sequelize.query(`
       SELECT 
         pon.*, 
@@ -2306,7 +2226,6 @@ router.get('/evaluations/avis/:prestataireId', async (req, res) => {
         type: sequelize.QueryTypes.SELECT,
       });
 
-    // Query for evaluations with id_Voyageur
     const voyageurEvaluations = await sequelize.query(`
       SELECT 
         pon.*, 
@@ -2329,7 +2248,6 @@ router.get('/evaluations/avis/:prestataireId', async (req, res) => {
         type: sequelize.QueryTypes.SELECT,
       });
 
-    // Combine the results from both queries
     const evaluations = clientBailleurEvaluations.concat(voyageurEvaluations);
 
     res.json(evaluations);
@@ -2338,6 +2256,8 @@ router.get('/evaluations/avis/:prestataireId', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+
 router.get('/avis/:prestationId/:prestataireId', async (req, res) => {
   const { prestationId, prestataireId } = req.params;
 
@@ -2439,7 +2359,7 @@ router.get('/discussionsOfUser', async (req, res) => {
 router.post('/messagesOfDiscussionById', async (req, res) => {
   console.log('Route /messagesOfDiscussionById called');
   const { user } = req.session;
-  const { id_receiver, type_receiver } = req.body; // Get parameters from request body for POST
+  const { id_receiver, type_receiver } = req.body; 
   try {
     const [messages] = await sequelize.query(`
       SELECT * FROM messages 
@@ -2501,7 +2421,6 @@ const fs = require('fs');
 router.post('/save-pdf', upload.single('file'), (req, res) => {
   const pdfFile = req.file;
 
-  // Ensure the file is a PDF
   if (pdfFile.mimetype !== 'application/pdf') {
     return res.status(400).send('Invalid file type');
   }
@@ -2597,7 +2516,6 @@ router.get('/financesByUserId', async (req, res) => {
 });
 
 router.get('/download/:file', (req, res) => {
-  // Adjust the path to point to the correct location of the uploads directory
   const filePath = path.resolve(__dirname, '..', 'uploads', req.params.file);
   res.download(filePath, req.params.file, (err) => {
     if (err) {
@@ -2642,7 +2560,7 @@ router.post('/signalement', async (req, res) => {
     query += 'sujet, statut) ';
     values += ':sujet, :statut)';
     replacements.sujet = sujet;
-    replacements.statut = 0; // Added statut with a default value of 1
+    replacements.statut = 0; 
 
     query += values;
 
@@ -2695,13 +2613,12 @@ router.get('/demandeDomaine', async (req, res) => {
 }
 );
 
-
 router.post('/handleDemandeDomaine', async (req, res) => {
   const { id, statut } = req.body;
   console.log('Handling demandeDomaine:', req.body);
 
   try {
-      // Fetch the demandeDomaine from the database
+
       const demandeDomaineResult = await sequelize.query(
           `SELECT * FROM demandeDomaine WHERE ID = ${id}`,
           { type: sequelize.QueryTypes.SELECT }
@@ -2714,7 +2631,6 @@ router.post('/handleDemandeDomaine', async (req, res) => {
       const demandeDomaine = demandeDomaineResult[0];
       const { ID_Prestataire, domaine } = demandeDomaine;
 
-      // If the statut is 'valider', assign the domaine to the prestataire
       if (statut === 'valider') {
           const prestataireResult = await sequelize.query(
               `SELECT * FROM prestataires WHERE id = ${ID_Prestataire}`,
@@ -2728,7 +2644,6 @@ router.post('/handleDemandeDomaine', async (req, res) => {
           const prestataire = prestataireResult[0];
           let updatedDomaines = [];
 
-          // Check if the domaine is already a valid JSON array
           if (prestataire.domaine) {
               try {
                   updatedDomaines = JSON.parse(prestataire.domaine);
@@ -2740,7 +2655,6 @@ router.post('/handleDemandeDomaine', async (req, res) => {
               }
           }
 
-          // Add the new domaine to the list if it's not already present
           if (!updatedDomaines.includes(domaine)) {
               updatedDomaines.push(domaine);
           }
@@ -2750,7 +2664,6 @@ router.post('/handleDemandeDomaine', async (req, res) => {
           );
       }
 
-      // Delete the demandeDomaine
       await sequelize.query(
           `DELETE FROM demandeDomaine WHERE ID = ${id}`
       );
@@ -2761,6 +2674,3 @@ router.post('/handleDemandeDomaine', async (req, res) => {
       res.status(500).send("Error handling demandeDomaine");
   }
 });
-
-
-

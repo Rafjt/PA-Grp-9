@@ -61,7 +61,6 @@ const GestionUtilisateur = () => {
         setBannedUsers(donnee);
       } catch (error) {
         console.error("Error fetching users:", error);
-        // Handle error gracefully, such as displaying an error message or retrying the fetch
       }
     };
 
@@ -76,9 +75,7 @@ const GestionUtilisateur = () => {
   };
 
   const handleSubmit = async (e) => {
-    // e.preventDefault();
     const data = await createUser(form);
-    // window.location.reload();
   };
 
   const filteredUsers = Object.keys(users).reduce((acc, userType) => {
@@ -94,7 +91,6 @@ const GestionUtilisateur = () => {
   const handleDelete = async (userId, userType) => {
     try {
       await deleteUser(userId, userType);
-      // Fetch updated data after deleting user
       const updatedUsers = await fetchUsers();
       setUsers(updatedUsers);
     } catch (error) {
@@ -104,16 +100,13 @@ const GestionUtilisateur = () => {
 
   const handleBan = async (userId, userType, userData) => {
     try {
-      // Ban the user
       await banUser(userId, userType, userData);
-      // Fetch updated users after banning
       const updatedUsers = await fetchUsers();
       setUsers({
         ...users,
         [userType]: updatedUsers[userType],
       });
 
-      // Fetch updated banned users after banning
       const updatedBannedUsers = await fetchBannedUsers();
       setBannedUsers(updatedBannedUsers);
     } catch (error) {
@@ -124,7 +117,6 @@ const GestionUtilisateur = () => {
   const unBan = async (userId) => {
     try {
       await unbanUser(userId);
-      // Fetch updated data after unbanning user
       const updatedBannedUsers = await fetchBannedUsers();
       setBannedUsers(updatedBannedUsers);
     } catch (error) {

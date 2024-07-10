@@ -51,7 +51,7 @@ const PerfPresta = () => {
   const getTrimmedNoteMoy = () => {
     if (generalInfo.noteMoy) {
       const notMoyString = generalInfo.noteMoy.toString();
-      const trimmedNotMoy = parseFloat(notMoyString).toFixed(1); // Trim the mean age to one decimal place
+      const trimmedNotMoy = parseFloat(notMoyString).toFixed(1);
       return trimmedNotMoy;
     }
     return 0;

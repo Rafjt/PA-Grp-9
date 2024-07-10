@@ -8,9 +8,9 @@ console.log('Host:', process.env.PCS_DB_HOST);
 const { Sequelize } = require("sequelize");
 
 const sequelize = new Sequelize(
-  process.env.PCS_DB_NAME, // database name
-  process.env.PCS_DB_USER, // username
-  process.env.PCS_DB_PASSWORD, // password
+  process.env.PCS_DB_NAME, 
+  process.env.PCS_DB_USER, 
+  process.env.PCS_DB_PASSWORD, 
   {
     host: process.env.PCS_DB_HOST,
     dialect: 'mysql'

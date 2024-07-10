@@ -62,7 +62,7 @@ const ReserverBien = () => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ pId, numberOfNights, totalCost }) // Include totalCost in the body
+                body: JSON.stringify({ pId, numberOfNights, totalCost }) 
             });
 
             if (response.ok) {
@@ -73,11 +73,9 @@ const ReserverBien = () => {
             }
         }
 
-        // Call the function
         await createCheckoutSession();
     }
 
-    // Check if fetchedData is null before trying to access its properties
     return (
         <div>
             <h1>Récapitulatif de la réservation</h1>

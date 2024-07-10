@@ -91,14 +91,13 @@ const GestionAnnonce = () => {
     
     const handleChange = (e) => {
         if (e.target.type === 'file') {
-            // If the input is a file input, handle the file upload
-            const files = Array.from(e.target.files); // Convert FileList to Array
+            const files = Array.from(e.target.files); 
             setForm({
                 ...form,
-                pictures: [...form.pictures, ...files] // Append new files to existing files
+                pictures: [...form.pictures, ...files] 
             });
         } else {
-            // For other inputs, handle as usual
+
             const value = e.target.type === 'checkbox' ? (e.target.checked ? 1 : 0) : e.target.value;
             setForm({
                 ...form,
@@ -122,7 +121,6 @@ const GestionAnnonce = () => {
           }
         }
       
-        // Log the FormData object to verify its contents
         for (let [key, value] of formData.entries()) {
           console.log(`ICIIIIIIII ${key}: ${value}`);
         }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { getCredentials, fetchFinanceByUserId,BASE_URL } from "../services";
-import './mesDocuments.css'; // Import the CSS file
+import './mesDocuments.css'; 
 
 function MesDocuments() {
     const [finances, setFinances] = useState([]);
@@ -33,9 +33,9 @@ function MesDocuments() {
                 const link = document.createElement('a');
                 link.href = blobUrl;
                 link.download = finance.nomDocument;
-                document.body.appendChild(link); // Append the link to the body
+                document.body.appendChild(link); 
                 link.click();
-                document.body.removeChild(link); // Remove the link after download
+                document.body.removeChild(link); 
     
                 setTimeout(() => window.URL.revokeObjectURL(blobUrl), 100);
             })

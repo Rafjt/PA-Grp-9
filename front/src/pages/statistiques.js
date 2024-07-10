@@ -61,7 +61,7 @@ const Statistiques = () => {
   const getTrimmedMeanAge = () => {
     if (meanAge) {
       const meanAgeString = meanAge.toString();
-      const trimmedAge = parseFloat(meanAgeString).toFixed(1); // Trim the mean age to one decimal place
+      const trimmedAge = parseFloat(meanAgeString).toFixed(1); 
       return trimmedAge;
     }
     return 0;
@@ -90,7 +90,6 @@ const Statistiques = () => {
           Retour
         </button>
         <div className="row">
-          {/* Left column (1/3 of the screen) */}
           <div className="col-md-4">
             {/* Utilisateurs */}
             <div className="rounded p-3 shadow mb-4">
@@ -112,9 +111,7 @@ const Statistiques = () => {
               </ul>
             </div>
           </div>
-          {/* Right column (2/3 of the screen) */}
           <div className="col-md-8">
-            {/* Empty div for the chart */}
             <div className="rounded p-3 shadow" style={{ minHeight: "500px" }}>
               <PieChart
                 counts={[
