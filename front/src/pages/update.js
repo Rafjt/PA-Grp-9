@@ -14,6 +14,15 @@ const Update = () => {
     type: type || 'VOYAGEURS',
     admin: '',
   });
+  const [initialValues, setInitialValues] = useState({
+    nom: '',
+    prenom: '',
+    dateDeNaissance: '',
+    adresseMail: '',
+    motDePasse: '',
+    type: type || 'VOYAGEURS',
+    admin: '',
+  });
 
   useEffect(() => {
     fetchUserById(id, values.type)
@@ -28,9 +37,19 @@ const Update = () => {
           type: values.type,
           admin: data.admin,
         });
+        setInitialValues({
+          nom: data.nom,
+          prenom: data.prenom,
+          dateDeNaissance: data.dateDeNaissance,
+          adresseMail: data.adresseMail,
+          motDePasse: data.motDePasse,
+          type: values.type,
+          admin: data.admin,
+        });
       })
       .catch((error) => console.log(error));
   }, [id, values.type]);
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -51,9 +70,15 @@ const Update = () => {
 
   const handleModify = async (e) => {
     e.preventDefault();
-    console.log('Modifyinggg user:', values);
+    console.log('Modifying user:', values);
     try {
-      const data = await updateUser(id, values.type, values);
+      const changedValues = Object.keys(values).reduce((acc, key) => {
+        if (values[key] !== initialValues[key]) {
+          acc[key] = values[key];
+        }
+        return acc;
+      }, {});
+      const data = await updateUser(id, values.type, changedValues);
     } catch (error) {
       console.log(error);
     }
