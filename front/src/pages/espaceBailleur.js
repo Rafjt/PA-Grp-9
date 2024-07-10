@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { BASE_URL } from "../services";
 import "./espaceBailleur.css";
+import { useTranslation } from "react-i18next";
 
 function EspaceBailleur() {
 
@@ -48,28 +49,35 @@ function EspaceBailleur() {
     const toEspaceDiscussion = () => {
         window.location.href = "/espaceDiscussion";
     }
+    const { t } = useTranslation();
 
     return (
         <div>
             <img src="/paris-tour-eiffel.jpg" alt="bailleur" className="banBailleur" />
-            <h1>Espace Bailleur</h1>
+            <h1>{t('espaceBailleur')}</h1>
             <hr />
             <div className="button-grid">
                 <button className="grid-button" onClick={toMesBiens}>
-                    MES BIENS
+                    {t('mesBiens')}
                 </button>
                 <button className="grid-button" onClick={toMesDoc}>
-                    MES DOCUMENTS ADMINISTRATIF ET PAIEMENTS
+                    {t('mesDocuments')}
                 </button>
-                <button className="grid-button"  onClick={toCreeBien}>
-                    METTRE EN LOCATION UN BIEN
+                <button className="grid-button" onClick={toCreeBien}>
+                    {t('mettreEnLocation')}
                 </button>
                 <button className="grid-button" onClick={toPrestations}>
-                    LOUER OU SUIVRE UN SERVICE
+                    {t('louerService')}
                 </button>
-                <button className="grid-button" onClick={toReport}>SIGNALER UN PROBLÈME</button>
-                <button className="grid-button" onClick={toEtatDesLieux}>GESTION ÉTAT DES LIEUX</button>
-                <button className="grid-button" onClick={toEspaceDiscussion}>MON ESPACE DISCUSSION</button>
+                <button className="grid-button" onClick={toReport}>
+                    {t('signalerProbleme')}
+                </button>
+                <button className="grid-button" onClick={toEtatDesLieux}>
+                    {t('gestionEtatDesLieux')}
+                </button>
+                <button className="grid-button" onClick={toEspaceDiscussion}>
+                    {t('monEspaceDiscussion')}
+                </button>
             </div>
         </div>
     );
