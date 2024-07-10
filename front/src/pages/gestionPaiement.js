@@ -27,8 +27,18 @@ const GestionPaiement = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(form);
-    await createPaiement(form);
+    const newPaiement = await createPaiement(form);
+    fetchPaiement().then((data) => {
+      setPaiements(data);
+      setForm({
+        idReservation: "",
+        nom: "",
+        datePaiement: "",
+        methodePaiement: "",
+        montant: "",
+        statut: "",
+      });
+    });
   };
 
   useEffect(() => {
@@ -62,8 +72,6 @@ const GestionPaiement = () => {
 
   const [editingId, setEditingId] = useState(null);
   const [editingData, setEditingData] = useState({});
-
-  // ... existing code ...
 
   const handleEdit = (paiement) => {
     setEditingId(paiement.id);

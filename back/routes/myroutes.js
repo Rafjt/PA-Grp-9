@@ -1763,14 +1763,55 @@ router.post("/paiement", async (req, res) => {
   let { idReservation, nom, datePaiement, methodePaiement, montant, statut } =
     req.body;
 
-  // If statut is empty, set it to "En attente"
   if (!statut) {
     statut = 'En attente';
   }
 
+  let columns = '';
+  let values = '';
+  let replacements = {};
+
+  if (idReservation) {
+    columns += 'id_Reservation, ';
+    values += ':idReservation, ';
+    replacements.idReservation = idReservation;
+  }
+  if (nom) {
+    columns += 'nom, ';
+    values += ':nom, ';
+    replacements.nom = nom;
+  }
+  if (datePaiement) {
+    columns += 'datePaiement, ';
+    values += ':datePaiement, ';
+    replacements.datePaiement = datePaiement;
+  }
+  if (methodePaiement) {
+    columns += 'methodePaiement, ';
+    values += ':methodePaiement, ';
+    replacements.methodePaiement = methodePaiement;
+  }
+  if (montant) {
+    columns += 'montant, ';
+    values += ':montant, ';
+    replacements.montant = montant;
+  }
+  if (statut) {
+    columns += 'statut, ';
+    values += ':statut, ';
+    replacements.statut = statut;
+  }
+
+  columns = columns.slice(0, -2);
+  values = values.slice(0, -2);
+
   try {
     await sequelize.query(
-      `INSERT INTO paiement (id_Reservation, nom, datePaiement, methodePaiement, montant, statut) VALUES ('${idReservation}', '${nom}', '${datePaiement}', '${methodePaiement}', '${montant}', '${statut}')`
+      `INSERT INTO paiement (${columns}) VALUES (${values})`,
+      {
+        replacements: replacements,
+        type: sequelize.QueryTypes.INSERT,
+      }
     );
   } catch (error) {
     console.error("Error creating paiement:", error);
@@ -1792,10 +1833,21 @@ router.put("/paiement/:id", async (req, res) => {
     statut,
   } = req.body;
 
+  let query = `UPDATE paiement SET `;
+  if (id_Reservation) query += `id_Reservation = '${id_Reservation}', `;
+  if (nom) query += `nom = '${nom}', `;
+  if (datePaiement) query += `datePaiement = '${datePaiement}', `;
+  if (methodePaiement) query += `methodePaiement = '${methodePaiement}', `;
+  if (montant) query += `montant = '${montant}', `;
+  if (statut) query += `statut = '${statut}', `;
+
+  // Remove the last comma and space
+  query = query.slice(0, -2);
+
+  query += ` WHERE id = ${id}`;
+
   try {
-    await sequelize.query(
-      `UPDATE paiement SET id_Reservation = '${id_Reservation}', nom = '${nom}', datePaiement = '${datePaiement}', methodePaiement = '${methodePaiement}', montant = '${montant}', statut = '${statut}' WHERE id = ${id}`
-    );
+    await sequelize.query(query);
   } catch (error) {
     console.error("Error modifying paiement:", error);
   }
