@@ -87,23 +87,61 @@ router.delete("/users/:userType/:id", async (req, res) => {
 
   console.log("Deleting user:", id, userType);
 
-  try {
-    if (userType === 'voyageurs') {
-      // Delete all reservations of the user
-      await sequelize.query(`DELETE FROM reservation WHERE id_ClientVoyageur = ${id}`);
-    } else if (userType === 'clientsBailleurs') {
-      // Delete all BienImo of the user
-      await sequelize.query(`DELETE FROM bienImo WHERE id_ClientBailleur = ${id}`);
-    }
+  // Object to map user types to their related table dependencies
+  const dependencies = {
+    clientsBailleurs: [
+      { table: "bienImo", foreignKey: "id_ClientBailleur" },
+      { table: "contrat", foreignKey: "id_Bailleur" },
+      { table: "facture", foreignKey: "id_ClientBailleur" },
+      { table: "finances", foreignKey: "id_ClientBailleur" },
+      { table: "etatDesLieux", foreignKey: "id_Bailleur" },
+      { table: "signalement", foreignKey: "id_ClientBailleur" },
+      { table: "prestation", foreignKey: "id_ClientBailleur" }
+    ],
+    prestataires: [
+      { table: "contrat", foreignKey: "id_Prestataire" },
+      { table: "evaluationPrestation", foreignKey: "id_Prestataire" },
+      { table: "finances", foreignKey: "id_Prestataire" },
+      { table: "prestation", foreignKey: "id_Prestataire" },
+      { table: "demandeDomaine", foreignKey: "ID_Prestataire" },
+      { table: "signalement", foreignKey: "id_Prestataire" }
+    ],
+    voyageurs: [
+      { table: "abonnement", foreignKey: "id_Voyageur" },
+      { table: "contrat", foreignKey: "id_Voyageur" },
+      { table: "finances", foreignKey: "id_Voyageur" },
+      { table: "prestation", foreignKey: "id_Voyageur" },
+      { table: "reservation", foreignKey: "id_ClientVoyageur" },
+      { table: "signalement", foreignKey: "id_Voyageur" }
+    ]
+  };
 
-    // Delete the user
-    await sequelize.query(`DELETE FROM ${userType} WHERE id = ${id}`);
-    res.send("User deleted");
+  try {
+    await sequelize.transaction(async (t) => {
+      // Handle foreign key dependencies
+      if (userType in dependencies) {
+        for (const { table, foreignKey } of dependencies[userType]) {
+          await sequelize.query(`DELETE FROM ${table} WHERE ${foreignKey} = :id`, {
+            replacements: { id },
+            transaction: t
+          });
+        }
+      }
+
+      // Delete the user
+      await sequelize.query(`DELETE FROM ${userType} WHERE id = :id`, {
+        replacements: { id },
+        transaction: t
+      });
+    });
+
+    res.json("User deleted");
   } catch (error) {
     console.error("Error deleting user:", error);
-    res.status(500).send("Failed to delete user");
+    res.status(500).json("Failed to delete user");
   }
 });
+
 
 // Home route
 router.get("/", (req, res) => {
@@ -274,21 +312,73 @@ router.put("/users/:id/:type", async (req, res) => {
 });
 
 router.post("/users/bannir/ausecours/:id/:type", async (req, res) => {
-  console.log("Modifying user:", req.body);
-  console.log(req);
   const { id, type } = req.params;
   const { nom, prenom, adresseMail } = req.body;
+
+  // Object to map user types to their related table dependencies
+  const dependencies = {
+    clientsBailleurs: [
+      { table: "bienImo", foreignKey: "id_ClientBailleur" },
+      { table: "contrat", foreignKey: "id_Bailleur" },
+      { table: "facture", foreignKey: "id_ClientBailleur" },
+      { table: "finances", foreignKey: "id_ClientBailleur" },
+      { table: "etatDesLieux", foreignKey: "id_Bailleur" },
+      { table: "signalement", foreignKey: "id_ClientBailleur" },
+      { table: "prestation", foreignKey: "id_ClientBailleur" }
+    ],
+    prestataires: [
+      { table: "contrat", foreignKey: "id_Prestataire" },
+      { table: "evaluationPrestation", foreignKey: "id_Prestataire" },
+      { table: "finances", foreignKey: "id_Prestataire" },
+      { table: "prestation", foreignKey: "id_Prestataire" },
+      { table: "demandeDomaine", foreignKey: "ID_Prestataire" },
+      { table: "signalement", foreignKey: "id_Prestataire" }
+    ],
+    voyageurs: [
+      { table: "abonnement", foreignKey: "id_Voyageur" },
+      { table: "contrat", foreignKey: "id_Voyageur" },
+      { table: "finances", foreignKey: "id_Voyageur" },
+      { table: "prestation", foreignKey: "id_Voyageur" },
+      { table: "reservation", foreignKey: "id_ClientVoyageur" },
+      { table: "signalement", foreignKey: "id_Voyageur" }
+    ]
+  };
+
   try {
-    await sequelize.query(
-      `INSERT INTO userBannis ( nom, prenom, adresseMail, dateBanissement) values ('${nom}', '${prenom}', '${adresseMail}', NOW());`
-    );
-    await sequelize.query(`DELETE FROM ${type} where id = ${id}`);
+    await sequelize.transaction(async (t) => {
+      // Insert banned user data
+      await sequelize.query(
+        `INSERT INTO userBannis (nom, prenom, adresseMail, dateBanissement) VALUES (:nom, :prenom, :adresseMail, NOW());`,
+        {
+          replacements: { nom, prenom, adresseMail },
+          transaction: t
+        }
+      );
+
+      // Remove foreign key constraints dynamically
+      if (type in dependencies) {
+        for (const { table, foreignKey } of dependencies[type]) {
+          await sequelize.query(`DELETE FROM ${table} WHERE ${foreignKey} = :id`, {
+            replacements: { id },
+            transaction: t
+          });
+        }
+      }
+
+      // Delete user from specific table
+      await sequelize.query(`DELETE FROM ${type} WHERE id = :id`, {
+        replacements: { id },
+        transaction: t
+      });
+    });
+
+    res.json("User banned");
   } catch (error) {
     console.error("Error banning user:", error);
-    res.status(500).send("Error banning user");
+    res.status(500).json("Error banning user");
   }
-  res.send("User banned");
 });
+
 
 router.get("/users/bannis", async (req, res) => {
   try {
